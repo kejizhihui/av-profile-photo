@@ -13,19 +13,6 @@ import fnmatch
 from configparser import ConfigParser
 
 
-def UpdateCheck(version):
-    if UpdateCheckSwitch() == '1':
-        html2 = get_html('https://raw.githubusercontent.com/yoshiko2/AV_Data_Capture/master/update_check.json')
-        html = json.loads(str(html2))
-
-        if not version == html['version']:
-            print('[*]                  * New update ' + html['version'] + ' *')
-            print('[*]                     ↓ Download ↓')
-            print('[*] ' + html['download'])
-            print('[*]======================================================')
-    else:
-        print('[+]Update Check disabled!')
-
 
 def movie_lists(escape_folder):
     escape_folder = re.split('[,，]', escape_folder)
@@ -49,25 +36,6 @@ def movie_lists(escape_folder):
     return total
 
 
-def CreatFailedFolder(failed_folder):
-    if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
-        try:
-            os.makedirs(failed_folder + '/')
-        except:
-            print("[-]failed!can not be make folder 'failed'\n[-](Please run as Administrator)")
-            os._exit(0)
-
-
-def CEF(path):
-    try:
-        files = os.listdir(path)  # 获取路径下的子文件(夹)列表
-        for file in files:
-            os.removedirs(path + '/' + file)  # 删除这个空文件夹
-            print('[+]Deleting empty folder', path + '/' + file)
-    except:
-        a = ''
-
-
 def getNumber(filepath):
     filepath = filepath.replace('.\\', '')
     if '-' in filepath or '_' in filepath:  # 普通提取番号 主要处理包含减号-和_的番号
@@ -88,49 +56,3 @@ def getNumber(filepath):
                 "['']").replace('_', '-')
         except:
             return re.search(r'(.+?)\.', filepath)[0]
-
-
-if __name__ == '__main__':
-    version = '2.3'
-    config_file = 'config.ini'
-    config = ConfigParser()
-    config.read(config_file, encoding='UTF-8')
-    success_folder = config['common']['success_output_folder']
-    failed_folder = config['common']['failed_output_folder']  # 失败输出目录
-    escape_folder = config['escape']['folders']  # 多级目录刮削需要排除的目录
-    print('[*]================== AV Data Capture ===================')
-    print('[*]                     Version ' + version)
-    print('[*]======================================================')
-
-    UpdateCheck(version)
-    CreatFailedFolder(failed_folder)
-    os.chdir(os.getcwd())
-    movie_list = movie_lists(escape_folder)
-
-    count = 0
-    count_all = str(len(movie_list))
-    print('[+]Find', count_all, 'movies')
-    if config['common']['soft_link'] == '1':
-        print('[!] --- Soft link mode is ENABLE! ----')
-    for i in movie_list:  # 遍历电影列表 交给core处理
-        count = count + 1
-        percentage = str(count / int(count_all) * 100)[:4] + '%'
-        print('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
-        try:
-            print("[!]Making Data for   [" + i + "], the number is [" + getNumber(i) + "]")
-            core_main(i, getNumber(i))
-            print("[*]======================================================")
-        except:  # 番号提取异常
-            print('[-]' + i + ' Cannot catch the number :')
-            if config['common']['soft_link'] == '1':
-                print('[-]Link', i, 'to failed folder')
-                os.symlink(i, str(os.getcwd()) + '/' + 'failed/')
-            else:
-                print('[-]Move ' + i + ' to failed folder')
-                shutil.move(i, str(os.getcwd()) + '/' + 'failed/')
-            continue
-
-    CEF(success_folder)
-    CEF(failed_folder)
-    print("[+]All finished!!!")
-    input("[+][+]Press enter key exit, you can check the error messge before you exit.")

@@ -139,7 +139,7 @@ def main(number):
             'label': getLabel(b),
             'year': getYear(getRelease(b)),  # str(re.search('\d{4}',getRelease(a)).group()),
             'actor_photo': getActorPhoto(getActor(b)),
-            'website': 'https://javdb3.com' + result1,
+            'website': 'https://javdb.com' + result1,
             'source': 'javdb.py',
         }
         if getNum(b) != number:  # 与搜索到的番号不匹配
