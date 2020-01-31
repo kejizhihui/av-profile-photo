@@ -821,7 +821,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================AVDC刮削主功能
     def UpdateCheck(self, version, config):
         if UpdateCheckSwitch(config) == '1':
-            html2 = get_html('https://raw.githubusercontent.com/yoshiko2/AV_Data_Capture/master/update_check.json')
+            html2 = get_html('https://raw.githubusercontent.com/moyy996/AVDC/master/update_check.json')
             html = json.loads(str(html2))
 
             if not version == html['version']:
@@ -850,7 +850,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[+]Deleting empty folder error!')
 
     def AVDC_Main(self):
-        version = '2.3'
+        version = '3.0'
         config_file = 'config.ini'
         config = ConfigParser()
         config.read(config_file, encoding='UTF-8')
