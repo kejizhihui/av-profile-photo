@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import threading
-from lxml import etree
-import sys
-import requests
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap
@@ -11,37 +8,16 @@ from PyQt5.QtGui import QTextCursor, QCursor
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSignal, QThread, Qt
 from AVDC import *
-import json
-import time
 from AVDC_EACH import *
-from AVDC_DETCH import *
-from core import *
-import glob
 import os
+import sys
 import time
-from ADC_function import *
-import json
-import shutil
-import fnmatch
-from configparser import ConfigParser
-import re
-import os
 import os.path
-import shutil
 from PIL import Image
-import time
 import json
-from ADC_function import *
 from configparser import ConfigParser
-import argparse
-# =========website========
 from AV_Data_Capture import *
-from fc2fans_club import *
-from siro import *
-from avsox import *
-from javbus import *
 from core import *
-from javdb import *
 from fanza import *
 import requests
 
@@ -56,14 +32,16 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init_Ui()
         self.Init()
         self.Load_Config()
+        self.update_version()
 
     def Init_Ui(self):
         pix = QPixmap('AVDC-ico.png')
         self.Ui.label_ico.setScaledContents(True)
         self.Ui.label_ico.setPixmap(pix)
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
-        self.setWindowOpacity(0.9)  # 设置窗口透明度
+        # self.setWindowOpacity(0.9)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+
         self.Ui.widget_setting.setStyleSheet(
             '''
             QWidget#widget_setting{
@@ -97,13 +75,20 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     padding:2px 4px;
             }            
             QTextBrowser#textBrowser_about{
-                    background:gray;
+                    background:white;
                     border:1px solid white;
                     width:300px;
                     border-radius:10px;
                     padding:2px 4px;
             }            
-            QPushButton#pushButton_start_cap,#pushButton_javdb_sp,#pushButton_move_mp4{
+            QTextBrowser#textBrowser_warning{
+                    background:gray;
+                    border:1px solid gray;
+                    width:300px;
+                    border-radius:10px;
+                    padding:2px 4px;
+            }            
+            QPushButton#pushButton_start_cap,#pushButton_javdb_sp,#pushButton_move_mp4,#pushButton_select_file{
                     font-size:20px;
                     background:#F0F8FF;
                     border:2px solid white;
@@ -128,16 +113,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.pushButton_main.clicked.connect(self.pushButton_main_clicked)
         self.Ui.pushButton_tool.clicked.connect(self.pushButton_tool_clicked)
         self.Ui.pushButton_setting.clicked.connect(self.pushButton_setting_clicked)
-        self.Ui.pushButton_javdb_sp.clicked.connect(self.pushButton_javdb_sp_clicked)
+        self.Ui.pushButton_select_file.clicked.connect(self.pushButton_select_file_clicked)
         self.Ui.pushButton_about.clicked.connect(self.pushButton_about_clicked)
         self.Ui.pushButton_start_cap.clicked.connect(self.pushButton_start_cap_clicked)
         self.Ui.pushButton_save_config.clicked.connect(self.pushButton_save_config_clicked)
         self.Ui.pushButton_move_mp4.clicked.connect(self.move_file)
-        # 对javdb爬虫的初始化
-        self.Ui.progressBar.setValue(0)
-        self.Ui.pushButton_start_javdb.clicked.connect(self.start)
-        self.progressBarValue.connect(self.set_processbar)
-        self.Ui.checkBox_cover.stateChanged.connect(self.cover_change)
 
     # ========================================================================加载config
     def Load_Config(self):
@@ -177,6 +157,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_media_name.setText(config['Name_Rule']['naming_rule'])
         self.Ui.lineEdit_escape_dir_move.setText(config['escape']['folders'])
 
+    # ========================================================================检测更新
+    def update_version(self):
+        version = '3.1'
+        self.add_text_main('[*]================== AV Data Capture ===================')
+        self.add_text_main('[*]                     Version ' + version)
+        self.add_text_main('[*]======================================================')
+        self.UpdateCheck(version)
+
     # ========================================================================鼠标拖动窗口
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
@@ -206,16 +194,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.stackedWidget.setCurrentIndex(0)
 
     def pushButton_tool_clicked(self):
-        self.Ui.stackedWidget.setCurrentIndex(2)
-
-    def pushButton_setting_clicked(self):
-        self.Ui.stackedWidget.setCurrentIndex(3)
-
-    def pushButton_javdb_sp_clicked(self):
         self.Ui.stackedWidget.setCurrentIndex(1)
 
+    def pushButton_setting_clicked(self):
+        self.Ui.stackedWidget.setCurrentIndex(2)
+
     def pushButton_about_clicked(self):
-        self.Ui.stackedWidget.setCurrentIndex(4)
+        self.Ui.stackedWidget.setCurrentIndex(3)
 
     def pushButton_start_cap_clicked(self):
         try:
@@ -278,6 +263,29 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         }
         save_config(json_config)
 
+    # ========================================================================小工具-单视频刮削
+    def pushButton_select_file_clicked(self):
+        fileName, fileType = QtWidgets.QFileDialog.getOpenFileName(self, "选取文件", os.getcwd(),
+                                                                   "Movie Files(*.mp4 *.avi *.rmvb "
+                                                                   "*.wmv *.mov *.mkv *.flv *.ts *.MP4 *.AVI *.RMVB "
+                                                                   "*.WMV *.MOV *.MKV *.FLV *.TS);;All Files(*)")
+
+        self.Ui.stackedWidget.setCurrentIndex(0)
+        try:
+            t = threading.Thread(target=self.select_file_thread, args=(fileName,))
+            t.start()  # 启动线程,即让线程开始执行
+        except Exception:
+            self.add_text_main('[-]Thread Select File Error!')
+
+    def select_file_thread(self, file_name):
+        file_root = os.getcwd().replace("\\\\", "/").replace("\\", "/")
+        file_path = file_name.replace(file_root, '.').replace("\\\\", "/").replace("\\", "/")
+        file_name = os.path.splitext(file_name.split('/')[-1])[0]
+        print(file_name, file_path, file_root)
+        self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
+        self.core_main(file_path, file_name)
+        self.add_text_main("[*]======================================================")
+
     # ========================================================================小工具-视频移动
     def move_file(self):
         self.Ui.stackedWidget.setCurrentIndex(0)
@@ -290,19 +298,26 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def move_file_thread(self):
         escape_dir = self.Ui.lineEdit_escape_dir_move.text()
         movie_list = movie_lists(escape_dir)
+        self.add_text_main('[+]Move Movies Start! Find ' + str(len(movie_list)) + ' Movies')
         for movie in movie_list:
             sour = movie
-            lenth = len(sour.split('\\'))
-            des = os.getcwd() + '\\' + sour.split('\\')[lenth - 1]
+            lenth = len(sour.split('/'))
+            des = os.getcwd() + '/' + sour.split('/')[lenth - 1]
             try:
-                if len(sour.split('\\')) > 2:
+                if len(sour.split('/')) > 2:
                     shutil.move(sour, des)
-                    self.add_text_main('[+]Move ' + sour.split('\\')[lenth - 1] + ' Success!')
+                    self.add_text_main('   [+]Move ' + sour.split('/')[lenth - 1] + ' Success!')
             except:
-                self.add_text_main('[+]Move ' + sour.split('\\')[lenth - 1] + ' Error!')
-        self.add_text_main("[+]All finished!!!")
+                self.add_text_main('[-]   Move ' + sour.split('/')[lenth - 1] + ' Error!')
+        self.add_text_main("[+]Move Movies All Finished!!!")
+        self.add_text_main("[*]======================================================")
 
     # ========================================================================core.py
+    def add_text_main(self, text):
+        time.sleep(0.1)
+        self.Ui.textBrowser_log_main.append(text)
+        self.Ui.textBrowser_log_main.moveCursor(QTextCursor.End)
+
     def moveFailedFolder(self, filepath, failed_folder):
         self.add_text_main('[-]Move to Failed output folder')
         shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
@@ -372,7 +387,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.moveFailedFolder(filepath, failed_folder)
             self.DownloadFileWithFilename(cover, number + c_word + '.jpg', path, Config, filepath, failed_folder)
             if not os.path.getsize(path + '/' + number + c_word + '.jpg') == 0:
-                self.add_text_main('[+]Image Downloaded!' + path + '/' + number + c_word + '.jpg')
+                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '.jpg')
                 return
             i = 1
             while i <= int(Config['proxy']['retry']):
@@ -388,15 +403,15 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 old_name = os.path.join(path, number + c_word + '.jpg')
                 new_name = os.path.join(path, number + c_word + '.jpg')
                 os.rename(old_name, new_name)
-                self.add_text_main('[+]Image Downloaded!' + path + '/' + number + c_word + '.jpg')
+                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '.jpg')
             else:
-                self.add_text_main('[+]Image Downloaded!' + path + '/' + number + c_word + '.jpg')
+                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '.jpg')
         elif option == 'plex':
             if self.DownloadFileWithFilename(cover, 'fanart.jpg', path, Config, filepath, failed_folder) == 'failed':
                 self.moveFailedFolder(filepath, failed_folder)
             self.DownloadFileWithFilename(cover, 'fanart.jpg', path, Config, filepath, failed_folder)
             if not os.path.getsize(path + '/fanart.jpg') == 0:
-                self.add_text_main('[+]Image Downloaded!' + path + '/fanart.jpg')
+                self.add_text_main('[+]Image Downloaded! fanart.jpg')
                 return
             i = 1
             while i <= int(Config['proxy']['retry']):
@@ -410,14 +425,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             if not os.path.getsize(path + '/' + number + c_word + '.jpg') == 0:
                 self.add_text_main('[!]Image Download Failed! Trying again.')
                 self.DownloadFileWithFilename(cover, number + c_word + '.jpg', path, Config, filepath, failed_folder)
-            self.add_text_main('[+]Image Downloaded!' + path + '/fanart.jpg')
+            self.add_text_main('[+]Image Downloaded! fanart.jpg')
         elif option == 'kodi':
             if self.DownloadFileWithFilename(cover, number + c_word + '-fanart.jpg', path, Config, filepath,
                                              failed_folder) == 'failed':
                 self.moveFailedFolder(filepath, failed_folder)
             self.DownloadFileWithFilename(cover, number + c_word + '-fanart.jpg', path, Config, filepath, failed_folder)
             if not os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
-                self.add_text_main('[+]Image Downloaded!' + path + '/' + number + c_word + '-fanart.jpg')
+                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '-fanart.jpg')
                 return
             i = 1
             while i <= int(Config['proxy']['retry']):
@@ -429,7 +444,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     continue
                 else:
                     break
-            self.add_text_main('[+]Image Downloaded!' + path + '/' + number + c_word + '-fanart.jpg')
+            self.add_text_main('[+]Image Downloaded! ' + number + c_word + '-fanart.jpg')
 
     def smallCoverCheck(self, path, number, imagecut, cover_small, c_word, option, Config, filepath, failed_folder):
         if imagecut == 3:
@@ -467,154 +482,78 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 os.remove(path + '/1.jpg')
 
     def PrintFiles(self, option, path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder, tag):
-        title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website = get_info(
+        title, studio, year, outline, runtime, director, actor_photo, actor, release, number, cover, website = get_info(
             json_data)
+        naming_rule = naming_rule.split('-')
+        name_title = ''
+        count = 0
+        for rule in naming_rule:
+            if count == 0:
+                name_title += json_data[rule]
+            else:
+                name_title += '-' + json_data[rule]
+            count += 1
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
-            if option == 'plex':
-                with open(path + "/" + number + c_word + ".nfo", "wt", encoding='UTF-8') as code:
-                    print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
-                    print("<movie>", file=code)
-                    print(" <title>" + naming_rule + part + "</title>", file=code)
-                    print("  <set>", file=code)
-                    print("  </set>", file=code)
-                    print("  <studio>" + studio + "+</studio>", file=code)
-                    print("  <year>" + year + "</year>", file=code)
-                    print("  <outline>" + outline + "</outline>", file=code)
-                    print("  <plot>" + outline + "</plot>", file=code)
-                    print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
-                    print("  <director>" + director + "</director>", file=code)
-                    print("  <poster>poster.png</poster>", file=code)
-                    print("  <thumb>thumb.png</thumb>", file=code)
-                    print("  <fanart>fanart.jpg</fanart>", file=code)
-                    try:
-                        for key, value in actor_photo.items():
-                            print("  <actor>", file=code)
-                            print("   <name>" + key + "</name>", file=code)
-                            if not value == '':  # or actor_photo == []:
-                                print("   <thumb>" + value + "</thumb>", file=code)
-                            print("  </actor>", file=code)
-                    except:
-                        aaaa = ''
-                    print("  <maker>" + studio + "</maker>", file=code)
-                    print("  <label>", file=code)
-                    print("  </label>", file=code)
-                    if cn_sub == '1':
-                        print("  <tag>中文字幕</tag>", file=code)
-                    try:
-                        for i in str(json_data['tag']).strip("[ ]").replace("'", '').replace(" ", '').split(','):
-                            print("  <tag>" + i + "</tag>", file=code)
-                    except:
-                        aaaaa = ''
-                    try:
-                        for i in str(json_data['tag']).strip("[ ]").replace("'", '').replace(" ", '').split(','):
-                            print("  <genre>" + i + "</genre>", file=code)
-                    except:
-                        aaaaaaaa = ''
-                    if cn_sub == '1':
-                        print("  <genre>中文字幕</genre>", file=code)
-                    print("  <num>" + number + "</num>", file=code)
-                    print("  <release>" + release + "</release>", file=code)
-                    print("  <cover>" + cover + "</cover>", file=code)
-                    print("  <website>" + website + "</website>", file=code)
-                    print("</movie>", file=code)
-                    self.add_text_main("[+]Writeed!          " + path + "/" + number + ".nfo")
-            elif option == 'emby':
-                with open(path + "/" + number + c_word + ".nfo", "wt", encoding='UTF-8') as code:
-                    print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
-                    print("<movie>", file=code)
-                    print(" <title>" + naming_rule + part + "</title>", file=code)
-                    print("  <set>", file=code)
-                    print("  </set>", file=code)
-                    print("  <studio>" + studio + "+</studio>", file=code)
-                    print("  <year>" + year + "</year>", file=code)
-                    print("  <outline>" + outline + "</outline>", file=code)
-                    print("  <plot>" + outline + "</plot>", file=code)
-                    print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
-                    print("  <director>" + director + "</director>", file=code)
+            with open(path + "/" + number + c_word + ".nfo", "wt", encoding='UTF-8') as code:
+                print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
+                print("<movie>", file=code)
+                print(" <title>" + name_title + part + "</title>", file=code)
+                print("  <set>", file=code)
+                print("  </set>", file=code)
+                print("  <studio>" + studio + "+</studio>", file=code)
+                print("  <year>" + year + "</year>", file=code)
+                print("  <outline>" + outline + "</outline>", file=code)
+                print("  <plot>" + outline + "</plot>", file=code)
+                print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
+                print("  <director>" + director + "</director>", file=code)
+                if option == 'emby':
                     print("  <poster>" + number + c_word + ".png</poster>", file=code)
                     print("  <thumb>" + number + c_word + ".png</thumb>", file=code)
                     print("  <fanart>" + number + c_word + '.jpg' + "</fanart>", file=code)
-                    try:
-                        for key, value in actor_photo.items():
-                            print("  <actor>", file=code)
-                            print("   <name>" + key + "</name>", file=code)
-                            if not value == '':  # or actor_photo == []:
-                                print("   <thumb>" + value + "</thumb>", file=code)
-                            print("  </actor>", file=code)
-                    except:
-                        aaaa = ''
-                    print("  <maker>" + studio + "</maker>", file=code)
-                    print("  <label>", file=code)
-                    print("  </label>", file=code)
-                    if cn_sub == '1':
-                        print("  <tag>中文字幕</tag>", file=code)
-                    try:
-                        for i in tag:
-                            print("  <tag>" + i + "</tag>", file=code)
-                    except:
-                        aaaaa = ''
-                    try:
-                        for i in tag:
-                            print("  <genre>" + i + "</genre>", file=code)
-                    except:
-                        aaaaaaaa = ''
-                    if cn_sub == '1':
-                        print("  <genre>中文字幕</genre>", file=code)
-                    print("  <num>" + number + "</num>", file=code)
-                    print("  <premiered>" + release + "</premiered>", file=code)
-                    print("  <cover>" + cover + "</cover>", file=code)
-                    print("  <website>" + "https://www.javbus.com/" + number + "</website>", file=code)
-                    print("</movie>", file=code)
-                    self.add_text_main("[+]Writeed!          " + path + "/" + number + c_word + ".nfo")
-            elif option == 'kodi':
-                with open(path + "/" + number + c_word + ".nfo", "wt", encoding='UTF-8') as code:
-                    print('<?xml version="1.0" encoding="UTF-8" ?>', file=code)
-                    print("<movie>", file=code)
-                    print(" <title>" + naming_rule + part + "</title>", file=code)
-                    print("  <set>", file=code)
-                    print("  </set>", file=code)
-                    print("  <studio>" + studio + "+</studio>", file=code)
-                    print("  <year>" + year + "</year>", file=code)
-                    print("  <outline>" + outline + "</outline>", file=code)
-                    print("  <plot>" + outline + "</plot>", file=code)
-                    print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
-                    print("  <director>" + director + "</director>", file=code)
+                elif option == 'kodi':
                     print("  <poster>" + number + c_word + "-poster.jpg</poster>", file=code)
                     print("  <fanart>" + number + c_word + '-fanart.jpg' + "</fanart>", file=code)
-                    try:
-                        for key, value in actor_photo.items():
-                            print("  <actor>", file=code)
-                            print("   <name>" + key + "</name>", file=code)
-                            if not value == '':  # or actor_photo == []:
-                                print("   <thumb>" + value + "</thumb>", file=code)
-                            print("  </actor>", file=code)
-                    except:
-                        aaaa = ''
-                    print("  <maker>" + studio + "</maker>", file=code)
-                    print("  <label>", file=code)
-                    print("  </label>", file=code)
-                    if cn_sub == '1':
-                        print("  <tag>中文字幕</tag>", file=code)
-                    try:
-                        for i in tag:
-                            print("  <tag>" + i + "</tag>", file=code)
-                    except:
-                        aaaaa = ''
-                    try:
-                        for i in tag:
-                            print("  <genre>" + i + "</genre>", file=code)
-                    except:
-                        aaaaaaaa = ''
-                    if cn_sub == '1':
-                        print("  <genre>中文字幕</genre>", file=code)
-                    print("  <num>" + number + "</num>", file=code)
+                elif option == 'plex':
+                    print("  <poster>poster.png</poster>", file=code)
+                    print("  <thumb>thumb.png</thumb>", file=code)
+                    print("  <fanart>fanart.jpg</fanart>", file=code)
+                try:
+                    for key, value in actor_photo.items():
+                        print("  <actor>", file=code)
+                        print("   <name>" + key + "</name>", file=code)
+                        if not value == '':  # or actor_photo == []:
+                            print("   <thumb>" + value + "</thumb>", file=code)
+                        print("  </actor>", file=code)
+                except:
+                    aaaa = ''
+                print("  <maker>" + studio + "</maker>", file=code)
+                print("  <label>", file=code)
+                print("  </label>", file=code)
+                if cn_sub == '1':
+                    print("  <tag>中文字幕</tag>", file=code)
+                try:
+                    for i in tag:
+                        print("  <tag>" + i + "</tag>", file=code)
+                except:
+                    aaaaa = ''
+                try:
+                    for i in tag:
+                        print("  <genre>" + i + "</genre>", file=code)
+                except:
+                    aaaaaaaa = ''
+                if cn_sub == '1':
+                    print("  <genre>中文字幕</genre>", file=code)
+                print("  <num>" + number + "</num>", file=code)
+                if option == 'emby':
+                    print("  <premiered>" + release + "</premiered>", file=code)
+                elif option == 'kodi' or option == 'plex':
                     print("  <release>" + release + "</release>", file=code)
-                    print("  <cover>" + cover + "</cover>", file=code)
-                    print("  <website>" + "https://www.javbus.com/" + number + "</website>", file=code)
-                    print("</movie>", file=code)
-                    self.add_text_main("[+]Writeed!          " + path + "/" + number + c_word + ".nfo")
+                print("  <cover>" + cover + "</cover>", file=code)
+                print("  <website>" + website + "</website>", file=code)
+                print("</movie>", file=code)
+                self.add_text_main("[+]Writeed!          " + number + c_word + ".nfo")
         except IOError as e:
             self.add_text_main("[-]Write Failed!")
             self.add_text_main(e)
@@ -742,26 +681,40 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main("[-]failed!Please rename the filename again!")
             self.moveFailedFolder(filepath, failed_folder)
 
-    def debug_mode(self, json_data, config):
-        title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website = get_info(
-            json_data)
+    def debug_mode(self, json_data, config):  # 输出调试信息
         try:
             if config['debug_mode']['switch'] == '1':
                 self.add_text_main('[+] ---Debug info---')
-                for i, v in json_data.items():
-                    if v == '':
+                for key, value in json_data.items():
+                    if value == '' or key == 'actor_photo' or key == 'year' or key == 'imagecut':
                         continue
-                    """
-                    if i == 'outline':
-                        self.add_text_main('[+]  -' + i + '    :' + str(len(v)) + 'characters')
-                        continue
-                    if i == 'actor_photo' or i == 'year':
-                        continue
-                    """
-                    self.add_text_main('[+]  -' + "%-11s" % i + ':' + str(v))
+                    self.add_text_main('   [+]-' + "%-13s" % key + ': ' + str(value))
                 self.add_text_main('[+] ---Debug info---')
         except:
-            self.add_text_main('[+] ---Debug error---')
+            self.add_text_main('[-] ---Debug error---')
+
+    def creatFolder(self, success_folder, json_data, Config):  # 创建文件夹
+        location_rule = json_data['location_rule'].split('/')[-1].split('-')
+        path = ''
+        count = 0
+        for rule in location_rule:
+            if count == 0:
+                path += json_data[rule]
+            else:
+                path += '-' + json_data[rule]
+            count += 1
+        if len(path) > 240:
+            self.add_text_main('[-]Error in Length of Path! Repleaced with Number')
+            path = json_data['number']
+        path = success_folder + '/' + json_data['actor'] + '/' + path
+        if not os.path.exists(path):
+            path = escapePath(path, Config)
+            try:
+                os.makedirs(path)
+            except:
+                self.add_text_main('[-]Error in Makedir Path')
+                return 'error'
+        return path
 
     def core_main(self, file_path, number_th):
         # =======================================================================初始化所需变量
@@ -770,7 +723,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         c_word = ''
         option = ''
         cn_sub = ''
-        path = ''
         config_file = 'config.ini'
         Config = ConfigParser()
         Config.read(config_file, encoding='UTF-8')
@@ -784,6 +736,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         filepath = file_path  # 影片的路径
         number = number_th
         json_data = getDataFromJSON(number, filepath, failed_folder, Config)  # 定义番号
+        self.debug_mode(json_data, Config)  # 调试模式检测
         imagecut = json_data['imagecut']
         tag = json_data['tag']
         if json_data['title'] == '' or number == '':
@@ -798,8 +751,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             c_word = '-C'  # 中文字幕影片后缀
 
         self.CreatFailedFolder(failed_folder)  # 创建输出失败目录
-        self.debug_mode(json_data, Config)  # 调试模式检测
-        path = creatFolder(success_folder, json_data['location_rule'], json_data, Config)  # 创建文件夹
+        path = self.creatFolder(success_folder, json_data, Config)  # 创建文件夹
+        if path == 'error':
+            self.add_text_main('[-]Move ' + file_path + ' to failed folder')
+            shutil.move(file_path, str(os.getcwd()) + '/' + 'failed/')
+            return
+        self.add_text_main('[+]Folder : ' + path)
         # =======================================================================刮削模式
         if program_mode == '1':
             if multi_part == 1:
@@ -819,18 +776,20 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.pasteFileToFolder_mode2(filepath, path, multi_part, number, part, c_word, Config)  # 移动文件
 
     # ========================================================================AVDC刮削主功能
-    def UpdateCheck(self, version, config):
-        if UpdateCheckSwitch(config) == '1':
+    def UpdateCheck(self, version):
+        if self.Ui.radioButton_update_on.isChecked():
+            check = 1
+        else:
+            check = 0
+        if UpdateCheckSwitch(check) == '1':
             html2 = get_html('https://raw.githubusercontent.com/moyy996/AVDC/master/update_check.json')
             html = json.loads(str(html2))
 
-            if not version == html['version']:
+            if float(version) < float(html['version']):
                 self.add_text_main('[*]                  * New update ' + html['version'] + ' *')
                 self.add_text_main('[*]                     ↓ Download ↓')
                 self.add_text_main('[*] ' + html['download'])
                 self.add_text_main('[*]======================================================')
-        else:
-            self.add_text_main('[+]Update Check disabled!')
 
     def CreatFailedFolder(self, failed_folder):
         if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
@@ -850,18 +809,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[+]Deleting empty folder error!')
 
     def AVDC_Main(self):
-        version = '3.0'
         config_file = 'config.ini'
         config = ConfigParser()
         config.read(config_file, encoding='UTF-8')
         success_folder = config['common']['success_output_folder']
         failed_folder = config['common']['failed_output_folder']  # 失败输出目录
         escape_folder = config['escape']['folders']  # 多级目录刮削需要排除的目录
-        self.add_text_main('[*]================== AV Data Capture ===================')
-        self.add_text_main('[*]                     Version ' + version)
-        self.add_text_main('[*]======================================================')
 
-        self.UpdateCheck(version, config)
         self.CreatFailedFolder(failed_folder)
         os.chdir(os.getcwd())
         movie_list = movie_lists(escape_folder)
@@ -871,227 +825,30 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.add_text_main('[+]Find ' + count_all + ' movies')
         if config['common']['soft_link'] == '1':
             self.add_text_main('[!] --- Soft link mode is ENABLE! ----')
-        for i in movie_list:  # 遍历电影列表 交给core处理
+        for movie in movie_list:  # 遍历电影列表 交给core处理
             count = count + 1
             percentage = str(count / int(count_all) * 100)[:4] + '%'
             self.add_text_main('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
             try:
-                self.add_text_main("[!]Making Data for   [" + i + "], the number is [" + getNumber(i) + "]")
-                self.core_main(i, getNumber(i))
+                self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + getNumber(movie) + "]")
+                self.core_main(movie, getNumber(movie))
                 self.add_text_main("[*]======================================================")
             except:  # 番号提取异常
-                self.add_text_main('[-]' + i + ' Cannot catch the number :')
+                self.add_text_main('[-]' + movie + ' Cannot catch the number :')
+                curr_path = str(os.getcwd()).replace('\\', '/')
                 if config['common']['soft_link'] == '1':
-                    self.add_text_main('[-]Link ' + i + ' to failed folder')
-                    os.symlink(i, str(os.getcwd()) + '/' + 'failed/')
+                    self.add_text_main('[-]Link ' + movie + ' to failed folder')
+                    try:
+                        os.symlink(movie, curr_path + '/' + 'failed/')
+                    except:
+                        self.add_text_main('[-]Link ' + movie + ' failed! Please run as Administrator!')
                 else:
-                    self.add_text_main('[-]Move ' + i + ' to failed folder')
-                    shutil.move(i, str(os.getcwd()) + '/' + 'failed/')
+                    self.add_text_main('[-]Move ' + movie + ' to failed folder')
+                    shutil.move(movie, curr_path + '/' + 'failed/')
                 continue
         self.CEF(success_folder)
         self.CEF(failed_folder)
         self.add_text_main("[+]All finished!!!")
-
-    # ========================================================================javdb爬虫部分
-    def cover_change(self):
-        if not self.Ui.checkBox_cover.isChecked():
-            self.Ui.label_pic.setText("封面图")
-            self.Ui.label_cover.setText("缩略图")
-
-    def show_pic(self, number, path):
-        pix = QPixmap(path + '\\' + number + '-fanart.jpg')
-        self.Ui.label_pic.setScaledContents(True)
-        self.Ui.label_pic.setPixmap(pix)
-        pix_cover = QPixmap(path + '\\' + number + '-poster.jpg')
-        self.Ui.label_cover.setScaledContents(True)
-        self.Ui.label_cover.setPixmap(pix_cover)
-
-    def start(self):
-        path = self.Ui.lineEdit_path.text()
-        url = self.Ui.lineEdit_site.text()
-        if url == '':
-            self.add_text('[-]请填写网址！')
-            return
-        elif path == '':
-            self.add_text('[-]请填写路径！')
-            return
-        try:
-            t = threading.Thread(target=self.press_start)
-            t.start()  # 启动线程,即让线程开始执行
-        except Exception:
-            self.add_text('[-]Thread Exist Error!')
-            self.exception()
-
-    def press_start(self):
-        self.Ui.pushButton_start_javdb.setEnabled(False)
-        self.main_sp()
-
-    def add_text_main(self, text):
-        time.sleep(0.1)
-        self.Ui.textBrowser_log_main.append(text)
-        self.Ui.textBrowser_log_main.moveCursor(QTextCursor.End)
-
-    def add_text(self, text):
-        self.Ui.textEdit_log.append(text)
-        self.Ui.textEdit_log.moveCursor(QTextCursor.End)
-
-    def check_jp_us(self, html):
-        title = html.xpath(
-            "//div[@id='videos']/div[@class='grid columns']/div[@class='grid-item column'][1]/a[@class='box']/div["
-            "@class='video-title2']/text()")
-        return title
-
-    def download(self, url, number, path, mode, count):
-        retry_num = 3
-        try:
-            timeout = 10
-            headers = {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
-            r = requests.get(url, headers=headers, timeout=timeout)
-            if r == '':
-                self.add_text('   [-]Image Download Error,Not Found!')
-                # os._exit(0)
-            with open(path + '\\' + number + '-' + mode + '.jpg', "wb") as code:
-                code.write(r.content)
-            code.close()
-            self.add_text('   [+]Image ' + number + '-' + mode + '.jpg Download Success !!')
-            return
-        except:
-            if count <= retry_num:
-                count += 1
-                self.add_text('   [-]Image Download Error! Retry........')
-                self.download(url, number, path, mode, count)
-            else:
-                self.add_text('   [-]Image Download Error!')
-                self.exception()
-
-    def set_processbar(self, value):
-        self.Ui.progressBar.setProperty("value", value)
-
-    def show_grade(self, number, path):
-        baiduDetect_fan = BaiduPicIndentify(number + '-fanart.jpg')
-        grade_fan, result_copy = baiduDetect_fan.detect_face(path)
-        if result_copy != '':
-            self.add_text(result_copy)
-        baiduDetect_pos = BaiduPicIndentify(number + '-poster.jpg')
-        grade_pos, result_copy = baiduDetect_pos.detect_face(path)
-        if result_copy != '':
-            self.add_text(result_copy)
-        self.Ui.label_grade_fan.setText(str('%.2f' % float(grade_fan)))
-        self.Ui.label_grade_pos.setText(str('%.2f' % float(grade_pos)))
-        self.add_text('   [+]fanart-' + str('%.2f' % float(grade_fan)) + '-poster-' + str('%.2f' % float(grade_pos)))
-
-    def get_info(self, html, i, jp_us):
-        title = ''
-        cover = ''
-        site = ''
-        number = ''
-        if jp_us == 0:
-            title = get_title_jp(html, i)
-            number = get_number_jp(html, i)
-            site = get_site_jp(html, i)
-            cover = get_cover_jp(html, i)
-        elif jp_us == 1:
-            title = get_title_us(html, i)
-            number = get_number_us(html, i)
-            site = get_site_us(html, i)
-            cover = get_cover_us(html, i)
-            temp = number
-            number = title
-            title = temp
-        return title, number, site, cover
-
-    def exception(self):
-        self.Ui.pushButton_start_javdb.setEnabled(True)
-        self.Ui.label_pic.setText("封面图")
-        self.Ui.label_cover.setText("缩略图")
-        self.Ui.label_grade_fan.setText('')
-        self.Ui.label_grade_pos.setText('')
-        self.Ui.label_number.setText('')
-        self.Ui.label_actor.setText('')
-
-    def sp(self, url, path):
-        html = {}
-        counts = 0
-        i = 1
-        try:
-            html = get_html(url)
-            # print(html)
-            counts = len(html.xpath(
-                '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\']'))
-        except:
-            html = etree.HTML(html)
-            counts = len(html.xpath(
-                '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\']'))
-            # self.exception()
-        if counts == 0:
-            return
-        # counts = 5
-        self.add_text('count is ' + str(counts))
-        jp_us = len(self.check_jp_us(html))
-        while i <= counts:
-            time.sleep(2)
-            title, number, site, cover = self.get_info(html, i, jp_us)
-            info_each = json.loads(each_main(site))
-            actor_each = info_each['actor']
-            release_each = info_each['release']
-            self.add_text(
-                '[' + str(i) + ']-' + number + '-' + title + '-' + release_each)  # + ' ' + site + ' ' + cover)
-            count_actor = len(actor_each.split(','))
-            if count_actor > 1:
-                actor_each = actor_each.split(',')[0] + '....'
-            self.Ui.label_number.setText(number)
-            self.Ui.label_actor.setText(actor_each)
-            value = int(i / counts * 100)
-            self.progressBarValue.emit(int(value))
-            if count_actor > 1 and self.Ui.checkBox_single.isChecked():
-                i += 1
-                continue
-            self.download(cover, number, path, 'fanart', 1)
-            self.download(info_each['cover'], number, path, 'poster', 1)
-            self.show_grade(number, path)
-            if self.Ui.checkBox_cover.isChecked():
-                self.show_pic(number, path)
-            i += 1
-
-    def main_sp(self):
-        path = self.Ui.lineEdit_path.text()
-        url = self.Ui.lineEdit_site.text()
-        if not os.path.exists(path):
-            os.mkdir(path)
-        write_url(url)
-        num = 1
-        url_new = ''
-        if 'page=' in url:
-            url_new = url.split('page=')[0]
-            num = int(url.split('page=')[1])
-        elif '?' in url:
-            url_new = url + '&'
-        elif '?' not in url:
-            url_new = url + '?'
-        url_new += 'page='
-        if self.Ui.comboBox_page.currentText() == '只本页':
-            self.Ui.label_page.setText(str(num))
-            self.sp(url, path)
-            self.add_text('[+]All Finished!!!')
-            self.exception()
-        elif self.Ui.comboBox_page.currentText() == '此页及以后':
-            page_count = self.Ui.lineEdit_page_num.text()
-            for i in range(0, int(page_count)):
-                self.add_text('Page ' + str(num + i))
-                self.Ui.label_page.setText(str(num + i) + '/' + str(num + int(page_count) - 1))
-                self.sp(url_new + str(num + i), path)
-            self.add_text('[+]All Finished!!!')
-            self.exception()
-        elif self.Ui.comboBox_page.currentText() == '此页及以前':
-            page_count = self.Ui.lineEdit_page_num.text()
-            for i in range(0, int(page_count)):
-                if num - i >= 1:
-                    self.add_text('Page ' + str(num - i))
-                    self.Ui.label_page.setText(str(num - i) + '/' + str(num - int(page_count) + 1))
-                    self.sp(url_new + str(num - i), path)
-            self.add_text('[+]All Finished!!!')
-            self.exception()
 
 
 if __name__ == '__main__':

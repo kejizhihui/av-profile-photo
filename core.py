@@ -1,23 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import re
-import os
-import os.path
 import shutil
-from PIL import Image
-import time
 import json
 from ADC_function import *
-from configparser import ConfigParser
-import argparse
-# =========website========
 import fc2fans_club
 import siro
 import avsox
 import javbus
 import javdb
 import fanza
-import requests
 
 
 # =====================本地文件处理===========================
@@ -76,7 +68,6 @@ def getDataFromJSON(file_number, filepath, failed_folder, config):  # 从JSON返
     title = json_data['title']
     actor_list = str(json_data['actor']).strip("[ ]").replace("'", '').split(',')  # 字符串转列表
     release = json_data['release']
-    number = json_data['number']
     try:
         cover_small = json_data['cover_small']
     except:
@@ -94,14 +85,15 @@ def getDataFromJSON(file_number, filepath, failed_folder, config):  # 从JSON返
     title = title.replace('<', '')
     title = title.replace('>', '')
     title = title.replace('|', '')
+    title = title.replace(' ', '')
     release = release.replace('/', '-')
     tmpArr = cover_small.split(',')
     if len(tmpArr) > 0:
         cover_small = tmpArr[0].strip('\"').strip('\'')
     # ====================处理异常字符 END================== #\/:*?"<>|
 
-    naming_rule = eval(config['Name_Rule']['naming_rule'])
-    location_rule = eval(config['Name_Rule']['location_rule'])
+    naming_rule = config['Name_Rule']['naming_rule']
+    location_rule = config['Name_Rule']['location_rule']
 
     # 返回处理后的json_data
     json_data['title'] = title
@@ -122,30 +114,12 @@ def get_info(json_data):  # 返回json里的数据
     runtime = json_data['runtime']
     director = json_data['director']
     actor_photo = json_data['actor_photo']
+    actor = json_data['actor']
     release = json_data['release']
     number = json_data['number']
     cover = json_data['cover']
     website = json_data['website']
-    return title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website
-
-
-def creatFolder(success_folder, location_rule, json_data, Config):  # 创建文件夹
-    title, studio, year, outline, runtime, director, actor_photo, release, number, cover, website = get_info(json_data)
-    if len(location_rule) > 240:  # 新建成功输出文件夹
-        path = success_folder + '/' + location_rule.replace("'actor'", "'manypeople'", 3).replace("actor",
-                                                                                                  "'manypeople'",
-                                                                                                  3)  # path为影片+元数据所在目录
-    else:
-        path = success_folder + '/' + location_rule
-    if not os.path.exists(path):
-        path = escapePath(path, Config)
-        try:
-            os.makedirs(path)
-        except:
-            path = success_folder + '/' + location_rule.replace('/[' + number + ']-' + title, "/number")
-            path = escapePath(path, Config)
-            os.makedirs(path)
-    return path
+    return title, studio, year, outline, runtime, director, actor_photo, actor, release, number, cover, website
 
 
 def copyRenameJpgToBackdrop(option, path, number, c_word):

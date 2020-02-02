@@ -3,14 +3,7 @@
 
 import requests
 from configparser import ConfigParser
-import os
-import re
-import time
-import sys
 from lxml import etree
-import sys
-import io
-import json
 
 
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
@@ -61,13 +54,10 @@ def ReadMediaWarehouse(config):
     return config['media']['media_warehouse']
 
 
-def UpdateCheckSwitch(config):
-    check = str(config['update']['update_check'])
-    if check == '1':
+def UpdateCheckSwitch(check):
+    if check == 1:
         return '1'
-    elif check == '0':
-        return '0'
-    elif check == '':
+    else:
         return '0'
 
 
