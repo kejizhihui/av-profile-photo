@@ -227,10 +227,7 @@ GUI版：<br>
 
 ---
 ### 5.1.8、关于番号提取失败或者异常
-**目前可以提取元素的影片:JAVBUS、JAVDB、AVSOX上有元数据的电影，素人系列:300Maan,259luxu,siro等,FC2系列**<br>
->下一张图片来自Pockies的blog 原作者已授权<br>
-
-![](https://raw.githubusercontent.com/Pockies/pic/master/741f9461gy1g1cxc31t41j20i804zdgo.jpg)
+**目前可以提取元素的影片:JAVBUS、JAVDB、AVSOX、FANZA、FC2CLUB上有元数据的电影，请确保视频名能在这些网站找到**<br>
 
 ---
 ### 5.1.9、关于PIL/image.py
