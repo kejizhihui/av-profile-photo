@@ -186,6 +186,11 @@ GUI版：<br>
 条件：文件名中间要有下划线或者减号"_","-"，没有多余的内容只有番号为最佳，可以让软件更好获取元数据<br>
 对于多影片重命名，可以用[ReNamer](http://www.den4b.com/products/renamer)来批量重命名<br>
 
+---
+### （11）、网站选择
+**1、All website**: 使用avsox,javbus,fanza,javdb,fc2club进行刮削。<br>
+**2、Only javdb**: 仅使用javdb进行刮削。<br>
+
 ## 3.多目录影片处理
 可以遍历**程序所在目录及子目录**（除指定的**排除目录**），对遍历到的所有视频进行刮削，成功则同**元数据、封面图**一起输出到**JAV_output**目录，失败移入**failed**目录。 
 
