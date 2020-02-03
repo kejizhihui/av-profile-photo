@@ -29,7 +29,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.1'
+        self.version = '3.2'
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -204,6 +204,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.stackedWidget.setCurrentIndex(3)
 
     def pushButton_start_cap_clicked(self):
+        self.Ui.pushButton_start_cap.setEnabled(False)
         try:
             t = threading.Thread(target=self.AVDC_Main)
             t.start()  # 启动线程,即让线程开始执行
@@ -869,9 +870,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     except shutil.Error as error_info:
                         self.add_text_main('[-] ' + str(error_info))
                 continue
+        self.Ui.pushButton_start_cap.setEnabled(True)
         self.CEF(success_folder)
         self.CEF(failed_folder)
         self.add_text_main("[+]All finished!!!")
+        self.add_text_main("[*]======================================================")
 
 
 if __name__ == '__main__':
