@@ -87,7 +87,7 @@ GUI版：<br>
 
 **2、媒体库：以下为刮削、导入后的EMBY**<br>
 **图片来自网络,由于相关法律法规，具体刮削完效果,请自行联想。**<br>
-<div align="center">
+<div>
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/emby.png" height="240">
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/emby_each.png" height="240">
 </div>
