@@ -25,11 +25,15 @@ class Ui_AVDV(object):
         self.pushButton_start_cap.setGeometry(QtCore.QRect(640, 20, 121, 61))
         self.pushButton_start_cap.setObjectName("pushButton_start_cap")
         self.textBrowser_log_main = QtWidgets.QTextBrowser(self.page_avdc)
-        self.textBrowser_log_main.setGeometry(QtCore.QRect(10, 100, 761, 601))
+        self.textBrowser_log_main.setGeometry(QtCore.QRect(10, 100, 761, 581))
         self.textBrowser_log_main.setObjectName("textBrowser_log_main")
         self.textBrowser_warning = QtWidgets.QTextBrowser(self.page_avdc)
         self.textBrowser_warning.setGeometry(QtCore.QRect(140, 30, 361, 41))
         self.textBrowser_warning.setObjectName("textBrowser_warning")
+        self.progressBar_avdc = QtWidgets.QProgressBar(self.page_avdc)
+        self.progressBar_avdc.setGeometry(QtCore.QRect(10, 690, 761, 23))
+        self.progressBar_avdc.setProperty("value", 24)
+        self.progressBar_avdc.setObjectName("progressBar_avdc")
         self.stackedWidget.addWidget(self.page_avdc)
         self.page_tool = QtWidgets.QWidget()
         self.page_tool.setObjectName("page_tool")
@@ -250,7 +254,7 @@ class Ui_AVDV(object):
         AVDV.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(AVDV)
-        self.stackedWidget.setCurrentIndex(2)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(AVDV)
 
     def retranslateUi(self, AVDV):

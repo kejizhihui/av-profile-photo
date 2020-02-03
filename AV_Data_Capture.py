@@ -44,10 +44,13 @@ def getNumber(filepath):
         except:  # 提取类似mkbd-s120番号
             file_number = re.search('\w+-\w+\d+', filename).group()
         return file_number
-    else:  # 提取不含减号-的番号，FANZA CID
+    else:  # 提取不含减号-的番号，FANZA CID 保留ssni00644，将MIDE139改成MIDE-139
         try:
-            return str(
-                re.findall(r'(.+?)\.', str(re.search('([^<>/\\\\|:""\\*\\?]+)\\.\\w+$', filepath).group()))).strip(
-                "['']").replace('_', '-')
+            file_number = os.path.splitext(filepath.split('/')[-1])[0]
+            find_num = re.findall(r'\d+', file_number)[0]
+            find_char = re.findall(r'\D+', file_number)[0]
+            if len(find_num) <= 4 and len(find_char) > 1:
+                file_number = find_char + '-' + find_num
+            return file_number
         except:
-            return re.search(r'(.+?)\.', filepath)[0]
+            return os.path.splitext(filepath.split('/')[-1])[0]

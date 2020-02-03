@@ -22,7 +22,7 @@ import requests
 
 
 class MyMAinWindow(QMainWindow, Ui_AVDV):
-    progressBarValue = pyqtSignal(int)
+    progressBarValue = pyqtSignal(int)  # 进度条信号量
 
     def __init__(self, parent=None):
         super(MyMAinWindow, self).__init__(parent)
@@ -38,6 +38,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         pix = QPixmap('AVDC-ico.png')
         self.Ui.label_ico.setScaledContents(True)
         self.Ui.label_ico.setPixmap(pix)  # 添加图标
+        self.Ui.progressBar_avdc.setValue(0)  # 进度条清0
+        self.progressBarValue.connect(self.set_processbar)
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
@@ -320,7 +322,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def moveFailedFolder(self, filepath, failed_folder):
         self.add_text_main('[-]Move to Failed output folder')
         shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
-        self.add_text_main("[*]======================================================")
         # os._exit(0)
 
     # =====================资源下载部分===========================
@@ -682,6 +683,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main("[-]failed!Please rename the filename again!")
             self.moveFailedFolder(filepath, failed_folder)
 
+    # ========================================================================更新进度条
+    def set_processbar(self, value):
+        self.Ui.progressBar_avdc.setProperty("value", value)
+
     # ========================================================================输出调试信息
     def debug_mode(self, json_data, config):
         try:
@@ -747,6 +752,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if json_data['title'] == '' or number == '':
             self.add_text_main('[-]Movie Data not found!')
             self.moveFailedFolder(filepath, failed_folder)
+            self.add_text_main("[*]======================================================")
             return
         # =======================================================================判断-C,-CD后缀
         if '-CD' in filepath or '-cd' in filepath:
@@ -763,6 +769,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             shutil.move(file_path, str(os.getcwd()) + '/' + 'failed/')
             return
         self.add_text_main('[+]Folder : ' + path)
+        self.add_text_main('[+]From : ' + json_data['website'])
         # =======================================================================刮削模式
         if program_mode == '1':
             if multi_part == 1:
@@ -837,15 +844,17 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[!] --- Soft link mode is ENABLE! ----')
         # =======================================================================遍历电影列表 交给core处理
         for movie in movie_list:  # 遍历电影列表 交给core处理
-            count = count + 1
+            count += 1
             percentage = str(count / int(count_all) * 100)[:4] + '%'
+            value = int(count / int(count_all) * 100)
+            self.progressBarValue.emit(int(value))
             self.add_text_main('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
             try:
                 self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + getNumber(movie) + "]")
                 self.core_main(movie, getNumber(movie))
                 self.add_text_main("[*]======================================================")
             except:  # 番号提取异常
-                self.add_text_main('[-]' + movie + ' Cannot catch the number :')
+                self.add_text_main('[-]Error！' + movie + ' Cannot catch the number :')
                 curr_path = str(os.getcwd()).replace('\\', '/')
                 if config['common']['soft_link'] == '1':
                     self.add_text_main('[-]Link ' + movie + ' to failed folder')
