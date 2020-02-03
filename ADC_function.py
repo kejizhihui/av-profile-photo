@@ -17,6 +17,8 @@ def save_config(json_config):
         print("failed_output_folder = " + json_config['failed_output_folder'], file=code)
         print("success_output_folder = " + json_config['success_output_folder'], file=code)
         print("soft_link = " + str(json_config['soft_link']), file=code)
+        print("website = " + json_config['website'], file=code)
+        print("#all or javdb", file=code)
         print("", file=code)
         print("[proxy]", file=code)
         print("proxy = " + json_config['proxy'], file=code)

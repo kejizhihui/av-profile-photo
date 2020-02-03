@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.0</string>
+   <string>AVDC-3.2</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page_avdc">
      <widget class="QPushButton" name="pushButton_start_cap">
@@ -188,8 +188,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_save_config">
       <property name="geometry">
        <rect>
-        <x>180</x>
-        <y>620</y>
+        <x>140</x>
+        <y>630</y>
         <width>361</width>
         <height>28</height>
        </rect>
@@ -202,7 +202,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>520</y>
+        <y>530</y>
         <width>761</width>
         <height>91</height>
        </rect>
@@ -247,7 +247,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>390</y>
+        <y>400</y>
         <width>751</width>
         <height>121</height>
        </rect>
@@ -304,7 +304,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>10</y>
         <width>751</width>
-        <height>371</height>
+        <height>381</height>
        </rect>
       </property>
       <property name="title">
@@ -314,7 +314,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>240</y>
+         <y>250</y>
          <width>751</width>
          <height>121</height>
         </rect>
@@ -371,7 +371,7 @@ p, li { white-space: pre-wrap; }
          <x>10</x>
          <y>20</y>
          <width>731</width>
-         <height>211</height>
+         <height>221</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -549,6 +549,39 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="text">
             <string>kodi</string>
+           </property>
+          </widget>
+         </widget>
+        </item>
+        <item>
+         <widget class="QGroupBox" name="groupBox_11">
+          <property name="title">
+           <string>网站选择：</string>
+          </property>
+          <widget class="QRadioButton" name="radioButton_all">
+           <property name="geometry">
+            <rect>
+             <x>190</x>
+             <y>10</y>
+             <width>291</width>
+             <height>19</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>All websites</string>
+           </property>
+          </widget>
+          <widget class="QRadioButton" name="radioButton_javdb">
+           <property name="geometry">
+            <rect>
+             <x>490</x>
+             <y>10</y>
+             <width>115</width>
+             <height>19</height>
+            </rect>
+           </property>
+           <property name="text">
+            <string>Only javdb</string>
            </property>
           </widget>
          </widget>

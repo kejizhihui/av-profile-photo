@@ -29,7 +29,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.2'
+        self.version = '3.21'
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -149,6 +149,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.Ui.radioButton_plex.setChecked(True)
         elif config['media']['media_warehouse'] == 'kodi':
             self.Ui.radioButton_kodi.setChecked(True)
+        if config['common']['website'] == 'all':
+            self.Ui.radioButton_all.setChecked(True)
+        elif config['common']['website'] == 'javdb':
+            self.Ui.radioButton_javdb.setChecked(True)
         self.Ui.lineEdit_success.setText(config['common']['success_output_folder'])
         self.Ui.lineEdit_fail.setText(config['common']['failed_output_folder'])
         self.Ui.lineEdit_escape_dir.setText(config['escape']['folders'])
@@ -225,6 +229,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         switch_debug = 0
         update_check = 0
         media_warehouse = ''
+        website = ''
         if self.Ui.radioButton_common.isChecked():  # 普通模式
             main_mode = 1
         elif self.Ui.radioButton_sort.isChecked():  # 整理模式
@@ -247,12 +252,17 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             media_warehouse = 'plex'
         elif self.Ui.radioButton_kodi.isChecked():  # kodi
             media_warehouse = 'kodi'
+        if self.Ui.radioButton_all.isChecked():  # all
+            website = 'all'
+        elif self.Ui.radioButton_javdb.isChecked():  # javdb
+            website = 'javdb'
         json_config = {
             'main_mode': main_mode,
             'soft_link': soft_link,
             'switch_debug': switch_debug,
             'update_check': update_check,
             'media_warehouse': media_warehouse,
+            'website': website,
             'failed_output_folder': self.Ui.lineEdit_fail.text(),
             'success_output_folder': self.Ui.lineEdit_success.text(),
             'proxy': self.Ui.lineEdit_proxy.text(),
@@ -283,7 +293,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         file_root = os.getcwd().replace("\\\\", "/").replace("\\", "/")
         file_path = file_name.replace(file_root, '.').replace("\\\\", "/").replace("\\", "/")
         file_name = os.path.splitext(file_name.split('/')[-1])[0]
-        print(file_name, file_path, file_root)
         self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
         self.core_main(file_path, file_name)
         self.add_text_main("[*]======================================================")
@@ -744,7 +753,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         success_folder = Config['common']['success_output_folder']  # 成功输出目录
         filepath = file_path  # 影片的路径
         number = number_th
-        json_data = getDataFromJSON(number, filepath, failed_folder, Config)  # 定义番号
+        json_data = {}
+        if self.Ui.radioButton_all.isChecked():
+            json_data = getDataFromJSON(number, Config, 1)  # 定义番号
+        elif self.Ui.radioButton_javdb.isChecked():
+            json_data = getDataFromJSON(number, Config, 2)  # 定义番号
         imagecut = json_data['imagecut']
         tag = json_data['tag']
         # =======================================================================调试模式
@@ -753,7 +766,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if json_data['title'] == '' or number == '':
             self.add_text_main('[-]Movie Data not found!')
             self.moveFailedFolder(filepath, failed_folder)
-            self.add_text_main("[*]======================================================")
             return
         # =======================================================================判断-C,-CD后缀
         if '-CD' in filepath or '-cd' in filepath:
