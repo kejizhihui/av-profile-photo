@@ -81,7 +81,7 @@ GUI版：<br>
 
 # 效果图
 **1、输出目录文件结构**<br>
-<div align="center">
+<div>
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/tree-jav-output.png" height="500">
 </div>
 
