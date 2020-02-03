@@ -22,7 +22,6 @@ def escapePath(path, Config):  # Remove escape literals
     return path
 
 
-
 def getDataFromJSON(file_number, filepath, failed_folder, config):  # 从JSON返回元数据
     # ================================================网站规则添加开始================================================
 
@@ -130,5 +129,3 @@ def copyRenameJpgToBackdrop(option, path, number, c_word):
         shutil.copy(path + '/' + number + c_word + '.jpg', path + '/Backdrop.jpg')
     if option == 'kodi':
         shutil.copy(path + '/' + number + c_word + '-fanart.jpg', path + '/Backdrop.jpg')
-
-

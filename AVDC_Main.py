@@ -8,7 +8,6 @@ from PyQt5.QtGui import QTextCursor, QCursor
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import pyqtSignal, QThread, Qt
 from AVDC import *
-from AVDC_EACH import *
 import os
 import sys
 import time
@@ -30,18 +29,19 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
+        self.version = '3.1'
         self.Init()
         self.Load_Config()
-        self.update_version()
+        self.show_version()
 
     def Init_Ui(self):
         pix = QPixmap('AVDC-ico.png')
         self.Ui.label_ico.setScaledContents(True)
-        self.Ui.label_ico.setPixmap(pix)
+        self.Ui.label_ico.setPixmap(pix)  # 添加图标
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
-
+        # 控件美化
         self.Ui.widget_setting.setStyleSheet(
             '''
             QWidget#widget_setting{
@@ -106,6 +106,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             }
             ''')
 
+    # ========================================================================按钮点击事件
     def Init(self):
         self.Ui.stackedWidget.setCurrentIndex(0)
         self.Ui.pushButton_close.clicked.connect(self.close_win)
@@ -157,13 +158,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_media_name.setText(config['Name_Rule']['naming_rule'])
         self.Ui.lineEdit_escape_dir_move.setText(config['escape']['folders'])
 
-    # ========================================================================检测更新
-    def update_version(self):
-        version = '3.1'
-        self.add_text_main('[*]================== AV Data Capture ===================')
-        self.add_text_main('[*]                     Version ' + version)
+    # ========================================================================显示版本号
+    def show_version(self):
+        self.add_text_main('[*]======================== AVDC ========================')
+        self.add_text_main('[*]                     Version ' + self.version)
         self.add_text_main('[*]======================================================')
-        self.UpdateCheck(version)
 
     # ========================================================================鼠标拖动窗口
     def mousePressEvent(self, e):
@@ -481,6 +480,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 img.save(path + '/poster.png')
                 os.remove(path + '/1.jpg')
 
+    # ========================================================================打印NFO
     def PrintFiles(self, option, path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder, tag):
         title, studio, year, outline, runtime, director, actor_photo, actor, release, number, cover, website = get_info(
             json_data)
@@ -681,7 +681,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main("[-]failed!Please rename the filename again!")
             self.moveFailedFolder(filepath, failed_folder)
 
-    def debug_mode(self, json_data, config):  # 输出调试信息
+    # ========================================================================输出调试信息
+    def debug_mode(self, json_data, config):
         try:
             if config['debug_mode']['switch'] == '1':
                 self.add_text_main('[+] ---Debug info---')
@@ -693,7 +694,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         except:
             self.add_text_main('[-] ---Debug error---')
 
-    def creatFolder(self, success_folder, json_data, Config):  # 创建文件夹
+    # ========================================================================创建输出文件夹
+    def creatFolder(self, success_folder, json_data, Config):
         location_rule = json_data['location_rule'].split('/')[-1].split('-')
         path = ''
         count = 0
@@ -736,12 +738,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         filepath = file_path  # 影片的路径
         number = number_th
         json_data = getDataFromJSON(number, filepath, failed_folder, Config)  # 定义番号
-        self.debug_mode(json_data, Config)  # 调试模式检测
         imagecut = json_data['imagecut']
         tag = json_data['tag']
+        # =======================================================================是否找到影片信息
         if json_data['title'] == '' or number == '':
             self.add_text_main('[-]Movie Data not found!')
             self.moveFailedFolder(filepath, failed_folder)
+        # =======================================================================调试模式
+        self.debug_mode(json_data, Config)
         # =======================================================================判断-C,-CD后缀
         if '-CD' in filepath or '-cd' in filepath:
             multi_part = 1
@@ -749,7 +753,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if '-c.' in filepath or '-C.' in filepath or '中文' in filepath or '字幕' in filepath:
             cn_sub = '1'
             c_word = '-C'  # 中文字幕影片后缀
-
+        # =======================================================================创建输出文件夹
         self.CreatFailedFolder(failed_folder)  # 创建输出失败目录
         path = self.creatFolder(success_folder, json_data, Config)  # 创建文件夹
         if path == 'error':
@@ -776,7 +780,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.pasteFileToFolder_mode2(filepath, path, multi_part, number, part, c_word, Config)  # 移动文件
 
     # ========================================================================AVDC刮削主功能
-    def UpdateCheck(self, version):
+    def UpdateCheck(self):
         if self.Ui.radioButton_update_on.isChecked():
             check = 1
         else:
@@ -785,7 +789,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             html2 = get_html('https://raw.githubusercontent.com/moyy996/AVDC/master/update_check.json')
             html = json.loads(str(html2))
 
-            if float(version) < float(html['version']):
+            if float(self.version) < float(html['version']):
                 self.add_text_main('[*]                  * New update ' + html['version'] + ' *')
                 self.add_text_main('[*]                     ↓ Download ↓')
                 self.add_text_main('[*] ' + html['download'])
@@ -806,25 +810,27 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 os.removedirs(path + '/' + file)  # 删除这个空文件夹
                 self.add_text_main('[+]Deleting empty folder' + path + '/' + file)
         except:
-            self.add_text_main('[+]Deleting empty folder error!')
+            print('[+]Deleting empty folder error!')
 
     def AVDC_Main(self):
+        # =======================================================================初始化所需变量
         config_file = 'config.ini'
         config = ConfigParser()
         config.read(config_file, encoding='UTF-8')
         success_folder = config['common']['success_output_folder']
         failed_folder = config['common']['failed_output_folder']  # 失败输出目录
         escape_folder = config['escape']['folders']  # 多级目录刮削需要排除的目录
-
-        self.CreatFailedFolder(failed_folder)
+        # =======================================================================检测更新,新建failed目录,获取影片列表
         os.chdir(os.getcwd())
-        movie_list = movie_lists(escape_folder)
-
+        self.UpdateCheck(self.version)
+        self.CreatFailedFolder(failed_folder)  # 新建failed文件夹
+        movie_list = movie_lists(escape_folder)  # 获取所有需要刮削的影片列表
         count = 0
         count_all = str(len(movie_list))
         self.add_text_main('[+]Find ' + count_all + ' movies')
         if config['common']['soft_link'] == '1':
             self.add_text_main('[!] --- Soft link mode is ENABLE! ----')
+        # =======================================================================遍历电影列表 交给core处理
         for movie in movie_list:  # 遍历电影列表 交给core处理
             count = count + 1
             percentage = str(count / int(count_all) * 100)[:4] + '%'

@@ -7,7 +7,6 @@ from ADC_function import *
 # import sys
 # import io
 # sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
-
 def getTitle(a):
     try:
         html = etree.fromstring(a, etree.HTMLParser())
