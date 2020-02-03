@@ -85,11 +85,11 @@ GUI版：<br>
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/tree-jav-output.png" height="500">
 </div>
 
-**2、媒体库：以下分别为KODI，EMBY**<br>
+**2、媒体库：以下为刮削、导入后的EMBY**<br>
 **图片来自网络,由于相关法律法规，具体刮削完效果,请自行联想。**<br>
 <div align="center">
-<img src="https://i.loli.net/2019/07/04/5d1cf9bb1b08b86592.jpg" height="240">
-<img src="https://i.loli.net/2019/07/04/5d1cf9bb2696937880.jpg" height="240">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby.png" height="240">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby_each.png" height="240">
 </div>
 
 # 如何使用
