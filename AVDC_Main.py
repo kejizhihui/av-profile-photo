@@ -488,11 +488,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         name_title = ''
         count = 0
         for rule in naming_rule:
-            if count == 0:
-                name_title += json_data[rule]
-            else:
-                name_title += '-' + json_data[rule]
-            count += 1
+            if count == 0 and json_data[rule] != '':
+                path += json_data[rule]
+                count += 1
+            elif count > 0 and json_data[rule] != '':
+                path += '-' + json_data[rule]
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
@@ -700,11 +700,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         path = ''
         count = 0
         for rule in location_rule:
-            if count == 0:
+            if count == 0 and json_data[rule] != '':
                 path += json_data[rule]
-            else:
+                count += 1
+            elif count > 0 and json_data[rule] != '':
                 path += '-' + json_data[rule]
-            count += 1
         if len(path) > 240:
             self.add_text_main('[-]Error in Length of Path! Repleaced with Number')
             path = json_data['number']
@@ -740,12 +740,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         json_data = getDataFromJSON(number, filepath, failed_folder, Config)  # 定义番号
         imagecut = json_data['imagecut']
         tag = json_data['tag']
+        # =======================================================================调试模式
+        self.debug_mode(json_data, Config)
         # =======================================================================是否找到影片信息
         if json_data['title'] == '' or number == '':
             self.add_text_main('[-]Movie Data not found!')
             self.moveFailedFolder(filepath, failed_folder)
-        # =======================================================================调试模式
-        self.debug_mode(json_data, Config)
+            return
         # =======================================================================判断-C,-CD后缀
         if '-CD' in filepath or '-cd' in filepath:
             multi_part = 1
@@ -783,6 +784,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def UpdateCheck(self):
         if self.Ui.radioButton_update_on.isChecked():
             check = 1
+            self.add_text_main('[!]Update Checking!')
         else:
             check = 0
         if UpdateCheckSwitch(check) == '1':
@@ -794,6 +796,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[*]                     ↓ Download ↓')
                 self.add_text_main('[*] ' + html['download'])
                 self.add_text_main('[*]======================================================')
+            else:
+                self.add_text_main('[!]No newer version available!')
 
     def CreatFailedFolder(self, failed_folder):
         if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
@@ -822,7 +826,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         escape_folder = config['escape']['folders']  # 多级目录刮削需要排除的目录
         # =======================================================================检测更新,新建failed目录,获取影片列表
         os.chdir(os.getcwd())
-        self.UpdateCheck(self.version)
+        self.UpdateCheck()
         self.CreatFailedFolder(failed_folder)  # 新建failed文件夹
         movie_list = movie_lists(escape_folder)  # 获取所有需要刮削的影片列表
         count = 0
@@ -849,8 +853,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     except:
                         self.add_text_main('[-]Link ' + movie + ' failed! Please run as Administrator!')
                 else:
-                    self.add_text_main('[-]Move ' + movie + ' to failed folder')
-                    shutil.move(movie, curr_path + '/' + 'failed/')
+                    try:
+                        shutil.move(movie, curr_path + '/' + 'failed/')
+                        self.add_text_main('[-]Move ' + movie + ' to failed folder')
+                    except shutil.Error as error_info:
+                        self.add_text_main('[-] ' + str(error_info))
                 continue
         self.CEF(success_folder)
         self.CEF(failed_folder)

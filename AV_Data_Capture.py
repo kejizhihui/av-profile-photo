@@ -38,7 +38,7 @@ def getNumber(filepath):
         filepath.strip('22-sht.me').strip('-HD').strip('-hd')
         filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filepath))  # 去除文件名中时间
         if 'FC2' or 'fc2' in filename:
-            filename = filename.replace('-PPV', '').replace('PPV-', '')
+            filename = filename.replace('-PPV', '').replace('PPV-', '').replace('-ppv', '').replace('ppv-', '')
         try:
             file_number = re.search('\w+-\d+', filename).group()
         except:  # 提取类似mkbd-s120番号
