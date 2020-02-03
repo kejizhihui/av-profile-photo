@@ -320,6 +320,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def moveFailedFolder(self, filepath, failed_folder):
         self.add_text_main('[-]Move to Failed output folder')
         shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
+        self.add_text_main("[*]======================================================")
         # os._exit(0)
 
     # =====================资源下载部分===========================
@@ -489,10 +490,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         count = 0
         for rule in naming_rule:
             if count == 0 and json_data[rule] != '':
-                path += json_data[rule]
+                name_title += json_data[rule]
                 count += 1
             elif count > 0 and json_data[rule] != '':
-                path += '-' + json_data[rule]
+                name_title += '-' + json_data[rule]
         try:
             if not os.path.exists(path):
                 os.makedirs(path)
