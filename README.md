@@ -105,8 +105,12 @@ GUI版：<br>
 * **详细请看以下教程**<br>
 
 ## 1.模块安装
-如果运行**源码**版，运行前请安装**Python环境**和安装以下**模块**  
-在终端/cmd/Powershell中输入以下代码来安装模块
+如果运行**源码**版，运行前请安装**Python环境**和安装以下**模块**<br>  
+在终端/cmd/Powershell中输入以下代码来安装模块<br>
+**1、批量**从py-require.txt安装<br>
+>pip install -r py-require.txt<br>
+
+**2、单个**按需安装<br>
 >pip install requests<br>
 >pip install pyquery<br>
 >pip install lxml<br>
