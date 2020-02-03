@@ -186,10 +186,10 @@ GUI版：<br>
 条件：文件名中间要有下划线或者减号"_","-"，没有多余的内容只有番号为最佳，可以让软件更好获取元数据<br>
 对于多影片重命名，可以用[ReNamer](http://www.den4b.com/products/renamer)来批量重命名<br>
 
-## 4.多目录影片处理
+## 3.多目录影片处理
 可以在多个有影片目录的父目录下搜索影片后缀，然后剪切到和程序同一目录下  
 
-## 多集影片处理
+## 4.多集影片处理
 可以把多集电影按照集数后缀命名为类似**ssni-xxx-cd1.mp4,ssni-xxx-cd2.mp4，abp-xxx-CD1.mp4**的规则，只要含有```-CDn./-cdn.```类似命名规则，即可使用分集功能
 
 ## 5.运行 ```AVDC_Main.py/AVDC.exe```
@@ -198,47 +198,47 @@ GUI版：<br>
 ## 5.1 异常处理（重要）
 ### 请确保软件是完整地！确保ini文件内容是和下载提供ini文件内容的一致的！
 ---
-### 关于软件打开就闪退
+### 5.1.1、关于软件打开就闪退
 可以打开cmd命令提示符，把 ```AVDC_Main.py/AVDC.exe```拖进cmd窗口回车运行，查看错误，出现的错误信息**依据以下条目解决**
 
 ---
-### 报```Connect Failed! Please check your Proxy or Network!```错误
+### 5.1.2、报```Connect Failed! Please check your Proxy or Network!```错误
 可以把文件的**proxy=后面的地址和端口删除**，并开启代理软件全局模式，或者重启电脑，代理软件，网卡
 
 ---
-### 关于 ```Updata_check``` 和 ```JSON``` 相关的错误
+### 5.1.3、关于 ```Updata_check``` 和 ```JSON``` 相关的错误
 跳转 [网络设置](#网络设置)
 
 ---
-### 关于字幕文件移动功能
+### 5.1.4、关于字幕文件移动功能
 字幕文件前缀必须与影片文件前缀一致，才可以使用该功能
 
 ---
-### 关于```FileNotFoundError: [WinError 3] 系统找不到指定的路径。: 'JAV_output''``` 
+### 5.1.5、关于```FileNotFoundError: [WinError 3] 系统找不到指定的路径。: 'JAV_output''``` 
 在软件所在文件夹下新建 JAV_output 文件夹，可能是你没有把软件拉到和电影的同一目录
 
 ---
-### 关于连接拒绝的错误
+### 5.1.6、关于连接拒绝的错误
 请设置好[代理](#针对某些地区的代理设置)<br>
 
 ---
-### 关于Nonetype,xpath报错
+### 5.1.7、关于Nonetype,xpath报错
 同上<br>
 
 ---
-### 关于番号提取失败或者异常
+### 5.1.8、关于番号提取失败或者异常
 **目前可以提取元素的影片:JAVBUS、JAVDB、AVSOX上有元数据的电影，素人系列:300Maan,259luxu,siro等,FC2系列**<br>
 >下一张图片来自Pockies的blog 原作者已授权<br>
 
 ![](https://raw.githubusercontent.com/Pockies/pic/master/741f9461gy1g1cxc31t41j20i804zdgo.jpg)
 
 ---
-### 关于PIL/image.py
+### 5.1.9、关于PIL/image.py
 暂时无解，可能是网络问题或者pillow模块打包问题，你可以用源码运行（要安装好第一步的模块）
 
 
 ## 6.软件会自动把元数据获取成功的电影移动到JAV_output文件夹中，根据演员分类，失败的电影移动到failed文件夹中。
-## 7.把JAV_output文件夹导入到EMBY,KODI中，等待元数据刷新，完成
+## 7.把JAV_output文件夹导入到EMBY,KODI,PLEX中，等待元数据刷新，完成
 ## 8.关于群晖NAS
 开启SMB在Windows上挂载为网络磁盘即可使用本软件，也适用于其他NAS
 ## 9.写在后面
