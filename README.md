@@ -67,70 +67,62 @@ GUI版：<br>
 [点击跳转至原作者博客文章](https://yoshiko2.github.io/2019/10/18/AVDC/)
 
 # GUI运行截图
-**主界面**
-![](https://github.com/moyy996/AVDC/blob/master/readme/main_window.png)
-**设置**
-![](https://github.com/moyy996/AVDC/blob/master/readme/setting.png)
-**工具**
-![](https://github.com/moyy996/AVDC/blob/master/readme/tool.png)
-**关于**
-![](https://github.com/moyy996/AVDC/blob/master/readme/about.png)
+
+## **主界面，设置，工具，关于**
+
+<div align="center">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/main_window.png" height="300">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/setting.png" height="300">
+</div>
+<div align="center">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/tool.png" height="300">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/about.png" height="300">
+</div>
 
 # 效果图
-**图片来自网络**，由于相关法律法规，具体效果请自行联想
-![](https://i.loli.net/2019/07/04/5d1cf9bb1b08b86592.jpg)
-![](https://i.loli.net/2019/07/04/5d1cf9bb2696937880.jpg)<br>
+**图片来自网络,由于相关法律法规，具体刮削完效果,请自行联想。**<br>
+</div>
+<div align="center">
+<img src="https://i.loli.net/2019/07/04/5d1cf9bb1b08b86592.jpg" height="240">
+<img src="https://i.loli.net/2019/07/04/5d1cf9bb2696937880.jpg" height="240">
+</div>
 
 # 如何使用
 ### 下载
-* release的程序可脱离**python环境**运行，可跳过 [模块安装](#1请安装模块在cmd终端逐条输入以下命令安装)<br>Release 下载地址(**仅限Windows**):<br>[![](https://img.shields.io/badge/%E4%B8%8B%E8%BD%BD-windows-blue.svg?style=for-the-badge&logo=windows)](https://github.com/moyy996/AVDC/releases)<br>
-* Linux,MacOS请下载源码包运行
+* **Release** 的程序可脱离**python环境**运行，源码包需要 [安装模块](#1模块安装)<br>
+* **Release** 下载地址(**仅限Windows**): [点击下载](https://github.com/moyy996/AVDC/releases)<br>
+* **源码包** 下载地址(**Windows,Linux,MacOS**): [点击下载](https://github.com/moyy996/AVDC/archive/master.zip)<br>
 
-* Windows Python环境:[点击前往](https://www.python.org/downloads/windows/) 选中executable installer下载
-* MacOS Python环境：[点击前往](https://www.python.org/downloads/mac-osx/)
+* Windows Python环境: [点击前往](https://www.python.org/downloads/windows/) 选中executable installer下载
+* MacOS Python环境： [点击前往](https://www.python.org/downloads/mac-osx/)
 * Linux Python环境：Linux用户懂的吧，不解释下载地址
+
 ### 简要教程:<br>
-**1.把软件拉到和电影的同一目录或者上级目录<br>2.运行AVDC.exe，配置设置页各项（配置方法请看以下教程）<br>3.点击开始等待完成<br>4.把JAV_output导入至KODI,EMBY中。<br>详细请看以下教程**<br>
+**1.把软件拉到和电影的同一目录或者上级目录**<br>
+**2.运行AVDC.exe，配置设置页各项（配置方法请看以下教程）**<br>
+**3.点击开始等待完成(出错请开调试模式后截图)**<br>
+**4.把JAV_output导入至KODI,EMBY,PLEX中。**<br>
+**详细请看以下教程**<br>
 
 ## 1.模块安装
 如果运行**源码**版，运行前请安装**Python环境**和安装以下**模块**  
 在终端/cmd/Powershell中输入以下代码来安装模块
-```python
-pip install requests
-```
-### 
-```python
-pip install pyquery
-```
-###
-```python
-pip install lxml
-```
-###
-```python
-pip install Beautifulsoup4
-```
-###
-```python
-pip install pillow
-```
-###
-```python
-pip install pyqt5
-```
-###
-```python
-pip install pyqt5-tools
-```
-###
+>pip install requests<br>
+>pip install pyquery<br>
+>pip install lxml<br>
+>pip install Beautifulsoup4<br>
+>pip install pillow<br>
+>pip install pyqt5<br>
+>pip install pyqt5-tools<br>
+
 ## 2.配置设置
 **设置界面**
 ![](https://github.com/moyy996/AVDC/blob/master/readme/setting.png)
 
 ---
 #### （1）、普通模式/整理模式
-  普通模式：通过番号刮削数据，包括元数据、封面图、缩略图、背景图。
-  整理模式：仅根据女优把电影命名为番号并分类到女优名称的文件夹下。
+  普通模式：通过番号刮削数据，包括元数据、封面图、缩略图、背景图。<br>
+  整理模式：仅根据女优把电影命名为番号并分类到女优名称的文件夹下。<br>
 
 ---
 #### （2）、软链接模式：使用此模式，要以```管理员身份```运行。
@@ -150,9 +142,9 @@ pip install pyqt5-tools
 
 ---
 #### （6）、命名规则
-  目录命名：存放视频数据的目录名，例：actor/number-title ,  actor/不可更改，后面的可以自定义，两个选项之间需要短横杠-。
-  视频标题：nfo中的标题命名。例：number-title。可以自定义，两个选项之间需要短横杠-。
-  可选项为title（片名）、actor（演员）、studio（公司）、director（导演）、release（发售日）、year（发行年份）、numbe（番号）、runtime（时长）
+  目录命名：存放视频数据的目录名，例：actor/number-title ,  actor/不可更改，后面的可以自定义，两个选项之间需要短横杠-。<br>
+  视频标题：nfo中的标题命名。例：number-title。可以自定义，两个选项之间需要短横杠-。<br>
+  可选项为title（片名）、actor（演员）、studio（公司）、director（导演）、release（发售日）、year（发行年份）、numbe（番号）、runtime（时长）<br>
 
 ---
 #### （7）、网络设置 
@@ -178,8 +170,8 @@ pip install pyqt5-tools
 
 ---
 ### （9）、排除指定字符和目录
-```排除字符``` 项指定字符删除，例如```排除字符： \()```，删除标题中```\()```字符  
-```排除目录``` 项指定目录，例如```排除目录： failed,JAV_output```，多目录刮削时跳过failed,JAV_output  
+```排除字符``` 项指定字符删除，例如```排除字符： \()```，删除标题中```\()```字符  <br>
+```排除目录``` 项指定目录，例如```排除目录： failed,JAV_output```，多目录刮削时跳过failed,JAV_output  <br>
 
 ---
 ### （10）、调试模式
