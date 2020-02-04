@@ -85,15 +85,17 @@
 </div>
 
 # 效果图
-**1、输出目录文件结构**<br>
+### **1、输出目录文件结构**<br>
+
 <div>
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/tree-jav-output.png" height="500">
 </div>
 
-**2、媒体库：以下为刮削、导入后的EMBY**<br>
+### **2、媒体库：以下为刮削、导入后的EMBY**<br>
+
 <div>
-<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby.png" height="240">
-<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby_each.png" height="240">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby.png" height="400">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby_each.png" height="400">
 </div>
 
 # 如何使用
