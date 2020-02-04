@@ -1,27 +1,8 @@
 # AVDC
 
 
-
-命令行版(原作者)：https://github.com/yoshiko2/AV_Data_Capture<br>
-<a title="Hits" target="_blank" href="https://github.com/yoshiko2/AV_Data_Capture"><img src="https://hits.b3log.org/yoshiko2/AV_Data_Capture.svg"></a>
-![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
-![](https://img.shields.io/github/downloads/yoshiko2/av_data_capture/total.svg?style=flat-square)
-![](https://img.shields.io/github/license/yoshiko2/av_data_capture.svg?style=flat-square)
-![](https://img.shields.io/github/release/yoshiko2/av_data_capture.svg?style=flat-square)
-![](https://img.shields.io/badge/Python-3.7-yellow.svg?style=flat-square&logo=python)<br>
-GUI版：<br>
-<a title="Hits" target="_blank" href="https://github.com/moyy996/avdc"><img src="https://hits.b3log.org/moyy996/AVDC.svg"></a>
-![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
-![](https://img.shields.io/github/downloads/moyy996/avdc/total.svg?style=flat-square)
-![](https://img.shields.io/github/license/moyy996/avdc.svg?style=flat-square)
-![](https://img.shields.io/github/release/moyy996/avdc.svg?style=flat-square)
-![](https://img.shields.io/badge/Python-3.6-yellow.svg?style=flat-square&logo=python)
-![](https://img.shields.io/badge/Pyqt-5-blue.svg?style=flat-square)<br>
-
-
-**日本电影元数据 抓取工具 | 刮削器**，配合本地影片管理软件EMBY,KODI，PLEX等管理本地影片，该软件起到分类与元数据抓取作用，利用元数据信息来分类，供本地影片分类整理使用。可**批量抓取**，也可**单个抓取**。可抓取**子目录下视频**，**多集视频**（-cd1/-cd2）。
-
 # 目录
+* [简介](#简介)
 * [声明](#声明)
 * [FAQ](#FAQ)
 * [故事](#故事)
@@ -41,7 +22,31 @@ GUI版：<br>
 * [导入至媒体库](#7把jav_output文件夹导入到embykodi中等待元数据刷新完成)
 * [关于群晖NAS](#8关于群晖NAS)
 * [写在后面](#9写在后面)
-* [TG电报群](#10tg官方电报群)
+
+
+# 简介
+**命令行版(原作者)**：https://github.com/yoshiko2/AV_Data_Capture<br>
+<a title="Hits" target="_blank" href="https://github.com/yoshiko2/AV_Data_Capture"><img src="https://hits.b3log.org/yoshiko2/AV_Data_Capture.svg"></a>
+![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
+![](https://img.shields.io/github/downloads/yoshiko2/av_data_capture/total.svg?style=flat-square)
+![](https://img.shields.io/github/license/yoshiko2/av_data_capture.svg?style=flat-square)
+![](https://img.shields.io/github/release/yoshiko2/av_data_capture.svg?style=flat-square)
+![](https://img.shields.io/badge/Python-3.7-yellow.svg?style=flat-square&logo=python)<br>
+**GUI版(本项目)**：<br>
+<a title="Hits" target="_blank" href="https://github.com/moyy996/avdc"><img src="https://hits.b3log.org/moyy996/AVDC.svg"></a>
+![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
+![](https://img.shields.io/github/downloads/moyy996/avdc/total.svg?style=flat-square)
+![](https://img.shields.io/github/license/moyy996/avdc.svg?style=flat-square)
+![](https://img.shields.io/github/release/moyy996/avdc.svg?style=flat-square)
+![](https://img.shields.io/badge/Python-3.6-yellow.svg?style=flat-square&logo=python)
+![](https://img.shields.io/badge/Pyqt-5-blue.svg?style=flat-square)<br>
+
+### 主要功能
+* **日本电影元数据 抓取工具 | 刮削器**，配合本地影片管理软件EMBY,KODI，PLEX等管理本地影片，该软件起到分类与元数据抓取作用，利用元数据信息来分类，供本地影片分类整理使用。<br>
+* 可**批量抓取**，也可**单个抓取**。可抓取**子目录下视频**，**多集视频**（-cd1/-cd2）。<br>
+* 目前可抓取网站：**javbus,javdb,avsox,fc2club,fanza**。<br>
+### 反馈
+* 欢迎使用体验,有**程序BUG问题、功能建议**,可进**电报群**反馈    [点击进群](https://t.me/joinchat/J54y1g3-a7nxJ_-WS4-KFQ)<br>
 
 # 声明
 * 本软件仅供**技术交流，学术交流**使用<br>
@@ -80,16 +85,17 @@ GUI版：<br>
 </div>
 
 # 效果图
-**1、输出目录文件结构**<br>
+### **1、输出目录文件结构**<br>
+
 <div>
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/tree-jav-output.png" height="500">
 </div>
 
-**2、媒体库：以下分别为KODI，EMBY**<br>
-**图片来自网络,由于相关法律法规，具体刮削完效果,请自行联想。**<br>
-<div align="center">
-<img src="https://i.loli.net/2019/07/04/5d1cf9bb1b08b86592.jpg" height="240">
-<img src="https://i.loli.net/2019/07/04/5d1cf9bb2696937880.jpg" height="240">
+### **2、媒体库：以下为刮削、导入后的EMBY**<br>
+
+<div>
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby.png" height="400">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/emby_each.png" height="400">
 </div>
 
 # 如何使用
@@ -245,7 +251,6 @@ GUI版：<br>
 开启SMB在Windows上挂载为网络磁盘即可使用本软件，也适用于其他NAS
 ## 9.写在后面
 怎么样，看着自己的日本电影被这样完美地管理，是不是感觉成就感爆棚呢?<br>
-## 10.tg官方电报群
-[ 点击进群](https://t.me/joinchat/J54y1g3-a7nxJ_-WS4-KFQ)<br>
+
 
 
