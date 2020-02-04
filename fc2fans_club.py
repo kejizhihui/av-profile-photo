@@ -82,23 +82,28 @@ def main(number):
     actor = getActor(htmlcode)
     if getActor(htmlcode) == '':
         actor = 'FC2系列'
-    dic = {
-        'title': getTitle(htmlcode),
-        'studio': getStudio(htmlcode),
-        'year': '',  # str(re.search('\d{4}',getRelease(number)).group()),
-        'outline': getOutline(htmlcode2),
-        'runtime': getYear(getRelease(htmlcode)),
-        'director': getStudio(htmlcode),
-        'actor': actor,
-        'release': getRelease(number),
-        'number': 'FC2-' + number,
-        'cover': getCover(htmlcode, number, htmlcode2),
-        'imagecut': 0,
-        'tag': getTag(htmlcode),
-        'actor_photo': '',
-        'website': 'https://fc2club.com//html/FC2-' + number + '.html',
-        'source': 'https://fc2club.com//html/FC2-' + number + '.html',
-    }
+    try:
+        dic = {
+            'title': getTitle(htmlcode),
+            'studio': getStudio(htmlcode),
+            'year': '',  # str(re.search('\d{4}',getRelease(number)).group()),
+            'outline': getOutline(htmlcode2),
+            'runtime': getYear(getRelease(htmlcode)),
+            'director': getStudio(htmlcode),
+            'actor': actor,
+            'release': getRelease(number),
+            'number': 'FC2-' + number,
+            'cover': getCover(htmlcode, number, htmlcode2),
+            'imagecut': 0,
+            'tag': getTag(htmlcode),
+            'actor_photo': '',
+            'website': 'https://fc2club.com//html/FC2-' + number + '.html',
+            'source': 'https://fc2club.com//html/FC2-' + number + '.html',
+        }
+    except:
+        dic = {
+            'title': '',
+        }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 

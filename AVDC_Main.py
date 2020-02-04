@@ -29,7 +29,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.21'
+        self.version = '3.22'
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -703,6 +703,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             if config['debug_mode']['switch'] == '1':
                 self.add_text_main('[+] ---Debug info---')
                 for key, value in json_data.items():
+                    if key == 'title' and value == '':
+                        self.add_text_main('   [+]Title is None, Not Find Info!')
+                        break
                     if value == '' or key == 'actor_photo' or key == 'year' or key == 'imagecut':
                         continue
                     self.add_text_main('   [+]-' + "%-13s" % key + ': ' + str(value))
@@ -711,22 +714,29 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[-] ---Debug error---')
 
     # ========================================================================创建输出文件夹
-    def creatFolder(self, success_folder, json_data, Config):
-        location_rule = json_data['location_rule'].split('/')[-1].split('-')
+    def creatFolder(self, success_folder, json_data, config):
+        location_rule_list = json_data['location_rule'].split('/')
         path = ''
-        count = 0
-        for rule in location_rule:
-            if count == 0 and json_data[rule] != '':
-                path += json_data[rule]
-                count += 1
-            elif count > 0 and json_data[rule] != '':
-                path += '-' + json_data[rule]
+        count_path = 0
+        for location_rule in location_rule_list:
+            location_rule = location_rule.split('-')
+            count_rule = 0
+            for rule in location_rule:
+                if count_rule == 0 and json_data[rule] != '':
+                    path += json_data[rule]
+                    count_rule += 1
+                elif count_rule > 0 and json_data[rule] != '':
+                    path += '-' + json_data[rule]
+            if count_path != len(location_rule_list) - 1:
+                path += '/'
+            count_path += 1
+        path = path.replace('//', '/')
         if len(path) > 240:
-            self.add_text_main('[-]Error in Length of Path! Repleaced with Number')
-            path = json_data['number']
-        path = success_folder + '/' + json_data['actor'] + '/' + path
+            self.add_text_main('[-]Error in Length of Path! Repleaced with actor/number')
+            path = json_data['actor'] + '/' + json_data['number']
+        path = success_folder + '/' + path
         if not os.path.exists(path):
-            path = escapePath(path, Config)
+            path = escapePath(path, config)
             try:
                 os.makedirs(path)
             except:
@@ -753,11 +763,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         success_folder = Config['common']['success_output_folder']  # 成功输出目录
         filepath = file_path  # 影片的路径
         number = number_th
+        # =======================================================================抓取网站设置
         json_data = {}
         if self.Ui.radioButton_all.isChecked():
-            json_data = getDataFromJSON(number, Config, 1)  # 定义番号
+            json_data = getDataFromJSON(number, Config, 1)  # 所有网站
         elif self.Ui.radioButton_javdb.isChecked():
-            json_data = getDataFromJSON(number, Config, 2)  # 定义番号
+            time.sleep(3)
+            json_data = getDataFromJSON(number, Config, 2)  # 仅javdb
         imagecut = json_data['imagecut']
         tag = json_data['tag']
         # =======================================================================调试模式
@@ -886,7 +898,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.CEF(success_folder)
         self.CEF(failed_folder)
         self.add_text_main("[+]All finished!!!")
-        self.add_text_main("[*]======================================================")
 
 
 if __name__ == '__main__':

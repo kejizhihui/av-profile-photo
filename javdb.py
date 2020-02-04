@@ -57,8 +57,8 @@ def getLabel(a):
 
 def getNum(a):
     html = etree.fromstring(a, etree.HTMLParser())
-    result1 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/text()')).strip(" ['']")
-    result2 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/a/text()')).strip(" ['']")
+    result1 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/text()')).strip(" ['']").replace('_', '-')
+    result2 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/a/text()')).strip(" ['']").replace('_', '-')
     return str(result2 + result1).strip('+')
 
 
