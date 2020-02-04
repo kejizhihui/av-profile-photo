@@ -47,15 +47,8 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
         # ==
         elif 'siro' in file_number or 'SIRO' in file_number or 'Siro' in file_number:
             json_data = json.loads(siro.main(file_number))
-        elif not '-' in file_number or '_' in file_number:
+        elif re.match('\D{2,}00\d{4,}', file_number):
             json_data = json.loads(fanza.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
-                json_data = json.loads(javbus.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
-                json_data = json.loads(avsox.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
-                json_data = json.loads(javdb.main(file_number))
-        # ==
         else:
             json_data = json.loads(javbus.main(file_number))
             if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
@@ -66,8 +59,10 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
         json_data = json.loads(javdb.main(file_number))
 
     # ================================================网站规则添加结束================================================
-
+    if json_data['website'] == 'timeout':
+        return json_data
     title = json_data['title']
+    number = json_data['number'].replace('_', '-')
     actor_list = str(json_data['actor']).strip("[ ]").replace("'", '').split(',')  # 字符串转列表
     release = json_data['release']
     try:
@@ -99,6 +94,7 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
 
     # 返回处理后的json_data
     json_data['title'] = title
+    json_data['number'] = number
     json_data['actor'] = actor
     json_data['release'] = release
     json_data['cover_small'] = cover_small
@@ -118,17 +114,8 @@ def get_info(json_data):  # 返回json里的数据
     actor_photo = json_data['actor_photo']
     actor = json_data['actor']
     release = json_data['release']
+    tag = json_data['tag']
     number = json_data['number']
     cover = json_data['cover']
     website = json_data['website']
-    return title, studio, year, outline, runtime, director, actor_photo, actor, release, number, cover, website
-
-
-def copyRenameJpgToBackdrop(option, path, number, c_word):
-    if option == 'plex':
-        shutil.copy(path + '/fanart.jpg', path + '/Backdrop.jpg')
-        shutil.copy(path + '/poster.png', path + '/thumb.png')
-    if option == 'emby':
-        shutil.copy(path + '/' + number + c_word + '.jpg', path + '/Backdrop.jpg')
-    if option == 'kodi':
-        shutil.copy(path + '/' + number + c_word + '-fanart.jpg', path + '/Backdrop.jpg')
+    return title, studio, year, outline, runtime, director, actor_photo, actor, release, tag, number, cover, website

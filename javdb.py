@@ -18,19 +18,17 @@ def getTitle(a):
 
 def getActor(a):  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]/td/text()
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//strong[contains(text(),"演員")]/../following-sibling::span/text()')).strip(" ['']")
-    result2 = str(html.xpath('//strong[contains(text(),"演員")]/../following-sibling::span/a/text()')).strip(" ['']")
-    return str(result1 + result2).strip('+').replace(",\\xa0", "").replace("'", "").replace(' ', '').replace(',,',
-                                                                                                             '').lstrip(
-        ',').replace(',', ', ')
+    result1 = html.xpath('//strong[contains(text(),"演員")]/../following-sibling::span/text()')
+    result2 = html.xpath('//strong[contains(text(),"演員")]/../following-sibling::span/a/text()')
+    return result1 + result2
 
 
 def getActorPhoto(actor):  # //*[@id="star_qdt"]/li/a/img
-    a = actor.split(',')
     d = {}
-    for i in a:
-        p = {i: ''}
-        d.update(p)
+    for i in actor:
+        if ',' not in i or ')' in i:
+            p = {i: ''}
+            d.update(p)
     return d
 
 
@@ -130,10 +128,8 @@ def main(number):
         result1 = html.xpath('//*[@id="videos"]/div/div/a/@href')[count - 1]
         b = get_html('https://javdb.com' + result1).replace(u'\xa0', u' ')
         dic = {
-            'actor': getActor(b),
-            'title': getTitle(b).replace("\\n", '').replace('        ', '').replace(getActor(a), '').replace(getNum(a),
-                                                                                                             '').replace(
-                '无码', '').replace('有码', '').lstrip(' ').replace(number, ''),
+            'actor': str(getActor(b)).strip(" [',']").replace('\'', ''),
+            'title': getTitle(b).replace("\\n", '').replace('_', '-').replace(number, '').strip().replace('  ', '-').replace(' ', '-'),
             'studio': getStudio(b),
             'outline': getOutline(b),
             'runtime': getRuntime(b),
@@ -152,17 +148,21 @@ def main(number):
         }
         if getNum(b) != number:  # 与搜索到的番号不匹配
             dic['title'] = ''
-            dic['number'] = ''
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
-        return js
     except:
-        dic = {
-            'title': '',
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
-        return js
+        if a == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+            }
+    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
+    return js
 
 
-# main('MIDE-139')
+# print(main('SSNI-658'))
 # input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
-# print(main('YMDD-178'))
+# print(main('ABS-141'))
+# print(main('050517-522'))

@@ -89,7 +89,13 @@ def getOutline(htmlcode):  # 获取演员
 
 def getSerise(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[7]/a/text()')).strip(" ['']")
+    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[6]/a/text()')).strip(" ['']")
+    return result
+
+
+def getSerise_uncensored(htmlcode):
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[5]/a/text()')).strip(" ['']")
     return result
 
 
@@ -141,23 +147,37 @@ def main_uncensored(number):
     if getTitle(htmlcode) == '':
         htmlcode = get_html('https://www.javbus.com/' + number.replace('-', '_'))
         dww_htmlcode = get_html("https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=" + number.replace("-", ''))
-    dic = {
-        'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))).replace(getNum(htmlcode) + '-', ''),
-        'studio': getStudio(htmlcode),
-        'year': getYear(htmlcode),
-        'outline': getOutline(dww_htmlcode),
-        'runtime': getRuntime(htmlcode),
-        'director': getDirector(htmlcode),
-        'actor': getActor(htmlcode),
-        'release': getRelease(htmlcode),
-        'number': getNum(htmlcode),
-        'cover': getCover(htmlcode),
-        'tag': getTag(htmlcode),
-        'label': getSerise(htmlcode),
-        'imagecut': 0,
-        'actor_photo': '',
-        'website': 'https://www.javbus.com/' + number,
-        'source': 'javbus.py',
-    }
+    try:
+        dic = {
+            'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))).replace(getNum(htmlcode) + '-', ''),
+            'studio': getStudio(htmlcode),
+            'year': getYear(htmlcode),
+            'outline': getOutline(dww_htmlcode),
+            'runtime': getRuntime(htmlcode),
+            'director': getDirector(htmlcode),
+            'actor': getActor(htmlcode),
+            'release': getRelease(htmlcode),
+            'number': getNum(htmlcode),
+            'cover': getCover(htmlcode),
+            'tag': getTag(htmlcode),
+            'label': getSerise_uncensored(htmlcode),
+            'imagecut': 0,
+            'actor_photo': getActorPhoto(htmlcode),
+            'website': 'https://www.javbus.com/' + number,
+            'source': 'javbus.py',
+        }
+    except:
+        if htmlcode == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+            }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
+
+# print(main('SSNI-658'))
+# print(main_uncensored('050517_522'))

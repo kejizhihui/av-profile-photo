@@ -23,6 +23,16 @@ def getActor(a):  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]
     return result
 
 
+def getActorPhoto(actor):  # //*[@id="star_qdt"]/li/a/img
+    actor = actor.split(',')
+    d = {}
+    for i in actor:
+        if ',' not in i:
+            p = {i: ''}
+            d.update(p)
+    return d
+
+
 def getStudio(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
@@ -41,9 +51,9 @@ def getRuntime(a):
 def getLabel(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
-        result1 = html.xpath("//td[contains(text(),'シリーズ：')]/following-sibling::td/a/text()")[0]
+        result1 = html.xpath("//td[contains(text(),'レーベル：')]/following-sibling::td/a/text()")[0]
     except:
-        result1 = html.xpath("//td[contains(text(),'シリーズ：')]/following-sibling::td/text()")[0]
+        result1 = html.xpath("//td[contains(text(),'レーベル：')]/following-sibling::td/text()")[0]
     return result1
 
 
@@ -110,13 +120,14 @@ def main(number):
         htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number)
         url = 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number
     try:
+        actor = getActor(htmlcode)
         dic = {
             'title': getTitle(htmlcode).strip(getActor(htmlcode)),
             'studio': getStudio(htmlcode),
             'outline': getOutline(htmlcode),
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
-            'actor': getActor(htmlcode),
+            'actor': actor,
             'release': getRelease(htmlcode),
             'number': getNum(htmlcode),
             'cover': getCover(htmlcode, number),
@@ -124,17 +135,23 @@ def main(number):
             'tag': getTag(htmlcode),
             'label': getLabel(htmlcode),
             'year': getYear(getRelease(htmlcode)),  # str(re.search('\d{4}',getRelease(a)).group()),
-            'actor_photo': '',
+            'actor_photo': getActorPhoto(actor),
             'website': url,
             'source': 'siro.py',
         }
     except:
-        dic = {
-            'title': '',
-        }
+        if htmlcode == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+            }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))  # .encode('UTF-8')
     return js
 
 # main('DV-1562')
 # input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
-# print(main('ssni00384'))
+# print(main('ssni00684'))

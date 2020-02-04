@@ -22,6 +22,15 @@ def getActor(htmlcode):
         return ''
 
 
+def getActorPhoto(actor):  # //*[@id="star_qdt"]/li/a/img
+    actor = actor.split('/')
+    d = {}
+    for i in actor:
+        p = {i: ''}
+        d.update(p)
+    return d
+
+
 def getStudio(htmlcode):  # 获取厂商
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result = str(html.xpath('/html/body/div[2]/div/div[1]/h5[3]/a[1]/text()')).strip(" ['']")
@@ -80,31 +89,37 @@ def main(number):
         'http://adult.contents.fc2.com/article_search.php?id=' + number + '&utm_source=aff_php&utm_medium=source_code&utm_campaign=from_aff_php')
     htmlcode = ADC_function.get_html('https://fc2club.com//html/FC2-' + number + '.html')
     actor = getActor(htmlcode)
-    if getActor(htmlcode) == '':
+    if len(actor) == 0:
         actor = 'FC2系列'
     try:
         dic = {
-            'title': getTitle(htmlcode),
+            'title': getTitle(htmlcode).replace(' ', '-'),
             'studio': getStudio(htmlcode),
             'year': '',  # str(re.search('\d{4}',getRelease(number)).group()),
             'outline': getOutline(htmlcode2),
             'runtime': getYear(getRelease(htmlcode)),
             'director': getStudio(htmlcode),
-            'actor': actor,
+            'actor': actor.replace('/', ','),
             'release': getRelease(number),
             'number': 'FC2-' + number,
             'cover': getCover(htmlcode, number, htmlcode2),
             'imagecut': 0,
             'tag': getTag(htmlcode),
-            'actor_photo': '',
+            'actor_photo': getActorPhoto(actor),
             'website': 'https://fc2club.com//html/FC2-' + number + '.html',
-            'source': 'https://fc2club.com//html/FC2-' + number + '.html',
+            'source': 'fc2fans_club.py',
         }
     except:
-        dic = {
-            'title': '',
-        }
+        if htmlcode2 == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+            }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
-# print(main('1051725'))
+# print(main('1121040'))

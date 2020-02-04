@@ -21,7 +21,7 @@ def getTitle(a):
     try:
         html = etree.fromstring(a, etree.HTMLParser())
         result = str(html.xpath('/html/body/div[2]/h3/text()')).strip(" ['']")  # [0]
-        return result.replace('/', '')
+        return result.replace('/', '').replace('_', '-')
     except:
         return ''
 
@@ -101,12 +101,10 @@ def main(number):
     result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
     if result1 == '' or result1 == 'null' or result1 == 'None':
         a = get_html('https://avsox.host/cn/search/' + number.replace('-', '_'))
-        print(a)
         html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
         result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
         if result1 == '' or result1 == 'null' or result1 == 'None':
             a = get_html('https://avsox.host/cn/search/' + number.replace('_', ''))
-            print(a)
             html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
             result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
     web = get_html(result1)
@@ -115,7 +113,7 @@ def main(number):
     try:
         dic = {
             'actor': getActor(web),
-            'title': getTitle(web).strip(getNum(web)),
+            'title': getTitle(web).strip(getNum(web)).strip().replace(' ', '-'),
             'studio': getStudio(info),
             'outline': '',  #
             'runtime': getRuntime(info),
@@ -133,10 +131,16 @@ def main(number):
             'source': 'avsox.py',
         }
     except:
-        dic = {
-            'title': '',
-        }
+        if a == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+            }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
-# print(main('012717_472'))
+# print(main('050517-522'))

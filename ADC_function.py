@@ -104,3 +104,4 @@ def get_html(url, cookies=None):  # 网页请求核心
             i += 1
             print('[-]Connect retry ' + str(i) + '/' + str(retry_count))
     print('[-]Connect Failed! Please check your Proxy or Network!')
+    return 'ProxyError'
