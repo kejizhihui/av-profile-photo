@@ -144,6 +144,7 @@ def main(number2):
         else:
             dic = {
                 'title': '',
+                'website': '',
             }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js

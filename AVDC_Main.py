@@ -29,7 +29,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.3'
+        self.version = '3.31'
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -212,15 +212,15 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         try:
             t = threading.Thread(target=self.AVDC_Main)
             t.start()  # 启动线程,即让线程开始执行
-        except Exception:
-            self.add_text_main('[-]Thread Exist Error!')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in pushButton_start_cap_clicked: ' + str(error_info))
 
     def pushButton_save_config_clicked(self):
         try:
             t = threading.Thread(target=self.save_config_clicked)
             t.start()  # 启动线程,即让线程开始执行
-        except Exception:
-            self.add_text_main('[-]Thread Save Config Error!')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in pushButton_save_config_clicked: ' + str(error_info))
 
     # ========================================================================读取设置页设置，保存在config.ini
     def save_config_clicked(self):
@@ -286,8 +286,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         try:
             t = threading.Thread(target=self.select_file_thread, args=(fileName,))
             t.start()  # 启动线程,即让线程开始执行
-        except Exception:
-            self.add_text_main('[-]Thread Select File Error!')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in pushButton_select_file_clicked: ' + str(error_info))
 
     def select_file_thread(self, file_name):
         file_root = os.getcwd().replace("\\\\", "/").replace("\\", "/")
@@ -296,9 +296,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         file_name = getNumber(file_name)
         self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
         try:
-            self.core_main(file_path, file_name)
-        except Exception:
-            self.add_text_main('[-]Error in Core!')
+            self.Core_Main(file_path, file_name)
+        except Exception as error_info:
+            self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
         self.add_text_main("[*]======================================================")
 
     # ========================================================================小工具-视频移动
@@ -307,8 +307,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         try:
             t = threading.Thread(target=self.move_file_thread)
             t.start()  # 启动线程,即让线程开始执行
-        except Exception:
-            self.add_text_main('[-]Thread Save Config Error!')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in move_file: ' + str(error_info))
 
     def move_file_thread(self):
         escape_dir = self.Ui.lineEdit_escape_dir_move.text()
@@ -322,8 +322,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 if len(sour.split('/')) > 2:
                     shutil.move(sour, des)
                     self.add_text_main('   [+]Move ' + sour.split('/')[lenth - 1] + ' Success!')
-            except:
-                self.add_text_main('[-]   Move ' + sour.split('/')[lenth - 1] + ' Error!')
+            except Exception as error_info:
+                self.add_text_main('[-]Error in move_file_thread: ' + str(error_info))
         self.add_text_main("[+]Move Movies All Finished!!!")
         self.add_text_main("[*]======================================================")
 
@@ -544,8 +544,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                         if not value == '':  # or actor_photo == []:
                             print("   <thumb>" + value + "</thumb>", file=code)
                         print("  </actor>", file=code)
-                except:
-                    aaaa = ''
+                except Exception as error_info:
+                    self.add_text_main('[-]Error in actor_photo: ' + str(error_info))
                 print("  <maker>" + studio + "</maker>", file=code)
                 print("  <label>", file=code)
                 print("  </label>", file=code)
@@ -554,13 +554,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 try:
                     for i in tag:
                         print("  <tag>" + i + "</tag>", file=code)
-                except:
-                    aaaaa = ''
+                except Exception as error_info:
+                    self.add_text_main('[-]Error in tag: ' + str(error_info))
                 try:
                     for i in tag:
                         print("  <genre>" + i + "</genre>", file=code)
-                except:
-                    aaaaaaaa = ''
+                except Exception as error_info:
+                    self.add_text_main('[-]Error in genre: ' + str(error_info))
                 if cn_sub == '1':
                     print("  <genre>中文字幕</genre>", file=code)
                 print("  <num>" + number + "</num>", file=code)
@@ -574,11 +574,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main("[+]Nfo Writed!       " + number + part + c_word + ".nfo")
         except IOError as e:
             self.add_text_main("[-]Write Failed!")
-            self.add_text_main(e)
+            self.add_text_main('[-]Error in PrintFiles: ' + str(e))
             self.moveFailedFolder(filepath, failed_folder)
-        except Exception as e1:
-            self.add_text_main(e1)
+        except Exception as error_info:
             self.add_text_main("[-]Write Failed!")
+            self.add_text_main('[-]Error in PrintFiles: ' + str(error_info))
             self.moveFailedFolder(filepath, failed_folder)
 
     def cutImage(self, option, imagecut, path, number, c_word):
@@ -671,11 +671,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 os.rename(os.getcwd() + '/' + number + c_word + '.sub', path + '/' + number + c_word + '.sub')
                 self.add_text_main('[+]Sub moved!')
         except FileExistsError:
-            self.add_text_main('[-]File Exists! Please check your movie!')
-            self.add_text_main('[-]move to the root folder of the program.')
-            # os._exit(0)
+            self.add_text_main('[-]Error in pasteFileToFolder_mode2! File Exists! Please check your movie!')
         except PermissionError:
-            self.add_text_main('[-]Error! Please run as administrator!')
+            self.add_text_main('[-]Error in pasteFileToFolder_mode2! Please run as administrator!')
 
     def pasteFileToFolder_mode2(self, filepath, path, multi_part, number, part, c_word, config):  # 文件路径，番号，后缀，要移动至的位置
         if multi_part == 1:
@@ -700,12 +698,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[+]Sub moved!')
             self.add_text_main('[!]Success')
         except FileExistsError:
-            self.add_text_main('[-]File Exists! Please check your movie!')
-            self.add_text_main('[-]move to the root folder of the program.')
-            # os._exit(0)
+            self.add_text_main('[-]Error in pasteFileToFolder_mode2! File Exists! Please check your movie!')
         except PermissionError:
-            self.add_text_main('[-]Error! Please run as administrator!')
-            # os._exit(0)
+            self.add_text_main('[-]Error in pasteFileToFolder_mode2! Please run as administrator!')
 
     def get_part(self, filepath, failed_folder):
         try:
@@ -713,8 +708,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 return re.findall('-CD\d+', filepath)[0]
             if re.search('-cd\d+', filepath):
                 return re.findall('-cd\d+', filepath)[0]
-        except:
-            self.add_text_main("[-]failed!Please rename the filename again!")
+        except Exception as error_info:
+            self.add_text_main('[-]Error in get_part: ' + str(error_info))
             self.moveFailedFolder(filepath, failed_folder)
 
     # ========================================================================更新进度条
@@ -734,8 +729,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                         continue
                     self.add_text_main('   [+]-' + "%-13s" % key + ': ' + str(value))
                 self.add_text_main('[+] ---Debug info---')
-        except:
-            self.add_text_main('[-] ---Debug error---')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in debug_mode: ' + str(error_info))
 
     # ========================================================================创建输出文件夹
     def creatFolder(self, success_folder, json_data, config):
@@ -763,12 +758,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             path = escapePath(path, config)
             try:
                 os.makedirs(path)
-            except:
-                self.add_text_main('[-]Error in Makedir Path')
+            except Exception as error_info:
+                self.add_text_main('[-]Error in creatFolder: ' + str(error_info))
                 return 'error'
         return path
 
-    def core_main(self, file_path, number_th):
+    def Core_Main(self, file_path, number_th):
         # =======================================================================初始化所需变量
         multi_part = 0
         part = ''
@@ -777,15 +772,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         cn_sub = ''
         filepath = file_path  # 影片的路径
         number = number_th.replace('_', '-')
-        if not re.match('\D{2,}0\d{4,}', number):
-            number = number.upper()
         config_file = 'config.ini'
         Config = ConfigParser()
         Config.read(config_file, encoding='UTF-8')
         try:
             option = ReadMediaWarehouse(Config)
-        except:
-            self.add_text_main('[-]Config media_warehouse read failed!')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in Core_Main: ' + str(error_info))
         program_mode = Config['common']['main_mode']  # 运行模式
         failed_folder = Config['common']['failed_output_folder']  # 失败输出目录
         success_folder = Config['common']['success_output_folder']  # 成功输出目录
@@ -794,6 +787,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if self.Ui.radioButton_all.isChecked():
             json_data = getDataFromJSON(number, Config, 1)  # 所有网站
         elif self.Ui.radioButton_javdb.isChecked():
+            self.add_text_main('[!]Please Wait Three Seconds！')
             time.sleep(3)
             json_data = getDataFromJSON(number, Config, 2)  # 仅javdb
         # =======================================================================是否找到影片信息
@@ -801,7 +795,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
             self.moveFailedFolder(filepath, failed_folder)
             return
-        if json_data['title'] == '' or json_data['number'] == '':
+        elif self.Ui.radioButton_javdb.isChecked() and json_data['actor'] == 'N/A':
+            self.add_text_main('[-]Your IP Has Been Blocked By JAVDB!')
+            return
+        elif json_data['title'] == '':
             self.add_text_main('[-]Movie Data not found!')
             self.moveFailedFolder(filepath, failed_folder)
             return
@@ -866,9 +863,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if not os.path.exists(failed_folder + '/'):  # 新建failed文件夹
             try:
                 os.makedirs(failed_folder + '/')
-            except:
-                self.add_text_main("[-]failed!can not be make Failed output folder\n[-](Please run as Administrator)")
-                # os._exit(0)
+            except Exception as error_info:
+                self.add_text_main('[-]Error in CreatFailedFolder: ' + str(error_info))
 
     def CEF(self, path):
         try:
@@ -911,23 +907,23 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
             try:
                 self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + getNumber(movie) + "]")
-                self.core_main(movie, getNumber(movie))
+                self.Core_Main(movie, getNumber(movie))
                 self.add_text_main("[*]======================================================")
-            except:  # 番号提取异常
-                self.add_text_main('[-]Error！' + movie + ' Cannot catch the number :')
+            except Exception as error_info:
+                self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
                 curr_path = str(os.getcwd()).replace('\\', '/')
                 if config['common']['soft_link'] == '1':
                     self.add_text_main('[-]Link ' + movie + ' to failed folder')
                     try:
                         os.symlink(movie, curr_path + '/' + 'failed/')
-                    except:
-                        self.add_text_main('[-]Link ' + movie + ' failed! Please run as Administrator!')
+                    except Exception as error_info:
+                        self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
                 else:
                     try:
                         shutil.move(movie, curr_path + '/' + 'failed/')
                         self.add_text_main('[-]Move ' + movie + ' to failed folder')
                     except shutil.Error as error_info:
-                        self.add_text_main('[-] ' + str(error_info))
+                        self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
                 self.add_text_main("[*]======================================================")
                 continue
         self.Ui.pushButton_start_cap.setEnabled(True)

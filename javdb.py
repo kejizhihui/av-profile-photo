@@ -84,9 +84,9 @@ def getTag(a):
         ',')
 
 
-def getCover_small(a):
+def getCover_small(a, count):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = html.xpath("//div[@class='item-image fix-scale-cover']/img/@src")[0]
+    result = html.xpath("//div[@class='item-image fix-scale-cover']/img/@src")[count]
     if not 'https' in result:
         result = 'https:' + result
     return result
@@ -112,57 +112,80 @@ def getOutline(htmlcode):
 
 
 def main(number):
-    number = number.upper()
     try:
         a = get_html('https://javdb.com/search?q=' + number + '&f=all').replace(u'\xa0', u' ')
         html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
         counts = len(html.xpath(
             '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\']'))
+        if counts == 0:
+            dic = {
+                'title': '',
+                'actor': '',
+                'website': '',
+            }
+            js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
+            return js
         count = 1
+        number_get = ''
+        movie_found = 0
         for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
             number_get = html.xpath(
                 '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\'][' + str(
                     count) + ']/a[@class=\'box\']/div[@class=\'uid\']/text()')[0]
-            if number == number_get:
+            number_get = number_get.replace('_', '-')
+            if number_get == number.upper() or number_get == number.lower():
+                movie_found = 1
                 break
         result1 = html.xpath('//*[@id="videos"]/div/div/a/@href')[count - 1]
         b = get_html('https://javdb.com' + result1).replace(u'\xa0', u' ')
-        dic = {
-            'actor': str(getActor(b)).strip(" [',']").replace('\'', ''),
-            'title': getTitle(b).replace("\\n", '').replace('_', '-').replace(number, '').strip().replace('  ', '-').replace(' ', '-'),
-            'studio': getStudio(b),
-            'outline': getOutline(b),
-            'runtime': getRuntime(b),
-            'director': getDirector(b),
-            'release': getRelease(b),
-            'number': getNum(b),
-            'cover': getCover(b),
-            'cover_small': getCover_small(a),
-            'imagecut': 3,
-            'tag': getTag(b),
-            'label': getLabel(b),
-            'year': getYear(getRelease(b)),  # str(re.search('\d{4}',getRelease(a)).group()),
-            'actor_photo': getActorPhoto(getActor(b)),
-            'website': 'https://javdb.com' + result1,
-            'source': 'javdb.py',
-        }
-        if getNum(b) != number:  # 与搜索到的番号不匹配
-            dic['title'] = ''
+        actor = getActor(b)
+        if len(actor) == 0 and 'FC2-' in number_get:
+            actor.append('FC2-NoActor')
+        if movie_found == 1:
+            dic = {
+                'actor': str(actor).strip(" [',']").replace('\'', ''),
+                'title': getTitle(b).replace("\\n", '').replace('_', '-').replace(number_get, '').strip().replace(' ', '-').replace('--', '-'),
+                'studio': getStudio(b),
+                'outline': getOutline(b),
+                'runtime': getRuntime(b),
+                'director': getDirector(b),
+                'release': getRelease(b),
+                'number': number_get,
+                'cover': getCover(b),
+                'cover_small': getCover_small(a, count - 1),
+                'imagecut': 3,
+                'tag': getTag(b),
+                'label': getLabel(b),
+                'year': getYear(getRelease(b)),  # str(re.search('\d{4}',getRelease(a)).group()),
+                'actor_photo': getActorPhoto(actor),
+                'website': 'https://javdb.com' + result1,
+                'source': 'javdb.py',
+            }
+        else:  # 未找到番号
+            dic = {
+                'title': '',
+                'actor': str(actor).strip(" [',']").replace('\'', ''),
+                'website': '',
+            }
     except:
         if a == 'ProxyError':
             dic = {
                 'title': '',
+                'actor': '',
                 'website': 'timeout',
             }
         else:
             dic = {
                 'title': '',
+                'actor': '',
+                'website': '',
             }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
 
-# print(main('SSNI-658'))
+# print(main('ADZ-081'))
 # input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
-# print(main('ABS-141'))
-# print(main('050517-522'))
+# print(main('abs-141'))
+# print(main('040409-562'))
+# print(main('n1403'))
