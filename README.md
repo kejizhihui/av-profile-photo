@@ -88,7 +88,7 @@
 ### **1、输出目录文件结构**<br>
 
 <div>
-<img src="https://github.com/moyy996/AVDC/blob/master/readme/tree-jav-output.png" height="500">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/tree-jav-output.png" height="700">
 </div>
 
 ### **2、媒体库：以下为刮削、导入后的EMBY**<br>
