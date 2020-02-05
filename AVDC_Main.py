@@ -380,16 +380,16 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     return
             except requests.exceptions.RequestException:
                 i += 1
-                self.add_text_main('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
             except requests.exceptions.ConnectionError:
                 i += 1
-                self.add_text_main('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
             except requests.exceptions.ProxyError:
                 i += 1
-                self.add_text_main('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
             except requests.exceptions.ConnectTimeout:
                 i += 1
-                self.add_text_main('[-]Image Download :  Connect retry ' + str(i) + '/' + str(retry_count))
+                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
         self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
         self.moveFailedFolder(filepath, failed_folder)
 
@@ -401,64 +401,63 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.moveFailedFolder(filepath, failed_folder)
             self.DownloadFileWithFilename(cover, number + c_word + '.jpg', path, Config, filepath, failed_folder)
             if not os.path.getsize(path + '/' + number + c_word + '.jpg') == 0:
-                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '.jpg')
+                self.add_text_main('[+]Fanart Downloaded! ' + number + c_word + '.jpg')
                 return
             i = 1
             while i <= int(Config['proxy']['retry']):
                 if os.path.getsize(path + '/' + number + c_word + '.jpg') == 0:
-                    self.add_text_main('[!]Image Download Failed! Trying again. [' + Config['proxy']['retry'] + '/3]')
+                    print('[!]Image Download Failed! Trying again. ' + str(i) + '/' + Config['proxy']['retry'])
                     self.DownloadFileWithFilename(cover, number + c_word + '.jpg', path, Config, filepath,
                                                   failed_folder)
                     i = i + 1
-                    continue
                 else:
                     break
             if multi_part == 1:
                 old_name = os.path.join(path, number + c_word + '.jpg')
                 new_name = os.path.join(path, number + c_word + '.jpg')
                 os.rename(old_name, new_name)
-                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '.jpg')
+                self.add_text_main('[+]Fanart Downloaded! ' + number + c_word + '.jpg')
             else:
-                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '.jpg')
+                self.add_text_main('[+]Fanart Downloaded! ' + number + c_word + '.jpg')
         elif option == 'plex':
             if self.DownloadFileWithFilename(cover, 'fanart.jpg', path, Config, filepath, failed_folder) == 'failed':
                 self.moveFailedFolder(filepath, failed_folder)
             self.DownloadFileWithFilename(cover, 'fanart.jpg', path, Config, filepath, failed_folder)
             if not os.path.getsize(path + '/fanart.jpg') == 0:
-                self.add_text_main('[+]Image Downloaded! fanart.jpg')
+                self.add_text_main('[+]Fanart Downloaded! fanart.jpg')
                 return
             i = 1
             while i <= int(Config['proxy']['retry']):
                 if os.path.getsize(path + '/fanart.jpg') == 0:
-                    self.add_text_main('[!]Image Download Failed! Trying again. [' + Config['proxy']['retry'] + '/3]')
+                    print('[!]Image Download Failed! Trying again. ' + str(i) + '/' + Config['proxy']['retry'])
                     self.DownloadFileWithFilename(cover, 'fanart.jpg', path, Config, filepath, failed_folder)
                     i = i + 1
                     continue
                 else:
                     break
             if not os.path.getsize(path + '/' + number + c_word + '.jpg') == 0:
-                self.add_text_main('[!]Image Download Failed! Trying again.')
+                print('[!]Image Download Failed! Trying again.')
                 self.DownloadFileWithFilename(cover, number + c_word + '.jpg', path, Config, filepath, failed_folder)
-            self.add_text_main('[+]Image Downloaded! fanart.jpg')
+            self.add_text_main('[+]Fanart Downloaded! fanart.jpg')
         elif option == 'kodi':
             if self.DownloadFileWithFilename(cover, number + c_word + '-fanart.jpg', path, Config, filepath,
                                              failed_folder) == 'failed':
                 self.moveFailedFolder(filepath, failed_folder)
             self.DownloadFileWithFilename(cover, number + c_word + '-fanart.jpg', path, Config, filepath, failed_folder)
             if not os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
-                self.add_text_main('[+]Image Downloaded! ' + number + c_word + '-fanart.jpg')
+                self.add_text_main('[+]Fanart Downloaded! ' + number + c_word + '-fanart.jpg')
                 return
             i = 1
             while i <= int(Config['proxy']['retry']):
                 if os.path.getsize(path + '/' + number + c_word + '-fanart.jpg') == 0:
-                    self.add_text_main('[!]Image Download Failed! Trying again. [' + Config['proxy']['retry'] + '/3]')
+                    print('[!]Image Download Failed! Trying again. ' + str(i) + '/' + Config['proxy']['retry'])
                     self.DownloadFileWithFilename(cover, number + c_word + '-fanart.jpg', path, Config, filepath,
                                                   failed_folder)
                     i = i + 1
                     continue
                 else:
                     break
-            self.add_text_main('[+]Image Downloaded! ' + number + c_word + '-fanart.jpg')
+            self.add_text_main('[+]Fanart Downloaded! ' + number + c_word + '-fanart.jpg')
 
     def smallCoverCheck(self, path, number, imagecut, cover_small, c_word, option, Config, filepath, failed_folder):
         if imagecut == 3:
@@ -471,7 +470,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 w = img.width
                 h = img.height
                 img.save(path + '/' + number + c_word + '.png')
-                self.add_text_main('[+]Image Cut!        ' + number + c_word + '.png')
+                self.add_text_main('[+]Poster Downloaded! ' + number + c_word + '.png')
                 time.sleep(1)
                 os.remove(path + '/1.jpg')
             if option == 'kodi':
@@ -483,7 +482,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 w = img.width
                 h = img.height
                 img.save(path + '/' + number + c_word + '-poster.jpg')
-                self.add_text_main('[+]Image Cut!        ' + number + c_word + '-poster.jpg')
+                self.add_text_main('[+]Poster Downloaded! ' + number + c_word + '-poster.jpg')
                 time.sleep(1)
                 os.remove(path + '/1.jpg')
             if option == 'plex':
@@ -495,7 +494,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 w = img.width
                 h = img.height
                 img.save(path + '/poster.png')
-                self.add_text_main('[+]Image Cut!        poster.png')
+                self.add_text_main('[+]Poster Downloaded! poster.png')
                 os.remove(path + '/1.jpg')
 
     # ========================================================================打印NFO
@@ -571,7 +570,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 print("  <cover>" + cover + "</cover>", file=code)
                 print("  <website>" + website + "</website>", file=code)
                 print("</movie>", file=code)
-                self.add_text_main("[+]Nfo Writed!       " + number + part + c_word + ".nfo")
+                self.add_text_main("[+]Nfo Writed!        " + number + part + c_word + ".nfo")
         except IOError as e:
             self.add_text_main("[-]Write Failed!")
             self.add_text_main('[-]Error in PrintFiles: ' + str(e))
@@ -591,7 +590,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     h = img.height
                     img2 = img.crop((w / 1.9, 0, w, h))
                     img2.save(path + '/poster.png')
-                    self.add_text_main('[+]Image Cut!        ' + 'poster.png')
+                    self.add_text_main('[+]Poster Cut!        ' + 'poster.png')
                 except:
                     self.add_text_main('[-]Cover cut failed!')
             elif imagecut == 0:
@@ -599,7 +598,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 w = img.width
                 h = img.height
                 img.save(path + '/poster.png')
-                self.add_text_main('[+]Image Cut!        ' + 'poster.png')
+                self.add_text_main('[+]Poster Cut!        ' + 'poster.png')
         elif option == 'emby':
             if imagecut == 1:
                 try:
@@ -609,7 +608,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     h = img.height
                     img2 = img.crop((w / 1.9, 0, w, h))
                     img2.save(path + '/' + number + c_word + '.png')
-                    self.add_text_main('[+]Image Cut!        ' + number + c_word + '.png')
+                    self.add_text_main('[+]Poster Cut!        ' + number + c_word + '.png')
                 except:
                     self.add_text_main('[-]Cover cut failed!')
             elif imagecut == 0:
@@ -617,7 +616,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 w = img.width
                 h = img.height
                 img.save(path + '/' + number + c_word + '.png')
-                self.add_text_main('[+]Image Cut!        ' + number + c_word + '.png')
+                self.add_text_main('[+]Poster Cut!        ' + number + c_word + '.png')
         elif option == 'kodi':
             if imagecut == 1:
                 try:
@@ -627,7 +626,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     h = img.height
                     img2 = img.crop((w / 1.9, 0, w, h))
                     img2.save(path + '/' + number + c_word + '-poster.jpg')
-                    self.add_text_main('[+]Image Cut!        ' + number + c_word + '-poster.jpg')
+                    self.add_text_main('[+]Poster Cut!        ' + number + c_word + '-poster.jpg')
                 except:
                     self.add_text_main('[-]Cover cut failed!')
             elif imagecut == 0:
@@ -640,7 +639,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 except:
                     img = img.convert('RGB')
                     img.save(path + '/' + number + c_word + '-poster.jpg')
-                self.add_text_main('[+]Image Cut!        ' + number + c_word + '-poster.jpg')
+                self.add_text_main('[+]Poster Cut!        ' + number + c_word + '-poster.jpg')
 
     def copyRenameJpgToBackdrop(self, option, path, number, c_word):
         if option == 'plex':
@@ -660,7 +659,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[+]Movie Linked!     ' + number + c_word + houzhui)
             else:
                 os.rename(filepath, path + '/' + number + c_word + houzhui)
-                self.add_text_main('[+]Movie Moved!      ' + number + c_word + houzhui)
+                self.add_text_main('[+]Movie Moved!       ' + number + c_word + houzhui)
             if os.path.exists(os.getcwd() + '/' + number + c_word + '.srt'):  # 字幕移动
                 os.rename(os.getcwd() + '/' + number + c_word + '.srt', path + '/' + number + c_word + '.srt')
                 self.add_text_main('[+]Sub moved!')
@@ -686,7 +685,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[+]Movie Linked!     ' + number + c_word + houzhui)
             else:
                 os.rename(filepath, path + '/' + number + c_word + houzhui)
-                self.add_text_main('[+]Movie Moved!      ' + number + c_word + houzhui)
+                self.add_text_main('[+]Movie Moved!       ' + number + c_word + houzhui)
             if os.path.exists(number + '.srt'):  # 字幕移动
                 os.rename(number + part + c_word + '.srt', path + '/' + number + c_word + '.srt')
                 self.add_text_main('[+]Sub moved!')
