@@ -39,10 +39,14 @@ def getNumber(filepath):
         filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filepath))  # 去除文件名中时间
         if 'FC2' or 'fc2' in filename:
             filename = filename.replace('-PPV', '').replace('PPV-', '').replace('-ppv', '').replace('ppv-', '')
-        try:
+        if re.search('\w+-\d+', filename):  # 提取类似mkbd-120番号
             file_number = re.search('\w+-\d+', filename).group()
-        except:  # 提取类似mkbd-s120番号
+        elif re.search('\w+-\w+\d+', filename):  # 提取类似mkbd-s120番号
             file_number = re.search('\w+-\w+\d+', filename).group()
+        elif re.search('\d+-\w+', filename):  # 提取类似 111111-MMMM 番号
+            file_number = re.search('\d+-\w+', filename).group()
+        elif re.search('\d+-\d+', filename):  # 提取类似 111111-000 番号
+            file_number = re.search('\d+-\d+', filename).group()
         return file_number
     else:  # 提取不含减号-的番号，FANZA CID 保留ssni00644，将MIDE139改成MIDE-139
         try:

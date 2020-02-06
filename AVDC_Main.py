@@ -29,7 +29,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.31'
+        self.version = '3.32'
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -175,7 +175,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if e.button() == Qt.LeftButton:
             self.m_drag = True
             self.m_DragPosition = e.globalPos() - self.pos()
-            e.accept()
             self.setCursor(QCursor(Qt.OpenHandCursor))
 
     def mouseReleaseEvent(self, e):
@@ -281,22 +280,36 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                                                                    "Movie Files(*.mp4 *.avi *.rmvb "
                                                                    "*.wmv *.mov *.mkv *.flv *.ts *.MP4 *.AVI *.RMVB "
                                                                    "*.WMV *.MOV *.MKV *.FLV *.TS);;All Files(*)")
-
-        self.Ui.stackedWidget.setCurrentIndex(0)
-        try:
-            t = threading.Thread(target=self.select_file_thread, args=(fileName,))
-            t.start()  # 启动线程,即让线程开始执行
-        except Exception as error_info:
-            self.add_text_main('[-]Error in pushButton_select_file_clicked: ' + str(error_info))
+        if fileName != '':
+            self.Ui.stackedWidget.setCurrentIndex(0)
+            try:
+                t = threading.Thread(target=self.select_file_thread, args=(fileName,))
+                t.start()  # 启动线程,即让线程开始执行
+            except Exception as error_info:
+                self.add_text_main('[-]Error in pushButton_select_file_clicked: ' + str(error_info))
 
     def select_file_thread(self, file_name):
         file_root = os.getcwd().replace("\\\\", "/").replace("\\", "/")
         file_path = file_name.replace(file_root, '.').replace("\\\\", "/").replace("\\", "/")
         file_name = os.path.splitext(file_name.split('/')[-1])[0]
-        file_name = getNumber(file_name)
+        mode = 0
+        if self.Ui.comboBox_website.currentText() == 'All websites':
+            mode = 1
+        elif self.Ui.comboBox_website.currentText() == 'javdb':
+            mode = 2
+        elif self.Ui.comboBox_website.currentText() == 'javbus':
+            mode = 3
+        elif self.Ui.comboBox_website.currentText() == 'avsox':
+            mode = 4
+        elif self.Ui.comboBox_website.currentText() == 'fc2club':
+            mode = 5
+        elif self.Ui.comboBox_website.currentText() == 'fanza':
+            mode = 6
+        elif self.Ui.comboBox_website.currentText() == 'siro':
+            mode = 7
         self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
         try:
-            self.Core_Main(file_path, file_name)
+            self.Core_Main(file_path, file_name, mode)
         except Exception as error_info:
             self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
         self.add_text_main("[*]======================================================")
@@ -313,7 +326,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def move_file_thread(self):
         escape_dir = self.Ui.lineEdit_escape_dir_move.text()
         movie_list = movie_lists(escape_dir)
-        self.add_text_main('[+]Move Movies Start! Find ' + str(len(movie_list)) + ' Movies')
+        self.add_text_main('[+]Move Movies Start!')
         for movie in movie_list:
             sour = movie
             lenth = len(sour.split('/'))
@@ -762,7 +775,19 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 return 'error'
         return path
 
-    def Core_Main(self, file_path, number_th):
+    # ========================================================================从指定网站获取json_data
+    def get_json_data(self, mode, number, config):
+        if (mode == 0 and self.Ui.radioButton_all.isChecked()) or mode == 1:
+            json_data = getDataFromJSON(number, config, 1)  # 所有网站
+        elif (mode == 0 and self.Ui.radioButton_javdb.isChecked()) or mode == 2:
+            self.add_text_main('[!]Please Wait Three Seconds！')
+            time.sleep(3)
+            json_data = getDataFromJSON(number, config, 2)  # 仅javdb
+        else:
+            json_data = getDataFromJSON(number, config, mode)  # 仅javbus或仅avsox或仅fc2club或仅fanza或仅siro
+        return json_data
+
+    def Core_Main(self, file_path, number_th, mode):
         # =======================================================================初始化所需变量
         multi_part = 0
         part = ''
@@ -781,14 +806,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         program_mode = Config['common']['main_mode']  # 运行模式
         failed_folder = Config['common']['failed_output_folder']  # 失败输出目录
         success_folder = Config['common']['success_output_folder']  # 成功输出目录
-        # =======================================================================抓取网站设置
-        json_data = {}
-        if self.Ui.radioButton_all.isChecked():
-            json_data = getDataFromJSON(number, Config, 1)  # 所有网站
-        elif self.Ui.radioButton_javdb.isChecked():
-            self.add_text_main('[!]Please Wait Three Seconds！')
-            time.sleep(3)
-            json_data = getDataFromJSON(number, Config, 2)  # 仅javdb
+        # =======================================================================获取json_data
+        json_data = self.get_json_data(mode, number, Config)
         # =======================================================================是否找到影片信息
         if json_data['website'] == 'timeout':
             self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
@@ -824,7 +843,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if program_mode == '1':
             if multi_part == 1:
                 number += part  # 这时number会被附加上-CDx后缀
-            self.smallCoverCheck(path, number, json_data['imagecut'], json_data['cover_small'], c_word, option, Config, filepath,
+            self.smallCoverCheck(path, number, json_data['imagecut'], json_data['cover_small'], c_word, option, Config,
+                                 filepath,
                                  failed_folder)  # 检查小封面
             self.imageDownload(option, json_data['cover'], number, c_word, path, multi_part, Config, filepath,
                                failed_folder)  # creatFoder会返回番号路径
@@ -906,7 +926,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
             try:
                 self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + getNumber(movie) + "]")
-                self.Core_Main(movie, getNumber(movie))
+                self.Core_Main(movie, getNumber(movie), 0)
                 self.add_text_main("[*]======================================================")
             except Exception as error_info:
                 self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))

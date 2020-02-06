@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_avdc">
      <widget class="QPushButton" name="pushButton_start_cap">
@@ -160,9 +160,9 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>30</y>
+         <y>60</y>
          <width>511</width>
-         <height>71</height>
+         <height>41</height>
         </rect>
        </property>
        <property name="text">
@@ -180,6 +180,64 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>选择文件</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_website">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>30</y>
+         <width>431</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>All websites</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>javdb</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>javbus</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>avsox</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>fc2club</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>fanza</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>siro</string>
+        </property>
+       </item>
+      </widget>
+      <widget class="QLabel" name="label_2">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>30</y>
+         <width>72</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>刮削网站:</string>
        </property>
       </widget>
      </widget>
