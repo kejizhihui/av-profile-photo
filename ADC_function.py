@@ -42,6 +42,10 @@ def save_config(json_config):
         print("", file=code)
         print("[debug_mode]", file=code)
         print("switch = " + str(json_config['switch_debug']), file=code)
+        print("", file=code)
+        print("[emby]", file=code)
+        print("emby_url = " + json_config['emby_url'], file=code)
+        print("api_key = " + json_config['api_key'], file=code)
     code.close()
 
 

@@ -150,7 +150,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>140</y>
         <width>751</width>
-        <height>121</height>
+        <height>111</height>
        </rect>
       </property>
       <property name="title">
@@ -239,6 +239,136 @@ p, li { white-space: pre-wrap; }
        <property name="text">
         <string>刮削网站:</string>
        </property>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_12">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>270</y>
+        <width>751</width>
+        <height>191</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>Emby-女优头像</string>
+      </property>
+      <widget class="QPushButton" name="pushButton_add_actor_pic">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>201</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>添加头像</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_emby_url">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>30</y>
+         <width>431</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_3">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>30</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Emby地址：</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_4">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>74</y>
+         <width>72</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>API密钥：</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_api_key">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>70</y>
+         <width>431</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_5">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>110</y>
+         <width>511</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>说明:
+   1、头像请放在程序目录下的Actor目录中。
+   2、密钥创建方法：Emby控制台-&gt;高级-&gt;API密钥-&gt;添加(APP名称任意)。</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_show_pic_actor">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>201</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>查看</string>
+       </property>
+      </widget>
+      <widget class="QComboBox" name="comboBox_pic_actor">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>110</y>
+         <width>201</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <item>
+        <property name="text">
+         <string>可添加头像的女优</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>没有头像的女优</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>已有头像的女优</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>所有女优</string>
+        </property>
+       </item>
       </widget>
      </widget>
     </widget>

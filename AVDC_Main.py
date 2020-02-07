@@ -19,6 +19,9 @@ from AV_Data_Capture import *
 from core import *
 from fanza import *
 import requests
+import re
+import shutil
+import base64
 
 
 class MyMAinWindow(QMainWindow, Ui_AVDV):
@@ -29,7 +32,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.32'
+        self.version = '3.4'
+        self.m_drag = False
+        self.m_DragPosition = 0
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -98,7 +103,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     border-radius:20px;
                     padding:2px 4px;
             }
-            QPushButton#pushButton_save_config, #pushButton_start_javdb{
+            QPushButton#pushButton_save_config,#pushButton_start_javdb,#pushButton_add_actor_pic,#pushButton_show_pic_actor{
                     font-size:18px;
                     background:#F0F8FF;
                     border:2px solid white;
@@ -121,6 +126,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.pushButton_start_cap.clicked.connect(self.pushButton_start_cap_clicked)
         self.Ui.pushButton_save_config.clicked.connect(self.pushButton_save_config_clicked)
         self.Ui.pushButton_move_mp4.clicked.connect(self.move_file)
+        self.Ui.pushButton_add_actor_pic.clicked.connect(self.pushButton_add_actor_pic_clicked)
+        self.Ui.pushButton_show_pic_actor.clicked.connect(self.pushButton_show_pic_actor_clicked)
 
     # ========================================================================加载config
     def Load_Config(self):
@@ -163,6 +170,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_dir_name.setText(config['Name_Rule']['location_rule'])
         self.Ui.lineEdit_media_name.setText(config['Name_Rule']['naming_rule'])
         self.Ui.lineEdit_escape_dir_move.setText(config['escape']['folders'])
+        self.Ui.lineEdit_emby_url.setText(config['emby']['emby_url'])
+        self.Ui.lineEdit_api_key.setText(config['emby']['api_key'])
 
     # ========================================================================显示版本号
     def show_version(self):
@@ -271,6 +280,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'naming_rule': self.Ui.lineEdit_media_name.text(),
             'literals': self.Ui.lineEdit_escape_char.text(),
             'folders': self.Ui.lineEdit_escape_dir.text(),
+            'emby_url': self.Ui.lineEdit_emby_url.text(),
+            'api_key': self.Ui.lineEdit_api_key.text(),
         }
         save_config(json_config)
 
@@ -339,6 +350,145 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[-]Error in move_file_thread: ' + str(error_info))
         self.add_text_main("[+]Move Movies All Finished!!!")
         self.add_text_main("[*]======================================================")
+
+    # ========================================================================小工具-emby女优头像
+    def pushButton_add_actor_pic_clicked(self):  # 添加头像按钮响应
+        self.Ui.stackedWidget.setCurrentIndex(0)
+        emby_url = self.Ui.lineEdit_emby_url.text()
+        api_key = self.Ui.lineEdit_api_key.text()
+        if emby_url == '':
+            self.add_text_main('[-]The emby_url is empty!')
+            self.add_text_main("[*]======================================================")
+            return
+        elif api_key == '':
+            self.add_text_main('[-]The api_key is empty!')
+            self.add_text_main("[*]======================================================")
+            return
+        try:
+            t = threading.Thread(target=self.found_profile_picture, args=(1,))
+            t.start()  # 启动线程,即让线程开始执行
+        except Exception as error_info:
+            self.add_text_main('[-]Error in pushButton_add_actor_pic_clicked: ' + str(error_info))
+
+    def pushButton_show_pic_actor_clicked(self):  # 查看按钮响应
+        self.Ui.stackedWidget.setCurrentIndex(0)
+        emby_url = self.Ui.lineEdit_emby_url.text()
+        api_key = self.Ui.lineEdit_api_key.text()
+        if emby_url == '':
+            self.add_text_main('[-]The emby_url is empty!')
+            self.add_text_main("[*]======================================================")
+            return
+        elif api_key == '':
+            self.add_text_main('[-]The api_key is empty!')
+            self.add_text_main("[*]======================================================")
+            return
+        if self.Ui.comboBox_pic_actor.currentIndex() == 0:  # 可添加头像的女优
+            try:
+                t = threading.Thread(target=self.found_profile_picture, args=(2,))
+                t.start()  # 启动线程,即让线程开始执行
+            except Exception as error_info:
+                self.add_text_main('[-]Error in pushButton_show_pic_actor_clicked: ' + str(error_info))
+        else:
+            try:
+                t = threading.Thread(target=self.show_actor, args=(self.Ui.comboBox_pic_actor.currentIndex(),))
+                t.start()  # 启动线程,即让线程开始执行
+            except Exception as error_info:
+                self.add_text_main('[-]Error in pushButton_show_pic_actor_clicked: ' + str(error_info))
+
+    def show_actor(self, mode):  # 按模式显示相应列表
+        actor_list = self.get_emby_actor_list()
+        count = 1
+        actor_list_temp = ''
+        if mode == 1:  # 没有头像的女优
+            self.add_text_main('[+]没有头像的女优!')
+        elif mode == 2:  # 有头像的女优
+            self.add_text_main('[+]有头像的女优!')
+        elif mode == 3:  # 所有女优
+            self.add_text_main('[+]所有女优!')
+        for actor in actor_list['Items']:
+            if mode == 3:  # 所有女优
+                actor_list_temp += str(count) + '.' + actor['Name'] + ','
+                count += 1
+            elif mode == 2 and actor['ImageTags'] != {}:  # 有头像的女优
+                actor_list_temp += str(count) + '.' + actor['Name'] + ','
+                count += 1
+            elif mode == 1 and actor['ImageTags'] == {}:  # 没有头像的女优
+                actor_list_temp += str(count) + '.' + actor['Name'] + ','
+                count += 1
+            if (count - 1) % 5 == 0 and actor_list_temp != '':
+                self.add_text_main('[+]' + actor_list_temp)
+                actor_list_temp = ''
+        self.add_text_main("[*]======================================================")
+
+    def get_emby_actor_list(self):  # 获取emby的演员列表
+        emby_url = self.Ui.lineEdit_emby_url.text()
+        api_key = self.Ui.lineEdit_api_key.text()
+        emby_url = emby_url.replace('：', ':')
+        url = 'http://' + emby_url + '/emby/Persons?api_key=' + api_key
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                          'Chrome/60.0.3100.0 Safari/537.36'}
+        getweb = requests.get(str(url), headers=headers, timeout=10)
+        getweb.encoding = 'utf-8'
+        actor_list = json.loads(getweb.text)
+        return actor_list
+
+    def found_profile_picture(self, mode):  # mode=1，上传头像，mode=2，显示可添加头像的女优
+        path = 'Actor'
+        profile_pictures = os.listdir(path)
+        actor_list = self.get_emby_actor_list()
+        if mode == 1:
+            self.add_text_main('[+]Start upload profile pictures!')
+        elif mode ==2:
+            self.add_text_main('[+]可添加头像的女优!')
+        count = 1
+        for actor in actor_list['Items']:
+            flag = 0
+            pic_name = ''
+            if actor['ImageTags'] == {}:
+                if actor['Name'] + '.jpg' in profile_pictures:
+                    flag = 1
+                    pic_name = actor['Name'] + '.jpg'
+                elif actor['Name'] + '.png' in profile_pictures:
+                    flag = 1
+                    pic_name = actor['Name'] + '.png'
+                if flag == 0:
+                    byname_list = re.split('[,()]', actor['Name'])
+                    for byname in byname_list:
+                        if byname + '.jpg' in profile_pictures:
+                            pic_name = byname + '.jpg'
+                            flag = 1
+                            break
+                        elif byname + '.png' in profile_pictures:
+                            pic_name = byname + '.png'
+                            flag = 1
+                            break
+                if flag == 1:
+                    if mode == 1:
+                        self.upload_profile_picture(count, actor, path + '/' + pic_name)
+                    else:
+                        self.add_text_main('[+]' + "%4s" % str(count) + '.Actor name: ' + actor['Name'] + '  Pic name: '
+                                           + pic_name)
+                    count += 1
+        self.add_text_main("[*]======================================================")
+
+    def upload_profile_picture(self, count, actor, pic_path):  # 上传头像
+        emby_url = self.Ui.lineEdit_emby_url.text()
+        api_key = self.Ui.lineEdit_api_key.text()
+        emby_url = emby_url.replace('：', ':')
+        f = open(pic_path, 'rb')  # 二进制方式打开图文件
+        b6_pic = base64.b64encode(f.read())  # 读取文件内容，转换为base64编码
+        f.close()
+        url = 'http://' + emby_url + '/emby/Items/' + actor['Id'] + '/Images/Primary?api_key=' + api_key
+        if pic_path.endswith('jpg'):
+            header = {"Content-Type": 'image/png', }
+        else:
+            header = {"Content-Type": 'image/jpeg', }
+        try:
+            respones = requests.post(url=url, data=b6_pic, headers=header)
+            self.add_text_main('[+]' + "%4s" % str(count) + '.Success upload profile picture for ' + actor['Name'] + '!')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in upload_profile_picture! ' + str(error_info))
 
     # ========================================================================core.py
     def add_text_main(self, text):
