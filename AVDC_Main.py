@@ -32,7 +32,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.4'
+        self.version = '3.41'
         self.m_drag = False
         self.m_DragPosition = 0
         self.Init()
@@ -45,6 +45,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.label_ico.setPixmap(pix)  # 添加图标
         self.Ui.progressBar_avdc.setValue(0)  # 进度条清0
         self.progressBarValue.connect(self.set_processbar)
+        self.Ui.progressBar_avdc.setTextVisible(False)  # 不显示进度条文字
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
@@ -110,6 +111,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     width:300px;
                     border-radius:13px;
                     padding:2px 4px;
+            }
+            QProgressBar::chunk{
+                    background-color: #2196F3;
+                    width: 5px; /*区块宽度*/
+                    margin: 0.5px;
             }
             ''')
 
@@ -318,8 +324,17 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             mode = 6
         elif self.Ui.comboBox_website.currentText() == 'siro':
             mode = 7
-        self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
         try:
+            if '-CD' in file_name or '-cd' in file_name:
+                part = ''
+                if re.search('-CD\d+', file_name):
+                    part = re.findall('-CD\d+', file_name)[0]
+                elif re.search('-cd\d+', file_name):
+                    part = re.findall('-cd\d+', file_name)[0]
+                file_name = file_name.replace(part, '')
+            if '-c.' in file_path or '-C.' in file_path:
+                file_name = file_name[0:-2]
+            self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
             self.Core_Main(file_path, file_name, mode)
         except Exception as error_info:
             self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
@@ -435,56 +450,68 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     def found_profile_picture(self, mode):  # mode=1，上传头像，mode=2，显示可添加头像的女优
         path = 'Actor'
+        if not os.path.exists(path):
+            self.add_text_main('[+]Actor folder not exist!')
+            self.add_text_main("[*]======================================================")
+            return
+        path_success = 'Actor/Success'
+        if not os.path.exists(path_success):
+            os.makedirs(path_success)
         profile_pictures = os.listdir(path)
         actor_list = self.get_emby_actor_list()
         if mode == 1:
             self.add_text_main('[+]Start upload profile pictures!')
-        elif mode ==2:
+        elif mode == 2:
             self.add_text_main('[+]可添加头像的女优!')
         count = 1
         for actor in actor_list['Items']:
             flag = 0
             pic_name = ''
-            if actor['ImageTags'] == {}:
-                if actor['Name'] + '.jpg' in profile_pictures:
-                    flag = 1
-                    pic_name = actor['Name'] + '.jpg'
-                elif actor['Name'] + '.png' in profile_pictures:
-                    flag = 1
-                    pic_name = actor['Name'] + '.png'
-                if flag == 0:
-                    byname_list = re.split('[,()]', actor['Name'])
-                    for byname in byname_list:
-                        if byname + '.jpg' in profile_pictures:
-                            pic_name = byname + '.jpg'
-                            flag = 1
-                            break
-                        elif byname + '.png' in profile_pictures:
-                            pic_name = byname + '.png'
-                            flag = 1
-                            break
-                if flag == 1:
-                    if mode == 1:
+            if actor['Name'] + '.jpg' in profile_pictures:
+                flag = 1
+                pic_name = actor['Name'] + '.jpg'
+            elif actor['Name'] + '.png' in profile_pictures:
+                flag = 1
+                pic_name = actor['Name'] + '.png'
+            if flag == 0:
+                byname_list = re.split('[,()]', actor['Name'])
+                for byname in byname_list:
+                    if byname + '.jpg' in profile_pictures:
+                        pic_name = byname + '.jpg'
+                        flag = 1
+                        break
+                    elif byname + '.png' in profile_pictures:
+                        pic_name = byname + '.png'
+                        flag = 1
+                        break
+            if flag == 1 and (actor['ImageTags'] == {} or not os.path.exists(path_success + '/' + pic_name)):
+                if mode == 1:
+                    try:
                         self.upload_profile_picture(count, actor, path + '/' + pic_name)
-                    else:
-                        self.add_text_main('[+]' + "%4s" % str(count) + '.Actor name: ' + actor['Name'] + '  Pic name: '
-                                           + pic_name)
-                    count += 1
+                        shutil.copy(path + '/' + pic_name, path_success + '/' + pic_name)
+                    except Exception as error_info:
+                        self.add_text_main('[-]Error in found_profile_picture! ' + str(error_info))
+                else:
+                    self.add_text_main('[+]' + "%4s" % str(count) + '.Actor name: ' + actor['Name'] + '  Pic name: '
+                                       + pic_name)
+                count += 1
+        if count == 1:
+            self.add_text_main('[-]NO profile picture can be uploaded!')
         self.add_text_main("[*]======================================================")
 
     def upload_profile_picture(self, count, actor, pic_path):  # 上传头像
         emby_url = self.Ui.lineEdit_emby_url.text()
         api_key = self.Ui.lineEdit_api_key.text()
         emby_url = emby_url.replace('：', ':')
-        f = open(pic_path, 'rb')  # 二进制方式打开图文件
-        b6_pic = base64.b64encode(f.read())  # 读取文件内容，转换为base64编码
-        f.close()
-        url = 'http://' + emby_url + '/emby/Items/' + actor['Id'] + '/Images/Primary?api_key=' + api_key
-        if pic_path.endswith('jpg'):
-            header = {"Content-Type": 'image/png', }
-        else:
-            header = {"Content-Type": 'image/jpeg', }
         try:
+            f = open(pic_path, 'rb')  # 二进制方式打开图文件
+            b6_pic = base64.b64encode(f.read())  # 读取文件内容，转换为base64编码
+            f.close()
+            url = 'http://' + emby_url + '/emby/Items/' + actor['Id'] + '/Images/Primary?api_key=' + api_key
+            if pic_path.endswith('jpg'):
+                header = {"Content-Type": 'image/png', }
+            else:
+                header = {"Content-Type": 'image/jpeg', }
             respones = requests.post(url=url, data=b6_pic, headers=header)
             self.add_text_main('[+]' + "%4s" % str(count) + '.Success upload profile picture for ' + actor['Name'] + '!')
         except Exception as error_info:
@@ -662,8 +689,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================打印NFO
     def PrintFiles(self, option, path, c_word, naming_rule, part, cn_sub, json_data, filepath, failed_folder):
-        title, studio, year, outline, runtime, director, actor_photo, actor, release, tag, number, cover, website = get_info(
-            json_data)
+        title, studio, year, outline, runtime, director, actor_photo, actor, release, tag, number, cover, website, label = get_info(json_data)
         naming_rule = naming_rule.split('-')
         name_title = ''
         count = 0
@@ -711,6 +737,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 print("  <maker>" + studio + "</maker>", file=code)
                 print("  <label>", file=code)
                 print("  </label>", file=code)
+                print("  <tag>" + label + "</tag>", file=code)
                 if cn_sub == '1':
                     print("  <tag>中文字幕</tag>", file=code)
                 try:
@@ -723,6 +750,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                         print("  <genre>" + i + "</genre>", file=code)
                 except Exception as error_info:
                     self.add_text_main('[-]Error in genre: ' + str(error_info))
+                print("  <genre>" + label + "</genre>", file=code)
                 if cn_sub == '1':
                     print("  <genre>中文字幕</genre>", file=code)
                 print("  <num>" + number + "</num>", file=code)
@@ -877,6 +905,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================更新进度条
     def set_processbar(self, value):
         self.Ui.progressBar_avdc.setProperty("value", value)
+        self.Ui.label_percent.setText(str(value) + '%')
 
     # ========================================================================输出调试信息
     def debug_mode(self, json_data, config):

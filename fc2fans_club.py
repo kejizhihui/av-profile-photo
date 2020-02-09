@@ -104,6 +104,7 @@ def main(number):
             'number': 'FC2-' + number,
             'cover': getCover(htmlcode, number, htmlcode2),
             'imagecut': 0,
+            'label': '',
             'tag': getTag(htmlcode),
             'actor_photo': getActorPhoto(actor),
             'website': 'https://fc2club.com//html/FC2-' + number + '.html',

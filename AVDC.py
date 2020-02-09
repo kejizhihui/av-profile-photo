@@ -31,9 +31,12 @@ class Ui_AVDV(object):
         self.textBrowser_warning.setGeometry(QtCore.QRect(140, 30, 361, 41))
         self.textBrowser_warning.setObjectName("textBrowser_warning")
         self.progressBar_avdc = QtWidgets.QProgressBar(self.page_avdc)
-        self.progressBar_avdc.setGeometry(QtCore.QRect(10, 690, 761, 23))
+        self.progressBar_avdc.setGeometry(QtCore.QRect(10, 690, 721, 23))
         self.progressBar_avdc.setProperty("value", 24)
         self.progressBar_avdc.setObjectName("progressBar_avdc")
+        self.label_percent = QtWidgets.QLabel(self.page_avdc)
+        self.label_percent.setGeometry(QtCore.QRect(740, 690, 31, 21))
+        self.label_percent.setObjectName("label_percent")
         self.stackedWidget.addWidget(self.page_avdc)
         self.page_tool = QtWidgets.QWidget()
         self.page_tool.setObjectName("page_tool")
@@ -307,7 +310,7 @@ class Ui_AVDV(object):
         AVDV.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(AVDV)
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(AVDV)
 
     def retranslateUi(self, AVDV):
@@ -319,6 +322,7 @@ class Ui_AVDV(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'SimSun\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt; font-weight:600; color:#000000;\">反馈BUG，请：开调试模式后截图。</span></p></body></html>"))
+        self.label_percent.setText(_translate("AVDV", "0%"))
         self.groupBox_6.setTitle(_translate("AVDV", "视频移动"))
         self.label_8.setText(_translate("AVDV", "程序所在目录的所有子目录(不包括排除目录)下的视频，移动到当前目录下。"))
         self.pushButton_move_mp4.setText(_translate("AVDV", "视频移动"))

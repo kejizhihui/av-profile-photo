@@ -142,4 +142,5 @@ def get_info(json_data):  # 返回json里的数据
     number = json_data['number']
     cover = json_data['cover']
     website = json_data['website']
-    return title, studio, year, outline, runtime, director, actor_photo, actor, release, tag, number, cover, website
+    label = json_data['label']
+    return title, studio, year, outline, runtime, director, actor_photo, actor, release, tag, number, cover, website, label
