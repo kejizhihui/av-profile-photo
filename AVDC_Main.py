@@ -731,7 +731,15 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if imagecut == 3:
             self.DownloadFileWithFilename(cover_small, 'cover_small.jpg', path, Config, filepath, failed_folder)
             try:
-                img = Image.open(path + '/cover_small.jpg')
+                fp = open(path + '/cover_small.jpg', 'rb')
+                img = Image.open(fp)
+                fp.close()
+                w = img.width
+                h = img.height
+                if int(w) >= int(h):
+                    self.add_text_main('[-]The size of cover_small.jpg is error, Try to cut fanart!')
+                    os.remove(path + '/cover_small.jpg')
+                    return 'small_cover_error'
                 if option == 'emby':
                     img.save(path + '/' + number + c_word + '.png')
                     self.add_text_main('[+]Poster Downloaded! ' + number + c_word + '.png')
