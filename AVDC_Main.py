@@ -32,7 +32,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.41'
+        self.version = '3.5'
         self.m_drag = False
         self.m_DragPosition = 0
         self.Init()
