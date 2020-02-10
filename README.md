@@ -158,9 +158,9 @@
 
 ---
 ### 2.6.命名规则
-  **1、目录命名**：存放视频数据的目录名，支持**多层目录**，例：actor/studio/number-title ,  目录之间用**斜线/**，两个选项之间用**短横杠-**。<br>
-  **2、视频标题**：nfo中的标题命名。例：number-title。可以自定义，两个选项之间需要**短横杠-**。<br>
-  **3、可选项**为title（片名）、actor（演员）、studio（公司）、director（导演）、release（发售日）、year（发行年份）、number（番号）、runtime（时长）<br>
+  **1、目录命名**：存放视频数据的目录名，支持**多层目录**，支持**自定义符号**，例：[actor]/studio/number-【title】。<br>
+  **2、视频标题**：nfo中的标题命名。例：number-[title]。可以自定义符号。<br>
+  **3、可选项**为title（片名）、actor（演员）、studio（公司）、director（导演）、release（发售日）、year（发行年份）、number（番号）、runtime（时长）、label（系列）<br>
 
 ---
 ### 2.7.网络设置 
@@ -202,6 +202,7 @@
 对于多影片重命名，可以用[ReNamer](http://www.den4b.com/products/renamer)来批量重命名<br><br>
 **3、Emby批量添加头像**：头像文件放在Actor目录下，填写emby网址、api密钥即可使用。[头像包下载](https://github.com/moyy996/AVDC/releases/tag/%E5%A4%B4%E5%83%8F%E5%8C%85)<br>
 可查看有头像，无头像女优，可往emby添加头像的女优。<br><br>
+**4、裁剪封面**：针对封面图比例错误，分辨率低的情况，判断人脸位置，裁剪缩略图为封面图。<br><br>
 
 
 ## 3.多目录影片处理
