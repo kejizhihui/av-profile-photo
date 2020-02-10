@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'AVDC.ui'
 #
-# Created by: PyQt5 UI code generator 5.14.1
+# Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
 
@@ -108,6 +108,15 @@ class Ui_AVDV(object):
         self.comboBox_pic_actor.addItem("")
         self.comboBox_pic_actor.addItem("")
         self.comboBox_pic_actor.addItem("")
+        self.groupBox_13 = QtWidgets.QGroupBox(self.page_tool)
+        self.groupBox_13.setGeometry(QtCore.QRect(10, 470, 751, 111))
+        self.groupBox_13.setObjectName("groupBox_13")
+        self.pushButton_select_fanart = QtWidgets.QPushButton(self.groupBox_13)
+        self.pushButton_select_fanart.setGeometry(QtCore.QRect(10, 20, 201, 71))
+        self.pushButton_select_fanart.setObjectName("pushButton_select_fanart")
+        self.label_6 = QtWidgets.QLabel(self.groupBox_13)
+        self.label_6.setGeometry(QtCore.QRect(230, 20, 511, 71))
+        self.label_6.setObjectName("label_6")
         self.stackedWidget.addWidget(self.page_tool)
         self.page_setting = QtWidgets.QWidget()
         self.page_setting.setObjectName("page_setting")
@@ -310,7 +319,7 @@ class Ui_AVDV(object):
         AVDV.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(AVDV)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(AVDV)
 
     def retranslateUi(self, AVDV):
@@ -350,6 +359,12 @@ class Ui_AVDV(object):
         self.comboBox_pic_actor.setItemText(1, _translate("AVDV", "没有头像的女优"))
         self.comboBox_pic_actor.setItemText(2, _translate("AVDV", "已有头像的女优"))
         self.comboBox_pic_actor.setItemText(3, _translate("AVDV", "所有女优"))
+        self.groupBox_13.setTitle(_translate("AVDV", "裁剪封面图"))
+        self.pushButton_select_fanart.setText(_translate("AVDV", "选择缩略图"))
+        self.label_6.setText(_translate("AVDV", "说明:\n"
+"  1、对有些封面图(.png)不满意,比例不对或者分辨率太低,可使用此工具。\n"
+"  2、此工具通过判断人脸位置，可以将缩略图(.jpg)裁剪为封面图。\n"
+"  3、不要选择Backdrop.jpg。"))
         self.pushButton_save_config.setText(_translate("AVDV", "保存"))
         self.groupBox_8.setTitle(_translate("AVDV", "命名规则"))
         self.label_43.setText(_translate("AVDV", "   目录命名：             "))

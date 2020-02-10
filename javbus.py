@@ -99,6 +99,21 @@ def getSerise_uncensored(htmlcode):
     return result
 
 
+def getCover_small(number):
+    htmlcode = get_html('https://avsox.host/cn/search/' + number)
+    html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
+    if result1 == '' or result1 == 'null' or result1 == 'None':
+        htmlcode = get_html('https://avsox.host/cn/search/' + number.replace('-', '_'))
+        html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+        result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
+        if result1 == '' or result1 == 'null' or result1 == 'None':
+            htmlcode = get_html('https://avsox.host/cn/search/' + number.replace('_', ''))
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    result = str(html.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')).strip(" ['']")
+    return result
+
+
 def getTag(htmlcode):  # 获取演员
     tag = []
     soup = BeautifulSoup(htmlcode, 'lxml')
@@ -111,12 +126,12 @@ def getTag(htmlcode):  # 获取演员
 
 
 def main(number):
+    htmlcode = get_html('https://www.javbus.com/' + number)
     try:
-        htmlcode = get_html('https://www.javbus.com/' + number)
-        try:
-            dww_htmlcode = get_html("https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=" + number.replace("-", ''))
-        except:
-            dww_htmlcode = ''
+        dww_htmlcode = get_html("https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=" + number.replace("-", ''))
+    except:
+        dww_htmlcode = ''
+    try:
         dic = {
             'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))),
             'studio': getStudio(htmlcode),
@@ -135,24 +150,31 @@ def main(number):
             'website': 'https://www.javbus.com/' + number,
             'source': 'javbus.py',
         }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
-        return js
     except:
-        return main_uncensored(number)
+        if htmlcode == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+                'website': '',
+            }
+    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
+    return js
 
 
 def main_uncensored(number):
     htmlcode = get_html('https://www.javbus.com/' + number)
-    dww_htmlcode = get_html("https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=" + number.replace("-", ''))
     if getTitle(htmlcode) == '':
         htmlcode = get_html('https://www.javbus.com/' + number.replace('-', '_'))
-        dww_htmlcode = get_html("https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=" + number.replace("-", ''))
     try:
         dic = {
             'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))).replace(getNum(htmlcode) + '-', ''),
             'studio': getStudio(htmlcode),
             'year': getYear(htmlcode),
-            'outline': getOutline(dww_htmlcode),
+            'outline': '',
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
             'actor': getActor(htmlcode),
@@ -161,11 +183,14 @@ def main_uncensored(number):
             'cover': getCover(htmlcode),
             'tag': getTag(htmlcode),
             'label': getSerise_uncensored(htmlcode),
-            'imagecut': 0,
+            'imagecut': 3,
+            'cover_small': getCover_small(number),
             'actor_photo': getActorPhoto(htmlcode),
             'website': 'https://www.javbus.com/' + number,
             'source': 'javbus.py',
         }
+        if dic['cover_small'] == '':
+            dic['imagecut'] = 0
     except:
         if htmlcode == 'ProxyError':
             dic = {
@@ -181,4 +206,4 @@ def main_uncensored(number):
     return js
 
 # print(main('SSNI-658'))
-# print(main_uncensored('050517_522'))
+# print(main_uncensored('051119-917'))

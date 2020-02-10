@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_avdc">
      <widget class="QPushButton" name="pushButton_start_cap">
@@ -382,6 +382,48 @@ p, li { white-space: pre-wrap; }
          <string>所有女优</string>
         </property>
        </item>
+      </widget>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_13">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>470</y>
+        <width>751</width>
+        <height>111</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>裁剪封面图</string>
+      </property>
+      <widget class="QPushButton" name="pushButton_select_fanart">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>201</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>选择缩略图</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_6">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>20</y>
+         <width>511</width>
+         <height>71</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>说明:
+  1、对有些封面图(.png)不满意,比例不对或者分辨率太低,可使用此工具。
+  2、此工具通过判断人脸位置，可以将缩略图(.jpg)裁剪为封面图。
+  3、不要选择Backdrop.jpg。</string>
+       </property>
       </widget>
      </widget>
     </widget>

@@ -5,7 +5,6 @@ import os
 from core import *
 
 
-
 def movie_lists(escape_folder):
     if escape_folder != '':
         escape_folder = re.split('[,，]', escape_folder)
@@ -32,21 +31,30 @@ def movie_lists(escape_folder):
 
 
 def getNumber(filepath):
-    filepath = filepath.replace('./', '')
-    if '-' in filepath or '_' in filepath:  # 普通提取番号 主要处理包含减号-和_的番号
-        filepath = filepath.replace("_", "-")
-        filepath.strip('22-sht.me').strip('-HD').strip('-hd')
-        filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filepath))  # 去除文件名中时间
+    filepath = filepath.replace('-C.', '.').replace('-c.', '.')
+    filepath = os.path.splitext(filepath.split('/')[-1])[0]
+    filepath = filepath.replace("_", "-")
+    part = ''
+    if re.search('-CD\d+', filepath):
+        part = re.findall('-CD\d+', filepath)[0]
+    if re.search('-cd\d+', filepath):
+        part = re.findall('-cd\d+', filepath)[0]
+    filepath.strip('22-sht.me').strip('-HD').strip('-hd')
+    filepath = filepath.replace(part, '')
+    filename = str(re.sub("\[\d{4}-\d{1,2}-\d{1,2}\] - ", "", filepath))  # 去除文件名中时间
+    if '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
             filename = filename.replace('-PPV', '').replace('PPV-', '').replace('-ppv', '').replace('ppv-', '')
         if re.search('\w+-\d+', filename):  # 提取类似mkbd-120番号
             file_number = re.search('\w+-\d+', filename).group()
-        elif re.search('\w+-\w+\d+', filename):  # 提取类似mkbd-s120番号
-            file_number = re.search('\w+-\w+\d+', filename).group()
+        elif re.search('\w+-\w\d+', filename):  # 提取类似mkbd-s120番号
+            file_number = re.search('\w+-\w\d+', filename).group()
         elif re.search('\d+-\w+', filename):  # 提取类似 111111-MMMM 番号
             file_number = re.search('\d+-\w+', filename).group()
         elif re.search('\d+-\d+', filename):  # 提取类似 111111-000 番号
             file_number = re.search('\d+-\d+', filename).group()
+        else:
+            file_number = filename
         return file_number
     else:  # 提取不含减号-的番号，FANZA CID 保留ssni00644，将MIDE139改成MIDE-139
         try:
