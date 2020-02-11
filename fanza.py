@@ -124,7 +124,7 @@ def main(number):
         dic = {
             'title': getTitle(htmlcode).strip(getActor(htmlcode)),
             'studio': getStudio(htmlcode),
-            'outline': getOutline(htmlcode),
+            'outline': getOutline(htmlcode).replace('\n', ''),
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
             'actor': actor,

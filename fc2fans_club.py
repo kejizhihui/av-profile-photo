@@ -96,7 +96,7 @@ def main(number):
             'title': getTitle(htmlcode).replace(' ', '-'),
             'studio': getStudio(htmlcode),
             'year': '',  # str(re.search('\d{4}',getRelease(number)).group()),
-            'outline': getOutline(htmlcode2),
+            'outline': getOutline(htmlcode2).replace('\n', ''),
             'runtime': getYear(getRelease(htmlcode)),
             'director': getStudio(htmlcode),
             'actor': actor.replace('/', ','),

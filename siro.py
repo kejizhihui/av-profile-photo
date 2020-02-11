@@ -22,6 +22,15 @@ def getActor(a):  # //*[@id="center_column"]/div[2]/div[1]/div/table/tbody/tr[1]
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '').replace('/', ',')
 
 
+def getActorPhoto(actor):  # //*[@id="star_qdt"]/li/a/img
+    d = {}
+    for i in actor:
+        if ',' not in i or ')' in i:
+            p = {i: ''}
+            d.update(p)
+    return d
+
+
 def getStudio(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//th[contains(text(),"シリーズ：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
@@ -117,13 +126,14 @@ def main(number2):
                                                                                        '').replace(
         '\n                        ', '')
     try:
+        actor = getActor(a)
         dic = {
             'title': getTitle(htmlcode).replace("\\n", '').replace('        ', ''),
             'studio': getStudio(a),
-            'outline': getOutline(htmlcode),
+            'outline': getOutline(htmlcode).replace('\n', ''),
             'runtime': getRuntime(a),
             'director': getDirector(a),
-            'actor': getActor(a),
+            'actor': actor,
             'release': getRelease(a),
             'number': getNum(a),
             'cover': getCover(htmlcode),
@@ -131,7 +141,7 @@ def main(number2):
             'tag': getTag(a),
             'label': getLabel(a),
             'year': getYear(getRelease(a)),  # str(re.search('\d{4}',getRelease(a)).group()),
-            'actor_photo': '',
+            'actor_photo': getActorPhoto(actor.split(',')),
             'website': 'https://www.mgstage.com/product/product_detail/' + str(number) + '/',
             'source': 'siro.py',
         }

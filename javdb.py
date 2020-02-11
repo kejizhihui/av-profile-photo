@@ -146,7 +146,7 @@ def main(number):
                 'actor': str(actor).strip(" [',']").replace('\'', ''),
                 'title': getTitle(b).replace("\\n", '').replace('_', '-').replace(number_get, '').strip().replace(' ', '-').replace('--', '-'),
                 'studio': getStudio(b),
-                'outline': getOutline(b),
+                'outline': getOutline(b).replace('\n', ''),
                 'runtime': getRuntime(b),
                 'director': getDirector(b),
                 'release': getRelease(b),

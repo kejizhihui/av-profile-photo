@@ -136,7 +136,7 @@ def main(number):
             'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))),
             'studio': getStudio(htmlcode),
             'year': str(re.search('\d{4}', getYear(htmlcode)).group()),
-            'outline': getOutline(dww_htmlcode),
+            'outline': getOutline(dww_htmlcode).replace('\n', ''),
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
             'actor': getActor(htmlcode),

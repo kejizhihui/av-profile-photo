@@ -24,6 +24,7 @@ from aip import AipBodyAnalysis
 from PIL import Image
 import os
 
+
 class MyMAinWindow(QMainWindow, Ui_AVDV):
     progressBarValue = pyqtSignal(int)  # 进度条信号量
 
@@ -32,9 +33,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
-        self.version = '3.5'
+        # 初始化需要的变量
+        self.version = '3.6'
         self.m_drag = False
         self.m_DragPosition = 0
+        self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
+        self.item_fail = self.Ui.treeWidget_number.topLevelItem(1)
+        self.json_array = {}
         self.Init()
         self.Load_Config()
         self.show_version()
@@ -49,6 +54,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)  # 隐藏边框
         # self.setWindowOpacity(0.9)  # 设置窗口透明度
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
+        self.Ui.treeWidget_number.expandAll()
+        self.Ui.checkBox_cover.setChecked(True)
         # 控件美化
         self.Ui.widget_setting.setStyleSheet(
             '''
@@ -75,6 +82,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     border-radius:20px;
                     padding:2px 4px;
             }            
+            QTextBrowser{
+                    border:1px solid gray;
+                    background:white;
+                    width:300px;
+                    border-radius:10px;
+                    padding:2px 4px;
+            }
             QLineEdit{
                     background:white;
                     border:1px solid white;
@@ -104,7 +118,15 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     border-radius:20px;
                     padding:2px 4px;
             }
-            QPushButton#pushButton_save_config,#pushButton_add_actor_pic,#pushButton_show_pic_actor{
+            QPushButton#pushButton_add_actor_pic{
+                    font-size:20px;
+                    background:#F0F8FF;
+                    border:2px solid white;
+                    width:300px;
+                    border-radius:20px;
+                    padding:2px 4px;
+            }
+            QPushButton#pushButton_save_config,#pushButton_show_pic_actor{
                     font-size:20px;
                     background:#F0F8FF;
                     border:2px solid white;
@@ -122,6 +144,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================按钮点击事件
     def Init(self):
         self.Ui.stackedWidget.setCurrentIndex(0)
+        self.Ui.treeWidget_number.clicked.connect(self.treeWidget_number_clicked)
         self.Ui.pushButton_close.clicked.connect(self.close_win)
         self.Ui.pushButton_min.clicked.connect(self.min_win)
         self.Ui.pushButton_main.clicked.connect(self.pushButton_main_clicked)
@@ -135,6 +158,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.pushButton_add_actor_pic.clicked.connect(self.pushButton_add_actor_pic_clicked)
         self.Ui.pushButton_show_pic_actor.clicked.connect(self.pushButton_show_pic_actor_clicked)
         self.Ui.pushButton_select_fanart.clicked.connect(self.pushButton_select_fanart_clicked)
+        self.Ui.pushButton_log.clicked.connect(self.pushButton_show_log_clicked)
+        self.Ui.checkBox_cover.stateChanged.connect(self.cover_change)
 
     # ========================================================================加载config
     def Load_Config(self):
@@ -221,6 +246,23 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     def pushButton_about_clicked(self):
         self.Ui.stackedWidget.setCurrentIndex(3)
+
+    def pushButton_show_log_clicked(self):
+        self.Ui.stackedWidget.setCurrentIndex(4)
+
+    def cover_change(self):
+        if not self.Ui.checkBox_cover.isChecked():
+            self.Ui.label_poster.setText("封面图")
+            self.Ui.label_fanart.setText("缩略图")
+
+    def treeWidget_number_clicked(self, qmodeLindex):
+        item = self.Ui.treeWidget_number.currentItem()
+        if item.text(0) != '成功' and item.text(0) != '失败':
+            try:
+                index_json = str(item.text(0)).split('.')[0]
+                self.add_label_info(self.json_array[str(index_json)])
+            except:
+                print('Error in treeWidget_number_clicked!')
 
     def pushButton_start_cap_clicked(self):
         self.Ui.pushButton_start_cap.setEnabled(False)
@@ -336,7 +378,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             if '-c.' in file_path or '-C.' in file_path:
                 file_name = file_name[0:-2]
             self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
-            self.Core_Main(file_path, file_name, mode)
+            self.Core_Main(file_path, file_name, mode, 0)
         except Exception as error_info:
             self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
         self.add_text_main("[*]======================================================")
@@ -401,14 +443,22 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         ey = 0
         ew = ewidth
         eh = height
-        img = Image.open(file_path)
+        fp = open(file_path, 'rb')
+        img = Image.open(fp)
         img_new_png = img.crop((ex, ey, ew + ex, eh + ey))
-        img_new_png.save(os.path.join(path, png_name))
+        fp.close()
+        img_new_png.save(path + '/' + png_name)
         self.add_text_main('[+]Poster Cut         ' + png_name + ' from ' + file_name + '!')
+        pix = QPixmap(file_path)
+        self.Ui.label_fanart.setScaledContents(True)
+        self.Ui.label_fanart.setPixmap(pix)  # 添加图标
+        pix = QPixmap(path + '/' + png_name)
+        self.Ui.label_poster.setScaledContents(True)
+        self.Ui.label_poster.setPixmap(pix)  # 添加图标
 
     # ========================================================================小工具-视频移动
     def move_file(self):
-        self.Ui.stackedWidget.setCurrentIndex(0)
+        self.Ui.stackedWidget.setCurrentIndex(4)
         try:
             t = threading.Thread(target=self.move_file_thread)
             t.start()  # 启动线程,即让线程开始执行
@@ -733,7 +783,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             try:
                 fp = open(path + '/cover_small.jpg', 'rb')
                 img = Image.open(fp)
-                fp.close()
                 w = img.width
                 h = img.height
                 if int(w) >= int(h):
@@ -750,9 +799,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     img.save(path + '/poster.png')
                     self.add_text_main('[+]Poster Downloaded! poster.png')
                 time.sleep(1)
+                fp.close()
                 os.remove(path + '/cover_small.jpg')
             except Exception as error_info:
                 self.add_text_main('[-]Error in smallCoverDownload: ' + str(error_info))
+                fp.close()
                 os.remove(path + '/cover_small.jpg')
                 self.add_text_main('[+]Try to cut fanart!')
                 return 'small_cover_error'
@@ -915,9 +966,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         except PermissionError:
             self.add_text_main('[-]Error in pasteFileToFolder_mode2! Please run as administrator!')
 
-    def pasteFileToFolder_mode2(self, filepath, path, multi_part, number, part, c_word, config):  # 文件路径，番号，后缀，要移动至的位置
-        if multi_part == 1:
-            number += part  # 这时number会被附加上CD1后缀
+    def pasteFileToFolder_mode2(self, filepath, path, number, part, c_word, config):  # 文件路径，番号，后缀，要移动至的位置
         houzhui = str(
             re.search('[.](AVI|RMVB|WMV|MOV|MP4|MKV|FLV|TS|avi|rmvb|wmv|mov|mp4|mkv|flv|ts)$', filepath).group())
         try:
@@ -962,11 +1011,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         try:
             self.add_text_main('[+] ---Debug info---')
             for key, value in json_data.items():
-                if key == 'title' and value == 'unknown':
+                if key == 'title' and value == '':
                     self.add_text_main('   [+]Title is None, Not Find Info!')
                     break
                 if value == '' or key == 'actor_photo':
                     continue
+                if key == 'tag':
+                    value = str(json_data['tag']).strip(" ['']").replace('\'', '')
                 self.add_text_main('   [+]-' + "%-13s" % key + ': ' + str(value))
             self.add_text_main('[+] ---Debug info---')
         except Exception as error_info:
@@ -1007,7 +1058,31 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             json_data = getDataFromJSON(number, config, mode)  # 仅javbus或仅avsox或仅fc2club或仅fanza或仅siro
         return json_data
 
-    def Core_Main(self, file_path, number_th, mode):
+    # ========================================================================json_data添加到主界面
+    def add_label_info(self, json_data):
+        self.Ui.label_number.setText(json_data['number'])
+        self.Ui.label_release.setText(json_data['release'])
+        self.Ui.label_director.setText(json_data['director'])
+        self.Ui.label_runtime.setText(json_data['runtime'])
+        self.Ui.label_studio.setText(json_data['studio'])
+        self.Ui.label_label.setText(json_data['label'])
+        self.Ui.label_title.setText(json_data['title'])
+        self.Ui.label_actor.setText(json_data['actor'])
+        self.Ui.label_outline.setText(json_data['outline'])
+        self.Ui.label_tag.setText(str(json_data['tag']))
+        fanart_path = json_data['fanart_path']
+        poster_path = json_data['poster_path']
+        if os.path.exists(fanart_path):
+            pix = QPixmap(fanart_path)
+            self.Ui.label_fanart.setScaledContents(True)
+            self.Ui.label_fanart.setPixmap(pix)  # 添加图标
+        if os.path.exists(poster_path):
+            pix = QPixmap(poster_path)
+            self.Ui.label_poster.setScaledContents(True)
+            self.Ui.label_poster.setPixmap(pix)  # 添加图标
+
+
+    def Core_Main(self, file_path, number_th, mode, count):
         # =======================================================================初始化所需变量
         multi_part = 0
         part = ''
@@ -1031,15 +1106,17 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         # =======================================================================是否找到影片信息
         if json_data['website'] == 'timeout':
             self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
-            self.moveFailedFolder(filepath, failed_folder)
-            return
+            return ''
         elif self.Ui.radioButton_javdb.isChecked() and json_data['actor'] == 'N/A':
             self.add_text_main('[-]Your IP Has Been Blocked By JAVDB!')
-            return
+            return ''
         elif json_data['title'] == '':
             self.add_text_main('[-]Movie Data not found!')
+            node = QTreeWidgetItem(self.item_fail)
+            node.setText(0, str(count) + '.' + os.path.splitext(filepath.split('/')[-1])[0])
+            self.item_fail.addChild(node)
             self.moveFailedFolder(filepath, failed_folder)
-            return
+            return 'not found'
         # =======================================================================调试模式
         if self.Ui.radioButton_debug_on.isChecked():
             self.debug_mode(json_data, Config)
@@ -1061,9 +1138,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.add_text_main('[+]From : ' + json_data['website'])
         # =======================================================================刮削模式
         number = json_data['number']
+        if multi_part == 1:
+            number += part  # 这时number会被附加上-CDx后缀
         if program_mode == '1':
-            if multi_part == 1:
-                number += part  # 这时number会被附加上-CDx后缀
             # imagecut 1 裁剪右半面，0 裁剪缩略图为封面，3 下载小封面
             self.fanartDownload(option, json_data['cover'], number, c_word, path, multi_part, Config, filepath,
                                 failed_folder)
@@ -1077,7 +1154,24 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.pasteFileToFolder(filepath, path, number, c_word, Config)  # 移动文件
             # =======================================================================整理模式
         elif program_mode == '2':
-            self.pasteFileToFolder_mode2(filepath, path, multi_part, number, part, c_word, Config)  # 移动文件
+            self.pasteFileToFolder_mode2(filepath, path, number, part, c_word, Config)  # 移动文件
+        # =======================================================================json添加封面项
+        fanart_path = ''
+        poster_path = ''
+        if self.Ui.radioButton_emby.isChecked():  # emby/jellyfin
+            fanart_path = path + '/' + number + c_word + '.jpg'
+            poster_path = path + '/' + number + c_word + '.png'
+        elif self.Ui.radioButton_plex.isChecked():  # plex
+            fanart_path = path + '/fanart.jpg'
+            poster_path = path + '/poster.png'
+        elif self.Ui.radioButton_kodi.isChecked():  # kodi
+            fanart_path = path + '/' + number + c_word + '-fanart.jpg'
+            poster_path = path + '/' + number + c_word + '-poster.jpg'
+        json_data['fanart_path'] = fanart_path
+        json_data['poster_path'] = poster_path
+        json_data['number'] = number
+        self.add_label_info(json_data)
+        self.json_array[str(count)] = json_data
 
     # ========================================================================AVDC刮削主功能
     def UpdateCheck(self):
@@ -1107,13 +1201,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[-]Error in CreatFailedFolder: ' + str(error_info))
 
     def CEF(self, path):
-        try:
-            dirs = os.listdir(path)  # 获取路径下的子文件(夹)列表
-            for dir in dirs:
+        dirs = os.listdir(path)  # 获取路径下的子文件(夹)列表
+        for dir in dirs:
+            try:
                 os.removedirs(path + '/' + dir)  # 删除这个空文件夹
                 self.add_text_main('[+]Deleting empty folder' + path + '/' + dir)
-        except:
-            print('[+]Deleting empty folder error!')
+            except:
+                print('[+]Deleting empty folder error!')
 
     def AVDC_Main(self):
         # =======================================================================初始化所需变量
@@ -1141,15 +1235,22 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         # =======================================================================遍历电影列表 交给core处理
         for movie in movie_list:  # 遍历电影列表 交给core处理
             count += 1
+            self.Ui.label_progress.setText(str(count) + '/' + str(count_all))
             percentage = str(count / int(count_all) * 100)[:4] + '%'
             value = int(count / int(count_all) * 100)
             self.progressBarValue.emit(int(value))
             self.add_text_main('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
             try:
                 self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + getNumber(movie) + "]")
-                self.Core_Main(movie, getNumber(movie), 0)
+                if self.Core_Main(movie, getNumber(movie), 0, count) != 'not found':
+                    node = QTreeWidgetItem(self.item_succ)
+                    node.setText(0, str(count) + '.' + os.path.splitext(movie.split('/')[-1])[0])
+                    self.item_succ.addChild(node)
                 self.add_text_main("[*]======================================================")
             except Exception as error_info:
+                node = QTreeWidgetItem(self.item_fail)
+                node.setText(0, str(count) + '.' + os.path.splitext(movie.split('/')[-1])[0])
+                self.item_fail.addChild(node)
                 self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
                 curr_path = str(os.getcwd()).replace('\\', '/')
                 if config['common']['soft_link'] == '1':
