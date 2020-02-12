@@ -33,9 +33,9 @@ def getActorPhoto(actor):  # //*[@id="star_qdt"]/li/a/img
 
 def getStudio(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"シリーズ：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
+    result1 = str(html.xpath('//th[contains(text(),"メーカー：")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
         '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"シリーズ：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
+    result2 = str(html.xpath('//th[contains(text(),"メーカー：")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
         '\\n')
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
@@ -100,15 +100,6 @@ def getCover(htmlcode):
     return result
 
 
-def getDirector(a):
-    html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result1 = str(html.xpath('//th[contains(text(),"シリーズ")]/../td/a/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    result2 = str(html.xpath('//th[contains(text(),"シリーズ")]/../td/text()')).strip(" ['']").strip('\\n    ').strip(
-        '\\n')
-    return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
-
-
 def getOutline(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result = str(html.xpath('//*[@id="introduction"]/dd/p[1]/text()')).strip(" ['']")
@@ -126,20 +117,20 @@ def main(number2):
                                                                                        '').replace(
         '\n                        ', '')
     try:
-        actor = getActor(a)
+        actor = getActor(a).replace(' ', '')
         dic = {
             'title': getTitle(htmlcode).replace("\\n", '').replace('        ', ''),
             'studio': getStudio(a),
             'outline': getOutline(htmlcode).replace('\n', ''),
             'runtime': getRuntime(a),
-            'director': getDirector(a),
+            'director': '',
             'actor': actor,
             'release': getRelease(a),
             'number': getNum(a),
             'cover': getCover(htmlcode),
             'imagecut': 0,
             'tag': getTag(a),
-            'label': getLabel(a),
+            'label': getLabel(a).strip(','),
             'year': getYear(getRelease(a)),  # str(re.search('\d{4}',getRelease(a)).group()),
             'actor_photo': getActorPhoto(actor.split(',')),
             'website': 'https://www.mgstage.com/product/product_detail/' + str(number) + '/',
@@ -159,4 +150,4 @@ def main(number2):
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
-# print(main('SIRO-3607'))
+# print(main('300MIUM-382'))

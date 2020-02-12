@@ -82,7 +82,12 @@ def getCover(htmlcode):
 
 def getCover_small(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')).strip(" ['']")
+    result = html.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')
+    if len(result) > 1:
+        result = result[0]
+    else:
+        result = str(result).strip(" ['']")
+
     return result
 
 

@@ -26,38 +26,40 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
     # ================================================网站规则添加开始================================================
     json_data = {}
     if mode == 1:  # 从全部网站刮削
-        if re.match('^\d{5,}', file_number):  # 111111-111
+        # =======================================================================无码抓取:111111-111,n1111,HEYZO-1111
+        if re.match('^\d{4,}', file_number) or re.match('n\d{4}', file_number) or 'HEYZO' in file_number.upper():
             json_data = json.loads(javbus.main_uncensored(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(avsox.main(file_number))
-        # ==
-        elif re.match('\d+\D+', file_number):  # 259LUXU-1111
+        # =======================================================================259LUXU-1111
+        elif re.match('\d+\D+', file_number):
             json_data = json.loads(siro.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(javbus.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
-        # ==
-        elif 'fc2' in file_number or 'FC2' in file_number:  # FC2-111111
+        # =======================================================================FC2-111111
+        elif 'FC2' in file_number.upper():
             json_data = json.loads(fc2fans_club.main(
                 file_number.replace('fc2-', '').replace('fc2_', '').replace('FC2-', '').replace('fc2_', '')))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
-        # ==
-        elif 'HEYZO' in file_number or 'heyzo' in file_number or 'Heyzo' in file_number:  # HEYZO-1111
-            json_data = json.loads(avsox.main(file_number))
-        # ==
-        elif 'siro' in file_number or 'SIRO' in file_number or 'Siro' in file_number:  # SIRO-111
+        # =======================================================================SIRO-111
+        elif 'SIRO' in file_number.upper():
             json_data = json.loads(siro.main(file_number))
-        elif re.match('\D{2,}00\d{3,}', file_number):  # ssni00321
+            if getDataState(json_data) == 0:
+                json_data = json.loads(javdb.main(file_number))
+        # =======================================================================ssni00321
+        elif re.match('\D{2,}00\d{3,}', file_number):
             json_data = json.loads(fanza.main(file_number))
-        else:  # MIDE-139, n1111
+        # =======================================================================MIDE-139
+        else:
             json_data = json.loads(javbus.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(avsox.main(file_number))
-            if getDataState(json_data) == 0:  # 如果元数据获取失败，请求番号至其他网站抓取
+            if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
     elif mode != 6 and re.match('\D{2,}00\d{3,}', file_number):
         json_data = {
@@ -68,7 +70,10 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
     elif mode == 2:  # 仅从javdb
         json_data = json.loads(javdb.main(file_number))
     elif mode == 3:  # 仅从javbus
-        json_data = json.loads(javbus.main(file_number))
+        if re.match('^\d{5,}', file_number) or re.match('n\d{4}', file_number) or 'HEYZO' in file_number.upper():
+            json_data = json.loads(javbus.main_uncensored(file_number))
+        else:
+            json_data = json.loads(javbus.main(file_number))
     elif mode == 4:  # 仅从avsox
         json_data = json.loads(avsox.main(file_number))
     elif mode == 5:  # 仅从fc2club

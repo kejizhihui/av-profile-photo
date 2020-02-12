@@ -32,14 +32,16 @@ def getTitle(htmlcode):  # 获取标题
 
 def getStudio(htmlcode):  # 获取厂商
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[5]/a/text()')).strip(" ['']")
+    result = str(html.xpath('//span[contains(text(),"製作商")]/following-sibling::a/text()')).strip(" ['']")
     return result
 
 
-def getYear(htmlcode):  # 获取年份
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[2]/text()')).strip(" ['']")
-    return result
+def getYear(getRelease):  # 获取年份
+    try:
+        result = str(re.search('\d{4}', getRelease).group())
+        return result
+    except:
+        return getRelease
 
 
 def getCover(htmlcode):  # 获取封面链接
@@ -50,14 +52,14 @@ def getCover(htmlcode):  # 获取封面链接
 
 def getRelease(htmlcode):  # 获取出版日期
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[2]/text()')).strip(" ['']")
+    result = str(html.xpath('//span[contains(text(),"發行日期")]/../text()')).strip(" ['']")
     return result
 
 
 def getRuntime(htmlcode):  # 获取分钟
-    soup = BeautifulSoup(htmlcode, 'lxml')
-    a = soup.find(text=re.compile('分鐘'))
-    return a
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    result = str(html.xpath('//span[contains(text(),"長度")]/../text()')).strip(" ['']")
+    return result
 
 
 def getActor(htmlcode):  # 获取女优
@@ -71,17 +73,17 @@ def getActor(htmlcode):  # 获取女优
 
 def getNum(htmlcode):  # 获取番号
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[1]/span[2]/text()')).strip(" ['']")
+    result = str(html.xpath('//span[contains(text(),"識別碼")]/following-sibling::span/text()')).strip(" ['']")
     return result
 
 
 def getDirector(htmlcode):  # 获取导演
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[4]/a/text()')).strip(" ['']")
+    result = str(html.xpath('//span[contains(text(),"導演")]/following-sibling::a/text()')).strip(" ['']")
     return result
 
 
-def getOutline(htmlcode):  # 获取演员
+def getOutline(htmlcode):  # 获取简介
     doc = pq(htmlcode)
     result = str(doc('tr td div.mg-b20.lh4 p.mg-b20').text())
     return result
@@ -89,17 +91,11 @@ def getOutline(htmlcode):  # 获取演员
 
 def getSerise(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[6]/a/text()')).strip(" ['']")
+    result = str(html.xpath('//span[contains(text(),"系列")]/following-sibling::a/text()')).strip(" ['']")
     return result
 
 
-def getSerise_uncensored(htmlcode):
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('/html/body/div[5]/div[1]/div[2]/p[5]/a/text()')).strip(" ['']")
-    return result
-
-
-def getCover_small(number):
+def getCover_small(number):  # 从avsox获取封面图
     htmlcode = get_html('https://avsox.host/cn/search/' + number)
     html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     result1 = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
@@ -110,11 +106,15 @@ def getCover_small(number):
         if result1 == '' or result1 == 'null' or result1 == 'None':
             htmlcode = get_html('https://avsox.host/cn/search/' + number.replace('_', ''))
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')).strip(" ['']")
+    result = html.xpath('//*[@id="waterfall"]/div/a/div[1]/img/@src')
+    if len(result) > 1:
+        result = result[0]
+    else:
+        result = str(result).strip(" ['']")
     return result
 
 
-def getTag(htmlcode):  # 获取演员
+def getTag(htmlcode):  # 获取标签
     tag = []
     soup = BeautifulSoup(htmlcode, 'lxml')
     a = soup.find_all(attrs={'class': 'genre'})
@@ -135,7 +135,7 @@ def main(number):
         dic = {
             'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))),
             'studio': getStudio(htmlcode),
-            'year': str(re.search('\d{4}', getYear(htmlcode)).group()),
+            'year': getYear(getRelease(htmlcode)),
             'outline': getOutline(dww_htmlcode).replace('\n', ''),
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
@@ -173,7 +173,7 @@ def main_uncensored(number):
         dic = {
             'title': str(re.sub('\w+-\d+-', '', getTitle(htmlcode))).replace(getNum(htmlcode) + '-', ''),
             'studio': getStudio(htmlcode),
-            'year': getYear(htmlcode),
+            'year': getYear(getRelease(htmlcode)),
             'outline': '',
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
@@ -182,7 +182,7 @@ def main_uncensored(number):
             'number': getNum(htmlcode),
             'cover': getCover(htmlcode),
             'tag': getTag(htmlcode),
-            'label': getSerise_uncensored(htmlcode),
+            'label': getSerise(htmlcode),
             'imagecut': 3,
             'cover_small': getCover_small(number),
             'actor_photo': getActorPhoto(htmlcode),
@@ -206,4 +206,5 @@ def main_uncensored(number):
     return js
 
 # print(main('SSNI-658'))
-# print(main_uncensored('051119-917'))
+# print(main_uncensored('122919-949'))
+# print(main_uncensored('012715-793'))

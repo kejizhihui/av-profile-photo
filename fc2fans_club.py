@@ -98,7 +98,7 @@ def main(number):
             'year': '',  # str(re.search('\d{4}',getRelease(number)).group()),
             'outline': getOutline(htmlcode2).replace('\n', ''),
             'runtime': getYear(getRelease(htmlcode)),
-            'director': getStudio(htmlcode),
+            'director': '',
             'actor': actor.replace('/', ','),
             'release': getRelease(number),
             'number': 'FC2-' + number,
@@ -124,4 +124,4 @@ def main(number):
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
-# print(main('1121040'))
+# print(main('1251689'))

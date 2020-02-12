@@ -25,7 +25,7 @@ class Ui_AVDV(object):
         self.pushButton_start_cap.setGeometry(QtCore.QRect(650, 10, 121, 41))
         self.pushButton_start_cap.setObjectName("pushButton_start_cap")
         self.textBrowser_warning = QtWidgets.QTextBrowser(self.page_avdc)
-        self.textBrowser_warning.setGeometry(QtCore.QRect(120, 10, 391, 41))
+        self.textBrowser_warning.setGeometry(QtCore.QRect(100, 10, 471, 41))
         self.textBrowser_warning.setObjectName("textBrowser_warning")
         self.horizontalLayoutWidget = QtWidgets.QWidget(self.page_avdc)
         self.horizontalLayoutWidget.setGeometry(QtCore.QRect(0, 680, 791, 41))
@@ -461,7 +461,7 @@ class Ui_AVDV(object):
         AVDV.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(AVDV)
-        self.stackedWidget.setCurrentIndex(3)
+        self.stackedWidget.setCurrentIndex(4)
         QtCore.QMetaObject.connectSlotsByName(AVDV)
 
     def retranslateUi(self, AVDV):

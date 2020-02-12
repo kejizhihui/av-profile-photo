@@ -55,8 +55,10 @@ def getLabel(a):
 
 def getNum(a):
     html = etree.fromstring(a, etree.HTMLParser())
-    result1 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/text()')).strip(" ['']").replace('_', '-')
-    result2 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/a/text()')).strip(" ['']").replace('_', '-')
+    result1 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/text()')).strip(
+        " ['']").replace('_', '-')
+    result2 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/a/text()')).strip(
+        " ['']").replace('_', '-')
     return str(result2 + result1).strip('+')
 
 
@@ -123,7 +125,8 @@ def main(number):
                 'actor': '',
                 'website': '',
             }
-            js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
+            js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
+                            separators=(',', ':'), )  # .encode('UTF-8')
             return js
         count = 1
         number_get = ''
@@ -144,7 +147,9 @@ def main(number):
         if movie_found == 1:
             dic = {
                 'actor': str(actor).strip(" [',']").replace('\'', ''),
-                'title': getTitle(b).replace("\\n", '').replace('_', '-').replace(number_get, '').strip().replace(' ', '-').replace('--', '-'),
+                'title': getTitle(b).replace('中文字幕', '').replace("\\n", '').replace('_', '-').replace(number_get,
+                                                                                                      '').strip().replace(
+                    ' ', '-').replace('--', '-'),
                 'studio': getStudio(b),
                 'outline': getOutline(b).replace('\n', ''),
                 'runtime': getRuntime(b),
@@ -184,7 +189,7 @@ def main(number):
     return js
 
 
-# print(main('ADZ-081'))
+# print(main('LUXU-1217'))
 # input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
 # print(main('abs-141'))
 # print(main('040409-562'))

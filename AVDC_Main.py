@@ -34,7 +34,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
         # 初始化需要的变量
-        self.version = '3.6'
+        self.version = '3.61'
         self.m_drag = False
         self.m_DragPosition = 0
         self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
@@ -860,12 +860,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     print("  <tag>中文字幕</tag>", file=code)
                 try:
                     for i in tag:
-                        print("  <tag>" + i + "</tag>", file=code)
+                        if i != '':
+                            print("  <tag>" + i + "</tag>", file=code)
                 except Exception as error_info:
                     self.add_text_main('[-]Error in tag: ' + str(error_info))
                 try:
                     for i in tag:
-                        print("  <genre>" + i + "</genre>", file=code)
+                        if i != '':
+                            print("  <genre>" + i + "</genre>", file=code)
                 except Exception as error_info:
                     self.add_text_main('[-]Error in genre: ' + str(error_info))
                 print("  <genre>" + label + "</genre>", file=code)
@@ -1027,6 +1029,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def creatFolder(self, success_folder, json_data, config):
         title, studio, year, outline, runtime, director, actor_photo, actor, release, tag, number, cover, website, label = get_info(
             json_data)
+        if len(actor.split(',')) >= 15:
+            actor = actor.split(',')[0] + ',' + actor.split(',')[1] + ',' + actor.split(',')[2] + '等演员'
         location_rule = json_data['location_rule']
         path = location_rule.replace('title', title).replace('studio', studio).replace('year', year).replace('runtime',
                                                                                                              runtime).replace(
@@ -1035,7 +1039,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         path = path.replace('//', '/')
         if len(path) > 200:
             self.add_text_main('[-]Error in Length of Path! Repleaced with actor/number')
-            path = json_data['actor'] + '/' + json_data['number']
+            path = actor + '/' + json_data['number']
         path = success_folder + '/' + path
         if not os.path.exists(path):
             path = escapePath(path, config)
@@ -1069,17 +1073,18 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.label_title.setText(json_data['title'])
         self.Ui.label_actor.setText(json_data['actor'])
         self.Ui.label_outline.setText(json_data['outline'])
-        self.Ui.label_tag.setText(str(json_data['tag']))
-        fanart_path = json_data['fanart_path']
-        poster_path = json_data['poster_path']
-        if os.path.exists(fanart_path):
-            pix = QPixmap(fanart_path)
-            self.Ui.label_fanart.setScaledContents(True)
-            self.Ui.label_fanart.setPixmap(pix)  # 添加图标
-        if os.path.exists(poster_path):
-            pix = QPixmap(poster_path)
-            self.Ui.label_poster.setScaledContents(True)
-            self.Ui.label_poster.setPixmap(pix)  # 添加图标
+        self.Ui.label_tag.setText(str(json_data['tag']).strip(" [',']").replace('\'', ''))
+        if self.Ui.checkBox_cover.isChecked():
+            fanart_path = json_data['fanart_path']
+            poster_path = json_data['poster_path']
+            if os.path.exists(fanart_path):
+                pix = QPixmap(fanart_path)
+                self.Ui.label_fanart.setScaledContents(True)
+                self.Ui.label_fanart.setPixmap(pix)  # 添加缩略图
+            if os.path.exists(poster_path):
+                pix = QPixmap(poster_path)
+                self.Ui.label_poster.setScaledContents(True)
+                self.Ui.label_poster.setPixmap(pix)  # 添加封面图
 
 
     def Core_Main(self, file_path, number_th, mode, count):
@@ -1131,8 +1136,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.CreatFailedFolder(failed_folder)  # 创建输出失败目录
         path = self.creatFolder(success_folder, json_data, Config)  # 创建文件夹
         if path == 'error':
-            self.add_text_main('[-]Move ' + file_path + ' to failed folder')
-            shutil.move(file_path, str(os.getcwd()) + '/' + 'failed/')
+            node = QTreeWidgetItem(self.item_fail)
+            node.setText(0, str(count) + '.' + os.path.splitext(filepath.split('/')[-1])[0])
+            self.item_fail.addChild(node)
+            self.moveFailedFolder(filepath, failed_folder)
             return
         self.add_text_main('[+]Folder : ' + path)
         self.add_text_main('[+]From : ' + json_data['website'])
