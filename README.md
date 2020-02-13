@@ -206,7 +206,7 @@
 **建议**的使用流程：到某网站找到这个番号,把番号改成网站上的规范番号,选用对应的网站刮削。<br>
 **条件**：文件名至少与一个网站上的番号相同，没有多余的内容只有番号为最佳，可以让软件更好获取元数据。<br>
 对于多影片重命名，可以用[ReNamer](http://www.den4b.com/products/renamer)来批量重命名<br><br>
-**3、Emby批量添加头像**：头像文件放在Actor目录下，填写emby网址、api密钥即可使用。[头像包下载](https://github.com/moyy996/AVDC/releases/tag/%E5%A4%B4%E5%83%8F%E5%8C%85)<br>
+**3、Emby批量添加头像**：头像文件放在Actor目录下，填写emby网址、api密钥即可使用。[头像包下载](https://github.com/moyy996/AVDC/releases/tag/%E5%A4%B4%E5%83%8F%E5%8C%85-2)<br>
 可查看有头像，无头像女优，可往emby添加头像的女优。<br><br>
 **4、裁剪封面**：针对封面图比例错误，分辨率低的情况，判断人脸位置，裁剪缩略图为封面图。<br><br>
 
