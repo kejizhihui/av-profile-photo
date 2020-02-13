@@ -24,7 +24,7 @@
 
 
 # 简介
-**命令行版(原作者)**：https://github.com/yoshiko2/AV_Data_Capture<br>
+**[命令行版](https://github.com/yoshiko2/AV_Data_Capture)(原作者)**：<br>
 <a title="Hits" target="_blank" href="https://github.com/yoshiko2/AV_Data_Capture"><img src="https://hits.b3log.org/yoshiko2/AV_Data_Capture.svg"></a>
 ![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
 ![](https://img.shields.io/github/downloads/yoshiko2/av_data_capture/total.svg?style=flat-square)
