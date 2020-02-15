@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.6</string>
+   <string>AVDC-3.7</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>4</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_avdc">
      <widget class="QPushButton" name="pushButton_start_cap">
@@ -359,11 +359,11 @@ p, li { white-space: pre-wrap; }
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_runtime">
+     <widget class="QLabel" name="label_publish">
       <property name="geometry">
        <rect>
         <x>580</x>
-        <y>120</y>
+        <y>170</y>
         <width>201</width>
         <height>39</height>
        </rect>
@@ -392,13 +392,13 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>500</x>
-        <y>120</y>
+        <y>170</y>
         <width>81</width>
         <height>39</height>
        </rect>
       </property>
       <property name="text">
-       <string>时长：</string>
+       <string>发行：</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_studio">
@@ -424,7 +424,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>580</x>
-        <y>170</y>
+        <y>120</y>
         <width>201</width>
         <height>39</height>
        </rect>
@@ -453,7 +453,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>500</x>
-        <y>170</y>
+        <y>120</y>
         <width>81</width>
         <height>39</height>
        </rect>
@@ -532,7 +532,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="title">
-       <string>视频移动</string>
+       <string>视频、字幕移动</string>
       </property>
       <widget class="QLabel" name="label_8">
        <property name="geometry">
@@ -544,7 +544,8 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>程序所在目录的所有子目录(不包括排除目录)下的视频，移动到当前目录下。</string>
+        <string>程序所在目录的所有子目录(不包括排除目录)下的视频及同名字幕，
+移动到当前目录下。</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_move_mp4">
@@ -557,7 +558,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>视频移动</string>
+        <string>开始移动</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_41">
@@ -763,7 +764,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>说明:
-   1、头像请放在程序目录下的Actor目录中。
+   1、头像请放在程序目录(AVDC目录)下的Actor目录中。
    2、密钥创建方法：Emby控制台-&gt;高级-&gt;API密钥-&gt;添加(APP名称任意)。</string>
        </property>
       </widget>
@@ -858,8 +859,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="pushButton_save_config">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>630</y>
+        <x>210</x>
+        <y>660</y>
         <width>361</width>
         <height>28</height>
        </rect>
@@ -874,7 +875,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>530</y>
         <width>761</width>
-        <height>91</height>
+        <height>121</height>
        </rect>
       </property>
       <property name="title">
@@ -886,7 +887,7 @@ p, li { white-space: pre-wrap; }
          <x>0</x>
          <y>20</y>
          <width>751</width>
-         <height>61</height>
+         <height>110</height>
         </rect>
        </property>
        <layout class="QFormLayout" name="formLayout_6">
@@ -909,6 +910,16 @@ p, li { white-space: pre-wrap; }
         </item>
         <item row="1" column="1">
          <widget class="QLineEdit" name="lineEdit_media_name"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_45">
+          <property name="text">
+           <string>   视频标题(本地文件)：   </string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="lineEdit_local_name"/>
         </item>
        </layout>
       </widget>
