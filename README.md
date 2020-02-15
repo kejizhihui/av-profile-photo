@@ -13,7 +13,7 @@
 * [下载](#下载)
 * [简明教程](#简要教程)
 * [模块安装](#1模块安装)
-* [配置](#2配置设置)
+* [配置设置](#2配置设置)
 * [小工具](#210工具)
 * [多目录影片处理](#3多目录影片处理)
 * [多集影片处理](#4多集影片处理)
@@ -24,7 +24,7 @@
 
 
 # 简介
-**命令行版(原作者)**：https://github.com/yoshiko2/AV_Data_Capture<br>
+**[命令行版](https://github.com/yoshiko2/AV_Data_Capture)(原作者)**：<br>
 <a title="Hits" target="_blank" href="https://github.com/yoshiko2/AV_Data_Capture"><img src="https://hits.b3log.org/yoshiko2/AV_Data_Capture.svg"></a>
 ![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
 ![](https://img.shields.io/github/downloads/yoshiko2/av_data_capture/total.svg?style=flat-square)
@@ -83,6 +83,11 @@
 <div align="center">
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/tool.png" height="300">
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/about.png" height="300">
+</div>
+
+## **查看成功番号的信息(GIF演示)**
+<div>
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/主页面.gif" height="500">
 </div>
 
 # 效果图
@@ -189,7 +194,7 @@
 
 ---
 ### 2.11.网站选择
-**1、All website**: 使用avsox,javbus,fanza,javdb,fc2club进行刮削。<br>
+**1、All website**: 使用avsox,javbus,fanza,javdb,fc2club，siro(mgstage)进行刮削。<br>
 **2、Only javdb**: 仅使用javdb进行刮削。<br>
 
 ---
@@ -198,9 +203,10 @@
 ![](https://github.com/moyy996/AVDC/blob/master/readme/tool.png)
 **1、视频移动**：可将程序目录下除排除目录下的所有视频，移动到程序目录下。<br><br>
 **2、单文件刮削**：偶尔有失败情况时，选择这个视频文件，使用文件名当番号进行刮削。<br>
-条件：文件名中间要有下划线或者减号’_‘,‘-’，没有多余的内容只有番号为最佳，可以让软件更好获取元数据<br>
+**建议**的使用流程：到某网站找到这个番号,把番号改成网站上的规范番号,选用对应的网站刮削。<br>
+**条件**：文件名至少与一个网站上的番号相同，没有多余的内容只有番号为最佳，可以让软件更好获取元数据。<br>
 对于多影片重命名，可以用[ReNamer](http://www.den4b.com/products/renamer)来批量重命名<br><br>
-**3、Emby批量添加头像**：头像文件放在Actor目录下，填写emby网址、api密钥即可使用。[头像包下载](https://github.com/moyy996/AVDC/releases/tag/%E5%A4%B4%E5%83%8F%E5%8C%85)<br>
+**3、Emby批量添加头像**：头像文件放在Actor目录下，填写emby网址、api密钥即可使用。[头像包下载](https://github.com/moyy996/AVDC/releases/tag/%E5%A4%B4%E5%83%8F%E5%8C%85-2)<br>
 可查看有头像，无头像女优，可往emby添加头像的女优。<br><br>
 **4、裁剪封面**：针对封面图比例错误，分辨率低的情况，判断人脸位置，裁剪缩略图为封面图。<br><br>
 
