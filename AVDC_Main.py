@@ -499,7 +499,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================小工具-emby女优头像
     def pushButton_add_actor_pic_clicked(self):  # 添加头像按钮响应
-        self.Ui.stackedWidget.setCurrentIndex(0)
+        self.Ui.stackedWidget.setCurrentIndex(4)
         emby_url = self.Ui.lineEdit_emby_url.text()
         api_key = self.Ui.lineEdit_api_key.text()
         if emby_url == '':
@@ -517,7 +517,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[-]Error in pushButton_add_actor_pic_clicked: ' + str(error_info))
 
     def pushButton_show_pic_actor_clicked(self):  # 查看按钮响应
-        self.Ui.stackedWidget.setCurrentIndex(0)
+        self.Ui.stackedWidget.setCurrentIndex(4)
         emby_url = self.Ui.lineEdit_emby_url.text()
         api_key = self.Ui.lineEdit_api_key.text()
         if emby_url == '':
