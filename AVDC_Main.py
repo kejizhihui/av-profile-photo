@@ -34,7 +34,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
         # 初始化需要的变量
-        self.version = '3.71'
+        self.version = '3.72'
         self.m_drag = False
         self.m_DragPosition = 0
         self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
@@ -1046,6 +1046,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             json_data)
         if len(actor.split(',')) >= 15:
             actor = actor.split(',')[0] + ',' + actor.split(',')[1] + ',' + actor.split(',')[2] + '等演员'
+        if 'N/A' in actor:
+            actor = 'Unknown'
         folder_name = json_data['folder_name']
         path = folder_name.replace('title', title).replace('studio', studio).replace('year', year).replace('runtime',
                                                                                                            runtime).replace(
@@ -1285,12 +1287,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 if config['common']['soft_link'] == '1':
                     self.add_text_main('[-]Link ' + movie + ' to failed folder')
                     try:
-                        os.symlink(movie, curr_path + '/' + 'failed/')
+                        os.symlink(movie, curr_path + '/' + failed_folder + '/')
                     except Exception as error_info:
                         self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
                 else:
                     try:
-                        shutil.move(movie, curr_path + '/' + 'failed/')
+                        shutil.move(movie, curr_path + '/' + failed_folder + '/')
                         self.add_text_main('[-]Move ' + movie + ' to failed folder')
                     except shutil.Error as error_info:
                         self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
