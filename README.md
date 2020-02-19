@@ -164,8 +164,9 @@
 ---
 ### 2.6.命名规则
   **1、目录命名**：存放视频数据的目录名，支持**多层目录**，支持**自定义符号**，例：[actor]/studio/number-【title】。<br>
-  **2、视频标题**：nfo中的标题命名。例：number-[title]。可以自定义符号。<br>
-  **3、可选项**为title（片名）、actor（演员）、studio（制作商）、director（导演）、release（发售日）、year（发行年份）、number（番号）、runtime（时长）、series（系列）、publisher（发行商）<br>
+  **2、视频标题（媒体库中）**：nfo中的标题命名。例：number-[title]。可以自定义符号。<br>
+  **3、视频标题（本地文件）**：本地视频、图片的命名。例：number-[title]。可以自定义符号。<br>
+  **4、可选项**为title（片名）、actor（演员）、studio（制作商）、director（导演）、release（发售日）、year（发行年份）、number（番号）、runtime（时长）、series（系列）、publisher（发行商）<br>
 
 ---
 ### 2.7.网络设置 
