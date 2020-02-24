@@ -42,7 +42,13 @@ def getNumber(filepath):
     filename = filename.replace(part, '')
     filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filename))  # 去除文件名中时间
     filename = str(re.sub("\d{4}-\d{1,2}-\d{1,2}-", "", filename))  # 去除文件名中时间
-    if '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
+    if re.search('^\D+.\d{2}.\d{2}.\d{2}', filename):  # 提取欧美番号 sexart.11.11.11
+        try:
+            file_number = re.search('\D+.\d{2}.\d{2}.\d{2}', filename).group()
+            return file_number
+        except:
+            return os.path.splitext(filepath.split('/')[-1])[0]
+    elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
             filename = filename.replace('-PPV', '').replace('PPV-', '').replace('-ppv', '').replace('ppv-', '')
         if re.search('\w+-\d+', filename):  # 提取类似mkbd-120番号
@@ -58,12 +64,6 @@ def getNumber(filepath):
         else:
             file_number = filename
         return file_number
-    elif re.search('\D+.\d{2}.\d{2}.\d{2}', filename):  # 提取欧美番号 sexart.11.11.11
-        try:
-            file_number = re.search('\D+.\d{2}.\d{2}.\d{2}', filename).group()
-            return file_number
-        except:
-            return os.path.splitext(filepath.split('/')[-1])[0]
     else:  # 提取不含减号-的番号，FANZA CID 保留ssni00644，将MIDE139改成MIDE-139
         try:
             file_number = os.path.splitext(filename.split('/')[-1])[0]
