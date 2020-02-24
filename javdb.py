@@ -57,7 +57,7 @@ def getSeries(htmlcode):
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
 
-def getNum(htmlcode):
+def getNumber(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result1 = str(html.xpath('//strong[contains(text(),"番號")]/../following-sibling::span/text()')).strip(
         " ['']").replace('_', '-')
@@ -195,8 +195,90 @@ def main(number):
     return js
 
 
+def main_us(number):
+    try:
+        htmlcode = get_html('https://javdb.com/search?q=' + number + '&f=all').replace(u'\xa0', u' ')
+        html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+        counts = len(html.xpath(
+            '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\']'))
+        if counts == 0:
+            dic = {
+                'title': '',
+                'actor': '',
+                'website': '',
+            }
+            js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
+                            separators=(',', ':'), )  # .encode('UTF-8')
+            return js
+        number_series = number.split('.')[0]
+        number_date = '20' + number.replace(number_series, '').strip('.')
+        number_date = number_date.replace('.', '-')
+        count = 1
+        movie_found = 0
+        for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
+            series_get = html.xpath(
+                '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\'][' + str(
+                    count) + ']/a[@class=\'box\']/div[@class=\'uid2\']/text()')[0]
+            date_get = html.xpath(
+                '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\'][' + str(
+                    count) + ']/a[@class=\'box\']/div[@class=\'meta\']/text()')[0]
+            if re.search('\d{4}-\d{1,2}-\d{1,2}', date_get):
+                date_get = re.findall('\d{4}-\d{1,2}-\d{1,2}', date_get)[0]
+            # number_get = number_get.replace('_', '-')
+            if (series_get.upper() == number_series.upper() or series_get.replace('-', '').upper() == number_series.upper()) and number_date == date_get:
+                movie_found = 1
+                break
+        result_url = 'https://javdb.com' + html.xpath('//*[@id="videos"]/div/div/a/@href')[count - 1]
+        html_info = get_html(result_url).replace(u'\xa0', u' ')
+        actor = getActor(html_info)
+        number = getNumber(html_info)
+        if movie_found == 1:
+            dic = {
+                'actor': str(actor).strip(" [',']").replace('\'', ''),
+                'title': getTitle(html_info).replace('中文字幕', '').replace("\\n", '').replace('_', '-').replace(number, '').strip(),
+                'studio': getStudio(html_info),
+                'publisher': getPublisher(html_info),
+                'outline': getOutline(html_info).replace('\n', ''),
+                'runtime': getRuntime(html_info).replace(' 分鍾', ''),
+                'director': getDirector(html_info),
+                'release': getRelease(html_info),
+                'number': number,
+                'cover': getCover(html_info),
+                'cover_small': getCover_small(htmlcode, count - 1),
+                'imagecut': 3,
+                'tag': getTag(html_info),
+                'series': getSeries(html_info),
+                'year': getYear(getRelease(html_info)),  # str(re.search('\d{4}',getRelease(htmlcode)).group()),
+                'actor_photo': getActorPhoto(actor),
+                'website': result_url,
+                'source': 'javdb.py',
+            }
+        else:  # 未找到番号
+            dic = {
+                'title': '',
+                'actor': str(actor).strip(" [',']").replace('\'', ''),
+                'website': '',
+            }
+    except:  # actor 用于判断ip是否被封
+        if htmlcode == 'ProxyError':
+            dic = {
+                'title': '',
+                'actor': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+                'actor': '',
+                'website': '',
+            }
+    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
+    return js
+
+
 # print(main('LUXU-1217'))
 # input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
 # print(main('abs-141'))
 # print(main('HYSD-00083'))
+# print(main_us('x-art.19.11.03'))
 # print(main('n1403'))

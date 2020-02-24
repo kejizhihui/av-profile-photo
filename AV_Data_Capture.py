@@ -32,16 +32,15 @@ def movie_lists(escape_folder):
 
 def getNumber(filepath):
     filepath = filepath.replace('-C.', '.').replace('-c.', '.')
-    filepath = os.path.splitext(filepath.split('/')[-1])[0]
-    # filepath = filepath.replace("_", "-")
+    filename = os.path.splitext(filepath.split('/')[-1])[0]
+    # filename = filename.replace("_", "-")
     part = ''
-    if re.search('-CD\d+', filepath):
-        part = re.findall('-CD\d+', filepath)[0]
-    if re.search('-cd\d+', filepath):
-        part = re.findall('-cd\d+', filepath)[0]
-    filepath.strip('22-sht.me').strip('-HD').strip('-hd')
-    filepath = filepath.replace(part, '')
-    filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filepath))  # 去除文件名中时间
+    if re.search('-CD\d+', filename):
+        part = re.findall('-CD\d+', filename)[0]
+    if re.search('-cd\d+', filename):
+        part = re.findall('-cd\d+', filename)[0]
+    filename = filename.replace(part, '')
+    filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filename))  # 去除文件名中时间
     filename = str(re.sub("\d{4}-\d{1,2}-\d{1,2}-", "", filename))  # 去除文件名中时间
     if '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
@@ -59,6 +58,12 @@ def getNumber(filepath):
         else:
             file_number = filename
         return file_number
+    elif re.search('\D+.\d{2}.\d{2}.\d{2}', filename):  # 提取欧美番号 sexart.11.11.11
+        try:
+            file_number = re.search('\D+.\d{2}.\d{2}.\d{2}', filename).group()
+            return file_number
+        except:
+            return os.path.splitext(filepath.split('/')[-1])[0]
     else:  # 提取不含减号-的番号，FANZA CID 保留ssni00644，将MIDE139改成MIDE-139
         try:
             file_number = os.path.splitext(filename.split('/')[-1])[0]

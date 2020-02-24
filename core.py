@@ -5,15 +5,15 @@ import shutil
 import json
 from ADC_function import *
 import fc2fans_club
-import siro
+import mgstage
 import avsox
 import javbus
 import javdb
-import fanza
+import dmm
 import javlibrary
 
-# =====================本地文件处理===========================
 
+# =====================本地文件处理===========================
 def escapePath(path, Config):  # Remove escape literals
     escapeLiterals = Config['escape']['literals']
     backslash = '\\'
@@ -35,7 +35,7 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
                 json_data = json.loads(avsox.main(file_number))
         # =======================================================================259LUXU-1111
         elif re.match('\d+\D+', file_number):
-            json_data = json.loads(siro.main(file_number))
+            json_data = json.loads(mgstage.main(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javbus.main(file_number))
             if getDataState(json_data) == 0:
@@ -46,14 +46,14 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
                 file_number.replace('fc2-', '').replace('fc2_', '').replace('FC2-', '').replace('fc2_', '')))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
-        # =======================================================================SIRO-111
-        elif 'SIRO' in file_number.upper():
-            json_data = json.loads(siro.main(file_number))
-            if getDataState(json_data) == 0:
-                json_data = json.loads(javdb.main(file_number))
         # =======================================================================ssni00321
         elif re.match('\D{2,}00\d{3,}', file_number) and '-' not in file_number and '_' not in file_number:
-            json_data = json.loads(fanza.main(file_number))
+            json_data = json.loads(dmm.main(file_number))
+        # =======================================================================sexart.15.06.14
+        elif re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+            json_data = json.loads(javdb.main_us(file_number))
+            if getDataState(json_data) == 0:
+                json_data = json.loads(javbus.main_us(file_number))
         # =======================================================================MIDE-139
         else:
             json_data = json.loads(javbus.main(file_number))
@@ -63,29 +63,34 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
                 json_data = json.loads(javdb.main(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(avsox.main(file_number))
-    elif mode != 6 and re.match('\D{2,}00\d{3,}', file_number):
+    elif re.match('\D{2,}00\d{3,}', file_number) and mode != 8:
         json_data = {
             'title': '',
             'actor': '',
             'website': '',
         }
-    elif mode == 2:  # 仅从javdb
-        json_data = json.loads(javdb.main(file_number))
-    elif mode == 3:  # 仅从javbus
+    elif mode == 2:  # 仅从javlibrary
+        json_data = json.loads(javlibrary.main(file_number, config['javlibrary_url']['url']))
+    elif mode == 3:  # 仅从mgstage
+        json_data = json.loads(mgstage.main(file_number))
+    elif mode == 4:  # 仅从fc2club
+        json_data = json.loads(fc2fans_club.main(file_number))
+    elif mode == 5:  # 仅从javbus
         if re.match('^\d{5,}', file_number) or re.match('n\d{4}', file_number) or 'HEYZO' in file_number.upper():
             json_data = json.loads(javbus.main_uncensored(file_number))
+        elif re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+            json_data = json.loads(javbus.main_us(file_number))
         else:
             json_data = json.loads(javbus.main(file_number))
-    elif mode == 4:  # 仅从avsox
+    elif mode == 6:  # 仅从javdb
+        if re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+            json_data = json.loads(javdb.main_us(file_number))
+        else:
+            json_data = json.loads(javdb.main(file_number))
+    elif mode == 7:  # 仅从avsox
         json_data = json.loads(avsox.main(file_number))
-    elif mode == 5:  # 仅从fc2club
-        json_data = json.loads(fc2fans_club.main(file_number))
-    elif mode == 6:  # 仅从fanza
-        json_data = json.loads(fanza.main(file_number))
-    elif mode == 7:  # 仅从siro
-        json_data = json.loads(siro.main(file_number))
-    elif mode == 8:  # 仅从javlibrary
-        json_data = json.loads(javlibrary.main(file_number, config['javlibrary_url']['url']))
+    elif mode == 8:  # 仅从dmm
+        json_data = json.loads(dmm.main(file_number))
 
     # ================================================网站规则添加结束================================================
     # print(json_data)
@@ -118,7 +123,7 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
     title = title.replace('<', '')
     title = title.replace('>', '')
     title = title.replace('|', '')
-    title = title.replace(' ', '')
+    title = title.replace(' ', '.')
     title = title.replace('【', '')
     title = title.replace('】', '')
     release = release.replace('/', '-')
@@ -149,8 +154,8 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
 
 def get_info(json_data):  # 返回json里的数据
     for key, value in json_data.items():
-        if value == '':
-            value = 'unknown'
+        if value == '' or value == 'N/A':
+            json_data[key] = 'unknown'
     title = json_data['title']
     studio = json_data['studio']
     publisher = json_data['publisher']

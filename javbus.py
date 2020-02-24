@@ -278,7 +278,81 @@ def main_uncensored(number):
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
+
+def main_us(number):
+    htmlcode = get_html('https://www.javbus.zone/search/' + number)
+    html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+    counts = len(html.xpath("//div[@class='row']/div[@id='waterfall']/div"))
+    result_url = ''
+    cover_small = ''
+    if counts == 0:
+        dic = {
+            'title': '',
+            'actor': '',
+            'website': '',
+        }
+        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
+                        separators=(',', ':'), )  # .encode('UTF-8')
+        return js
+    for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
+        number_get = html.xpath("//div[@id='waterfall']/div[" + str(
+            count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
+        if number_get.upper() == number.upper() or number_get.replace('-', '').upper() == number.upper():
+            result_url = html.xpath(
+                "//div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
+            cover_small = html.xpath(
+                "//div[@id='waterfall']/div[" + str(
+                    count) + "]/a[@class='movie-box']/div[@class='photo-frame']/img[@class='img']/@src")[0]
+            break
+    if result_url == 'not found':
+        dic = {
+            'title': '',
+            'actor': '',
+            'website': '',
+        }
+        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
+                        separators=(',', ':'), )  # .encode('UTF-8')
+        return js
+    htmlcode = get_html(result_url)
+    try:
+        number = getNum(htmlcode)
+        dic = {
+            'title': getTitle(htmlcode).replace(number, '').strip(),
+            'studio': getStudio(htmlcode),
+            'publisher': '',
+            'year': getYear(getRelease(htmlcode)),
+            'outline': '',
+            'runtime': getRuntime(htmlcode).replace('分鐘', '').strip(),
+            'director': getDirector(htmlcode),
+            'actor': getActor(htmlcode),
+            'release': getRelease(htmlcode),
+            'number': getNum(htmlcode),
+            'cover': getCover(htmlcode),
+            'tag': getTag(htmlcode),
+            'series': getSeries(htmlcode),
+            'imagecut': 3,
+            'cover_small': cover_small,
+            'actor_photo': getActorPhoto(htmlcode),
+            'website': result_url,
+            'source': 'javbus.py',
+        }
+    except Exception as error_info:
+        print('Error in javbus.main_us :' + str(error_info))
+        if htmlcode == 'ProxyError':
+            dic = {
+                'title': '',
+                'website': 'timeout',
+            }
+        else:
+            dic = {
+                'title': '',
+                'website': '',
+            }
+    js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
+    return js
+
 # print(find_number('KA-001'))
 # print(main('OFJE-175'))
 # print(main_uncensored('122919-949'))
 # print(main_uncensored('012715-793'))
+# print(main_us('sexart.15.06.10'))

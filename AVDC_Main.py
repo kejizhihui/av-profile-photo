@@ -15,7 +15,7 @@ import json
 from configparser import ConfigParser
 from AV_Data_Capture import *
 from core import *
-from fanza import *
+from dmm import *
 import requests
 import shutil
 import base64
@@ -34,7 +34,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
         # 初始化需要的变量
-        self.version = '3.72'
+        self.version = '3.8'
         self.m_drag = False
         self.m_DragPosition = 0
         self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
@@ -189,9 +189,21 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         elif config['media']['media_warehouse'] == 'kodi':
             self.Ui.radioButton_kodi.setChecked(True)
         if config['common']['website'] == 'all':
-            self.Ui.radioButton_all.setChecked(True)
+            self.Ui.comboBox_website_all.setCurrentIndex(0)
+        elif config['common']['website'] == 'javlibrary':
+            self.Ui.comboBox_website_all.setCurrentIndex(1)
+        elif config['common']['website'] == 'mgstage':
+            self.Ui.comboBox_website_all.setCurrentIndex(2)
+        elif config['common']['website'] == 'fc2club':
+            self.Ui.comboBox_website_all.setCurrentIndex(3)
+        elif config['common']['website'] == 'javbus':
+            self.Ui.comboBox_website_all.setCurrentIndex(4)
         elif config['common']['website'] == 'javdb':
-            self.Ui.radioButton_javdb.setChecked(True)
+            self.Ui.comboBox_website_all.setCurrentIndex(5)
+        elif config['common']['website'] == 'avsox':
+            self.Ui.comboBox_website_all.setCurrentIndex(6)
+        elif config['common']['website'] == 'dmm':
+            self.Ui.comboBox_website_all.setCurrentIndex(7)
         self.Ui.lineEdit_success.setText(config['common']['success_output_folder'])
         self.Ui.lineEdit_fail.setText(config['common']['failed_output_folder'])
         self.Ui.lineEdit_escape_dir.setText(config['escape']['folders'])
@@ -205,6 +217,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_escape_dir_move.setText(config['escape']['folders'])
         self.Ui.lineEdit_emby_url.setText(config['emby']['emby_url'])
         self.Ui.lineEdit_api_key.setText(config['emby']['api_key'])
+        self.Ui.lineEdit_javlibrary_url.setText(config['javlibrary_url']['url'])
 
     # ========================================================================显示版本号
     def show_version(self):
@@ -263,7 +276,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 index_json = str(item.text(0)).split('.')[0]
                 self.add_label_info(self.json_array[str(index_json)])
             except:
-                print('Error in treeWidget_number_clicked!')
+                print('Error in treeWidget_number_clicked!: No info!')
 
     def pushButton_start_cap_clicked(self):
         self.Ui.pushButton_start_cap.setEnabled(False)
@@ -311,10 +324,22 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             media_warehouse = 'plex'
         elif self.Ui.radioButton_kodi.isChecked():  # kodi
             media_warehouse = 'kodi'
-        if self.Ui.radioButton_all.isChecked():  # all
+        if self.Ui.comboBox_website_all.currentText() == 'All websites':  # all
             website = 'all'
-        elif self.Ui.radioButton_javdb.isChecked():  # javdb
+        elif self.Ui.comboBox_website_all.currentText() == 'javlibrary':  # javlibrary
+            website = 'javlibrary'
+        elif self.Ui.comboBox_website_all.currentText() == 'mgstage':  # mgstage
+            website = 'mgstage'
+        elif self.Ui.comboBox_website_all.currentText() == 'fc2club':  # fc2club
+            website = 'fc2club'
+        elif self.Ui.comboBox_website_all.currentText() == 'javbus':  # javbus
+            website = 'javbus'
+        elif self.Ui.comboBox_website_all.currentText() == 'javdb':  # javdb
             website = 'javdb'
+        elif self.Ui.comboBox_website_all.currentText() == 'avsox':  # avsox
+            website = 'avsox'
+        elif self.Ui.comboBox_website_all.currentText() == 'dmm':  # dmm
+            website = 'dmm'
         json_config = {
             'main_mode': main_mode,
             'soft_link': soft_link,
@@ -334,6 +359,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'folders': self.Ui.lineEdit_escape_dir.text(),
             'emby_url': self.Ui.lineEdit_emby_url.text(),
             'api_key': self.Ui.lineEdit_api_key.text(),
+            'javlib_url': self.Ui.lineEdit_javlibrary_url.text(),
         }
         save_config(json_config)
 
@@ -355,23 +381,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         file_root = os.getcwd().replace("\\\\", "/").replace("\\", "/")
         file_path = file_name.replace(file_root, '.').replace("\\\\", "/").replace("\\", "/")
         file_name = os.path.splitext(file_name.split('/')[-1])[0]
-        mode = 0
-        if self.Ui.comboBox_website.currentText() == 'All websites':
-            mode = 1
-        elif self.Ui.comboBox_website.currentText() == 'javdb':
-            mode = 2
-        elif self.Ui.comboBox_website.currentText() == 'javbus':
-            mode = 3
-        elif self.Ui.comboBox_website.currentText() == 'avsox':
-            mode = 4
-        elif self.Ui.comboBox_website.currentText() == 'fc2club':
-            mode = 5
-        elif self.Ui.comboBox_website.currentText() == 'fanza':
-            mode = 6
-        elif self.Ui.comboBox_website.currentText() == 'siro(mgstage)':
-            mode = 7
-        elif self.Ui.comboBox_website.currentText() == 'javlibrary':
-            mode = 8
+        mode = self.Ui.comboBox_website.currentIndex() + 1
         try:
             if '-CD' in file_name or '-cd' in file_name:
                 part = ''
@@ -412,9 +422,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if self.Ui.radioButton_emby.isChecked():  # emby/jellyfin
             png_name = os.path.splitext(file_name)[0] + '.png'
         elif self.Ui.radioButton_plex.isChecked():  # plex
-            png_name = 'poster.png'
+            png_name = 'poster.jpg'
         elif self.Ui.radioButton_kodi.isChecked():  # kodi
-            png_name = file_name.replace('-fanart.jpg', '-poster.png')
+            png_name = file_name.replace('-fanart.jpg', '-poster.jpg')
         try:
             if os.path.exists(os.path.join(path, png_name)):
                 os.remove(os.path.join(path, png_name))
@@ -815,8 +825,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     img.save(path + '/' + naming_rule + '-poster.jpg')
                     self.add_text_main('[+]Poster Downloaded! ' + naming_rule + '-poster.jpg')
                 elif option == 'plex':
-                    img.save(path + '/poster.png')
-                    self.add_text_main('[+]Poster Downloaded! poster.png')
+                    img.save(path + '/poster.jpg')
+                    self.add_text_main('[+]Poster Downloaded! poster.jpg')
                 time.sleep(1)
                 fp.close()
                 os.remove(path + '/cover_small.jpg')
@@ -860,7 +870,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     print("  <poster>" + name_file + "-poster.jpg</poster>", file=code)
                     print("  <fanart>" + name_file + '-fanart.jpg' + "</fanart>", file=code)
                 elif option == 'plex':
-                    print("  <poster>poster.png</poster>", file=code)
+                    print("  <poster>poster.jpg</poster>", file=code)
                     print("  <thumb>thumb.png</thumb>", file=code)
                     print("  <fanart>fanart.jpg</fanart>", file=code)
                 try:
@@ -934,8 +944,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     w = img.width
                     h = img.height
                     img2 = img.crop((w / 1.9, 0, w, h))
-                    img2.save(path + '/poster.png')
-                    self.add_text_main('[+]Poster Cut!        ' + 'poster.png')
+                    img2.save(path + '/poster.jpg')
+                    self.add_text_main('[+]Poster Cut!        ' + 'poster.jpg')
                 except:
                     self.add_text_main('[-]Cover cut failed!')
             elif imagecut == 0:
@@ -973,7 +983,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def copyRenameJpgToBackdrop(self, option, path, naming_rule):
         if option == 'plex':
             shutil.copy(path + '/fanart.jpg', path + '/Backdrop.jpg')
-            shutil.copy(path + '/poster.png', path + '/thumb.png')
+            shutil.copy(path + '/poster.jpg', path + '/thumb.png')
         if option == 'emby':
             shutil.copy(path + '/' + naming_rule + '.jpg', path + '/Backdrop.jpg')
         if option == 'kodi':
@@ -1033,7 +1043,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     break
                 if value == '' or key == 'actor_photo':
                     continue
-                if key == 'tag':
+                if key == 'tag' and len(value) == 0:
+                    continue
+                elif key == 'tag':
                     value = str(json_data['tag']).strip(" ['']").replace('\'', '')
                 self.add_text_main('   [+]-' + "%-13s" % key + ': ' + str(value))
             self.add_text_main('[+] ---Debug info---')
@@ -1046,8 +1058,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             json_data)
         if len(actor.split(',')) >= 15:
             actor = actor.split(',')[0] + ',' + actor.split(',')[1] + ',' + actor.split(',')[2] + '等演员'
-        if 'N/A' in actor:
-            actor = 'Unknown'
         folder_name = json_data['folder_name']
         path = folder_name.replace('title', title).replace('studio', studio).replace('year', year).replace('runtime',
                                                                                                            runtime).replace(
@@ -1070,14 +1080,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================从指定网站获取json_data
     def get_json_data(self, mode, number, config):
-        if (mode == 0 and self.Ui.radioButton_all.isChecked()) or mode == 1:
-            json_data = getDataFromJSON(number, config, 1)  # 所有网站
-        elif (mode == 0 and self.Ui.radioButton_javdb.isChecked()) or mode == 2:
+        if mode == 6:  # javdb模式
             self.add_text_main('[!]Please Wait Three Seconds！')
             time.sleep(3)
-            json_data = getDataFromJSON(number, config, 2)  # 仅javdb
+            json_data = getDataFromJSON(number, config, 6)
         else:
-            json_data = getDataFromJSON(number, config, mode)  # 仅javbus或仅avsox或仅fc2club或仅fanza或仅siro或仅javlibrary
+            json_data = getDataFromJSON(number, config, mode)
         return json_data
 
     # ========================================================================json_data添加到主界面
@@ -1129,7 +1137,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if json_data['website'] == 'timeout':
             self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
             return ''
-        elif self.Ui.radioButton_javdb.isChecked() and json_data['actor'] == 'N/A':
+        elif mode == 6 and json_data['actor'] == 'N/A':
             self.add_text_main('[-]Your IP Has Been Blocked By JAVDB!')
             return ''
         elif json_data['title'] == '':
@@ -1188,7 +1196,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             poster_path = path + '/' + naming_rule + '.png'
         elif self.Ui.radioButton_plex.isChecked():  # plex
             fanart_path = path + '/fanart.jpg'
-            poster_path = path + '/poster.png'
+            poster_path = path + '/poster.jpg'
         elif self.Ui.radioButton_kodi.isChecked():  # kodi
             fanart_path = path + '/' + naming_rule + '-fanart.jpg'
             poster_path = path + '/' + naming_rule + '-poster.jpg'
@@ -1246,6 +1254,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         success_folder = config['common']['success_output_folder']
         failed_folder = config['common']['failed_output_folder']  # 失败输出目录
         escape_folder = config['escape']['folders']  # 多级目录刮削需要排除的目录
+        mode = self.Ui.comboBox_website_all.currentIndex() + 1
         # =======================================================================检测更新,判断网络情况,新建failed目录,获取影片列表
         os.chdir(os.getcwd())
         if self.UpdateCheck() == 'ProxyError':
@@ -1272,7 +1281,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[!] - ' + percentage + ' [' + str(count) + '/' + count_all + '] -')
             try:
                 self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + getNumber(movie) + "]")
-                result = self.Core_Main(movie, getNumber(movie), 0, count)
+                result = self.Core_Main(movie, getNumber(movie), mode, count)
                 if result != 'not found' and getNumber(movie) != '':
                     node = QTreeWidgetItem(self.item_succ)
                     node.setText(0, str(count) + '.' + getNumber(movie) + result)

@@ -18,7 +18,7 @@ def save_config(json_config):
         print("success_output_folder = " + json_config['success_output_folder'], file=code)
         print("soft_link = " + str(json_config['soft_link']), file=code)
         print("website = " + json_config['website'], file=code)
-        print("#all or javdb", file=code)
+        print("# all or javlibrary or mgstage or fc2club or javbus or javdb or avsox or dmm", file=code)
         print("", file=code)
         print("[proxy]", file=code)
         print("proxy = " + json_config['proxy'], file=code)
@@ -35,7 +35,7 @@ def save_config(json_config):
         print("", file=code)
         print("[media]", file=code)
         print("media_warehouse = " + json_config['media_warehouse'], file=code)
-        print("#emby or plex or kodi ,emby = jellyfin", file=code)
+        print("# emby or plex or kodi ,emby = jellyfin", file=code)
         print("", file=code)
         print("[escape]", file=code)
         print("literals = " + json_config['literals'], file=code)
@@ -47,6 +47,9 @@ def save_config(json_config):
         print("[emby]", file=code)
         print("emby_url = " + json_config['emby_url'], file=code)
         print("api_key = " + json_config['api_key'], file=code)
+        print("", file=code)
+        print("[javlibrary_url]", file=code)
+        print("url = " + json_config['javlib_url'], file=code)
     code.close()
 
 
