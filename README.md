@@ -72,7 +72,7 @@
 
 <div align="center">
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/main_window.png" height="300">
-<img src="https://github.com/moyy996/AVDC/blob/master/readme/setting.png" height="300">
+<img src="https://github.com/moyy996/AVDC/blob/master/readme/setting.gif" height="300">
 </div>
 <div align="center">
 <img src="https://github.com/moyy996/AVDC/blob/master/readme/tool.png" height="300">
