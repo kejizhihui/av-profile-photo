@@ -1153,58 +1153,6 @@ p, li { white-space: pre-wrap; }
               <string>kodi</string>
              </property>
             </widget>
-            <widget class="QGroupBox" name="groupBox_14">
-             <property name="geometry">
-              <rect>
-               <x>0</x>
-               <y>0</y>
-               <width>739</width>
-               <height>43</height>
-              </rect>
-             </property>
-             <property name="title">
-              <string>媒体库：</string>
-             </property>
-             <widget class="QRadioButton" name="radioButton_emby_2">
-              <property name="geometry">
-               <rect>
-                <x>200</x>
-                <y>10</y>
-                <width>181</width>
-                <height>19</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>emby/jellyfin</string>
-              </property>
-             </widget>
-             <widget class="QRadioButton" name="radioButton_plex_2">
-              <property name="geometry">
-               <rect>
-                <x>450</x>
-                <y>10</y>
-                <width>81</width>
-                <height>19</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>plex</string>
-              </property>
-             </widget>
-             <widget class="QRadioButton" name="radioButton_kodi_2">
-              <property name="geometry">
-               <rect>
-                <x>630</x>
-                <y>10</y>
-                <width>81</width>
-                <height>19</height>
-               </rect>
-              </property>
-              <property name="text">
-               <string>kodi</string>
-              </property>
-             </widget>
-            </widget>
            </widget>
           </item>
           <item>
