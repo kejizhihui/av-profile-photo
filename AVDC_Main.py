@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import threading
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QApplication, QMainWindow
 from PyQt5.QtGui import QPixmap
 from PyQt5.QtGui import QTextCursor, QCursor
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import pyqtSignal, QThread, Qt
-from AVDC import *
+from PyQt5.QtCore import pyqtSignal, Qt
+from Ui.AVDC import *
 import sys
 import time
 import os.path
-import json
-from configparser import ConfigParser
-from AV_Data_Capture import *
-from core import *
-from dmm import *
+from Getter.dmm import *
+from Function.Function import *
 import requests
 import shutil
 import base64
@@ -33,8 +28,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui = Ui_AVDV()  # 实例化 Ui
         self.Ui.setupUi(self)  # 初始化Ui
         self.Init_Ui()
+        self.set_style()
         # 初始化需要的变量
-        self.version = '3.8'
+        self.version = '3.81'
         self.m_drag = False
         self.m_DragPosition = 0
         self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
@@ -43,9 +39,22 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init()
         self.Load_Config()
         self.show_version()
+        # ========================================================================打开日志文件
+        if self.Ui.radioButton_log_on.isChecked():
+            if not os.path.exists('Log'):
+                os.makedirs('Log')
+            log_name = 'Log/' + time.strftime("%Y-%m-%d-%H-%M-%S", time.localtime()) + '.txt'
+            self.log_txt = open(log_name, "wb", buffering=0)
+            self.add_text_main('[-]Created log file: ' + log_name)
+            self.add_text_main("[*]======================================================")
 
     def Init_Ui(self):
-        pix = QPixmap('AVDC-ico.png')
+        ico_path = ''
+        if os.path.exists('AVDC-ico.png'):
+            ico_path = 'AVDC-ico.png'
+        elif os.path.exists('Ui/AVDC-ico.png'):
+            ico_path = 'Ui/AVDC-ico.png'
+        pix = QPixmap(ico_path)
         self.Ui.label_ico.setScaledContents(True)
         self.Ui.label_ico.setPixmap(pix)  # 添加图标
         self.Ui.progressBar_avdc.setValue(0)  # 进度条清0
@@ -56,6 +65,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.setAttribute(QtCore.Qt.WA_TranslucentBackground)  # 设置窗口背景透明
         self.Ui.treeWidget_number.expandAll()
         self.Ui.checkBox_cover.setChecked(True)
+
+    def set_style(self):
         # 控件美化
         self.Ui.widget_setting.setStyleSheet(
             '''
@@ -91,7 +102,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             }
             QLineEdit{
                     background:white;
-                    border:1px solid white;
+                    border:1px solid gray;
                     width:300px;
                     border-radius:10px;
                     padding:2px 4px;
@@ -160,6 +171,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.pushButton_select_fanart.clicked.connect(self.pushButton_select_fanart_clicked)
         self.Ui.pushButton_log.clicked.connect(self.pushButton_show_log_clicked)
         self.Ui.checkBox_cover.stateChanged.connect(self.cover_change)
+        self.Ui.horizontalSlider_timeout.valueChanged.connect(self.lcdNumber_timeout_change)
+        self.Ui.horizontalSlider_retry.valueChanged.connect(self.lcdNumber_retry_change)
 
     # ========================================================================加载config
     def Load_Config(self):
@@ -178,6 +191,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.Ui.radioButton_update_on.setChecked(True)
         elif int(config['update']['update_check']) == 0:
             self.Ui.radioButton_update_off.setChecked(True)
+        if int(config['log']['save_log']) == 1:
+            self.Ui.radioButton_log_on.setChecked(True)
+        elif int(config['log']['save_log']) == 0:
+            self.Ui.radioButton_log_off.setChecked(True)
         if int(config['debug_mode']['switch']) == 1:
             self.Ui.radioButton_debug_on.setChecked(True)
         elif int(config['debug_mode']['switch']) == 0:
@@ -209,8 +226,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_escape_dir.setText(config['escape']['folders'])
         self.Ui.lineEdit_escape_char.setText(config['escape']['literals'])
         self.Ui.lineEdit_proxy.setText(config['proxy']['proxy'])
-        self.Ui.lineEdit_timeout.setText(config['proxy']['timeout'])
-        self.Ui.lineEdit_retry.setText(config['proxy']['retry'])
+        self.Ui.horizontalSlider_timeout.setValue(int(config['proxy']['timeout']))
+        self.Ui.horizontalSlider_retry.setValue(int(config['proxy']['retry']))
         self.Ui.lineEdit_dir_name.setText(config['Name_Rule']['folder_name'])
         self.Ui.lineEdit_media_name.setText(config['Name_Rule']['naming_media'])
         self.Ui.lineEdit_local_name.setText(config['Name_Rule']['naming_file'])
@@ -221,9 +238,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================显示版本号
     def show_version(self):
-        self.add_text_main('[*]======================== AVDC ========================')
-        self.add_text_main('[*]                     Version ' + self.version)
-        self.add_text_main('[*]======================================================')
+        self.Ui.textBrowser_log_main.append('[*]======================== AVDC ========================')
+        self.Ui.textBrowser_log_main.append('[*]                     Version ' + self.version)
+        self.Ui.textBrowser_log_main.append('[*]======================================================')
 
     # ========================================================================鼠标拖动窗口
     def mousePressEvent(self, e):
@@ -264,6 +281,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def pushButton_show_log_clicked(self):
         self.Ui.stackedWidget.setCurrentIndex(4)
 
+    def lcdNumber_timeout_change(self):
+        timeout = self.Ui.horizontalSlider_timeout.value()
+        self.Ui.lcdNumber_timeout.display(timeout)
+
+    def lcdNumber_retry_change(self):
+        retry = self.Ui.horizontalSlider_retry.value()
+        self.Ui.lcdNumber_retry.display(retry)
+
     def cover_change(self):
         if not self.Ui.checkBox_cover.isChecked():
             self.Ui.label_poster.setText("封面图")
@@ -276,7 +301,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 index_json = str(item.text(0)).split('.')[0]
                 self.add_label_info(self.json_array[str(index_json)])
             except:
-                print('Error in treeWidget_number_clicked!: No info!')
+                print(item.text(0) + ': No info!')
 
     def pushButton_start_cap_clicked(self):
         self.Ui.pushButton_start_cap.setEnabled(False)
@@ -300,6 +325,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         soft_link = 0
         switch_debug = 0
         update_check = 0
+        save_log = 0
         media_warehouse = ''
         website = ''
         if self.Ui.radioButton_common.isChecked():  # 普通模式
@@ -318,6 +344,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             update_check = 1
         elif self.Ui.radioButton_update_off.isChecked():  # 不检查更新
             update_check = 0
+        if self.Ui.radioButton_log_on.isChecked():  # 开启日志
+            save_log = 1
+        elif self.Ui.radioButton_log_off.isChecked():  # 关闭日志
+            save_log = 0
         if self.Ui.radioButton_emby.isChecked():  # emby/jellyfin
             media_warehouse = 'emby'
         elif self.Ui.radioButton_plex.isChecked():  # plex
@@ -345,13 +375,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'soft_link': soft_link,
             'switch_debug': switch_debug,
             'update_check': update_check,
+            'save_log': save_log,
             'media_warehouse': media_warehouse,
             'website': website,
             'failed_output_folder': self.Ui.lineEdit_fail.text(),
             'success_output_folder': self.Ui.lineEdit_success.text(),
             'proxy': self.Ui.lineEdit_proxy.text(),
-            'timeout': self.Ui.lineEdit_timeout.text(),
-            'retry': self.Ui.lineEdit_retry.text(),
+            'timeout': self.Ui.horizontalSlider_timeout.value(),
+            'retry': self.Ui.horizontalSlider_retry.value(),
             'folder_name': self.Ui.lineEdit_dir_name.text(),
             'naming_media': self.Ui.lineEdit_media_name.text(),
             'naming_file': self.Ui.lineEdit_local_name.text(),
@@ -482,28 +513,29 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     def move_file_thread(self):
         escape_dir = self.Ui.lineEdit_escape_dir_move.text()
+        sub_type = ['.srt', '.ass', '.sub']
+        des_path = 'Movie_moved'
         movie_list = movie_lists(escape_dir)
+        if not os.path.exists(des_path):
+            self.add_text_main('[+]Created folder Movie_moved!')
+            os.makedirs(des_path)
         self.add_text_main('[+]Move Movies Start!')
         for movie in movie_list:
+            if des_path in movie:
+                continue
             sour = movie
             lenth = len(sour.split('/'))
-            des = os.getcwd() + '/' + sour.split('/')[lenth - 1]
+            des = des_path + '/' + sour.split('/')[lenth - 1]
             try:
                 if len(sour.split('/')) > 2:
                     shutil.move(sour, des)
-                    self.add_text_main('   [+]Move ' + sour.split('/')[lenth - 1] + ' Success!')
+                    self.add_text_main('   [+]Move ' + sour.split('/')[lenth - 1] + ' to Movie_moved Success!')
                     path_old = sour.replace(sour.split('/')[-1], '')
                     filename = sour.split('/')[-1].split('.')[0]
-                    if os.path.exists(path_old + '/' + filename + '.srt'):  # 字幕移动
-                        os.rename(path_old + '/' + filename + '.srt', os.getcwd() + '/' + filename + '.srt')
-                        self.add_text_main('   [+]Sub moved! ' + filename + '.srt')
-                    elif os.path.exists(path_old + '/' + filename + '.ass'):  # 字幕移动
-                        os.rename(path_old + '/' + filename + '.ass', os.getcwd() + '/' + filename + '.ass')
-                        self.add_text_main('   [+]Sub moved! ' + filename + '.ass')
-                    elif os.path.exists(path_old + '/' + filename + '.sub'):  # 字幕移动
-                        os.rename(path_old + '/' + filename + '.sub', os.getcwd() + '/' + filename + '.sub')
-                        self.add_text_main('   [+]Sub moved! ' + filename + '.sub')
-
+                    for sub in sub_type:
+                        if os.path.exists(path_old + '/' + filename + sub):  # 字幕移动
+                            shutil.move(path_old + '/' + filename + sub, des_path + '/' + filename + sub)
+                            self.add_text_main('   [+]Sub moved! ' + filename + sub)
             except Exception as error_info:
                 self.add_text_main('[-]Error in move_file_thread: ' + str(error_info))
         self.add_text_main("[+]Move Movies All Finished!!!")
@@ -688,12 +720,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def add_text_main(self, text):
         time.sleep(0.1)
         self.Ui.textBrowser_log_main.append(text)
+        self.log_txt.write((str(text) + '\n').encode('utf8'))
         self.Ui.textBrowser_log_main.moveCursor(QTextCursor.End)
 
     # ========================================================================移动到失败文件夹
     def moveFailedFolder(self, filepath, failed_folder):
         self.add_text_main('[-]Move to Failed output folder')
-        shutil.move(filepath, str(os.getcwd()) + '/' + failed_folder + '/')
+        shutil.move(filepath, failed_folder + '/')
 
     # ========================================================================下载文件
     def DownloadFileWithFilename(self, url, filename, path, Config, filepath, failed_folder):
@@ -814,8 +847,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 img = Image.open(fp)
                 w = img.width
                 h = img.height
-                if int(w) >= int(h):
-                    self.add_text_main('[-]The size of cover_small.jpg is error, Try to cut fanart!')
+                if not (1.45 <= h/w <= 1.55):
+                    self.add_text_main('[-]The size of cover_small.jpg is wrong, Try to cut fanart!')
+                    fp.close()
                     os.remove(path + '/cover_small.jpg')
                     return 'small_cover_error'
                 if option == 'emby':
@@ -827,7 +861,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 elif option == 'plex':
                     img.save(path + '/poster.jpg')
                     self.add_text_main('[+]Poster Downloaded! poster.jpg')
-                time.sleep(1)
                 fp.close()
                 os.remove(path + '/cover_small.jpg')
             except Exception as error_info:
@@ -856,12 +889,17 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 print(" <title>" + name_media + "</title>", file=code)
                 print("  <set>", file=code)
                 print("  </set>", file=code)
-                print("  <studio>" + studio + "+</studio>", file=code)
-                print("  <year>" + year + "</year>", file=code)
-                print("  <outline>" + outline + "</outline>", file=code)
-                print("  <plot>" + outline + "</plot>", file=code)
-                print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
-                print("  <director>" + director + "</director>", file=code)
+                if studio != 'unknown':
+                    print("  <studio>" + studio + "+</studio>", file=code)
+                if str(year) != 'unknown':
+                    print("  <year>" + year + "</year>", file=code)
+                if outline != 'unknown':
+                    print("  <outline>" + outline + "</outline>", file=code)
+                    print("  <plot>" + outline + "</plot>", file=code)
+                if str(runtime) != 'unknown':
+                    print("  <runtime>" + str(runtime).replace(" ", "") + "</runtime>", file=code)
+                if director != 'unknown':
+                    print("  <director>" + director + "</director>", file=code)
                 if option == 'emby':
                     print("  <poster>" + name_file + ".png</poster>", file=code)
                     print("  <thumb>" + name_file + ".png</thumb>", file=code)
@@ -875,56 +913,58 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     print("  <fanart>fanart.jpg</fanart>", file=code)
                 try:
                     for key, value in actor_photo.items():
-                        print("  <actor>", file=code)
-                        print("   <name>" + key + "</name>", file=code)
-                        if not value == '':  # or actor_photo == []:
-                            print("   <thumb>" + value + "</thumb>", file=code)
-                        print("  </actor>", file=code)
+                        if str(key) != 'unknown':
+                            print("  <actor>", file=code)
+                            print("   <name>" + key + "</name>", file=code)
+                            if not value == '':  # or actor_photo == []:
+                                print("   <thumb>" + value + "</thumb>", file=code)
+                            print("  </actor>", file=code)
                 except Exception as error_info:
                     self.add_text_main('[-]Error in actor_photo: ' + str(error_info))
-                if studio != '':
+                if studio != 'unknown':
                     print("  <maker>" + studio + "</maker>", file=code)
-                if publisher != '':
+                if publisher != 'unknown':
                     print("  <maker>" + publisher + "</maker>", file=code)
                 print("  <label>", file=code)
                 print("  </label>", file=code)
                 try:
                     for i in tag:
-                        if i != '':
+                        if i != 'unknown':
                             print("  <tag>" + i + "</tag>", file=code)
                 except Exception as error_info:
                     self.add_text_main('[-]Error in tag: ' + str(error_info))
                 if re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper():
                     print("  <tag>無碼</tag>", file=code)
-                if series != '':
+                if series != 'unknown':
                     print("  <tag>" + '系列:' + series + "</tag>", file=code)
-                if studio != '':
+                if studio != 'unknown':
                     print("  <tag>" + '製作:' + studio + "</tag>", file=code)
-                if publisher != '':
+                if publisher != 'unknown':
                     print("  <tag>" + '發行:' + publisher + "</tag>", file=code)
                 if cn_sub == 1:
                     print("  <tag>中文字幕</tag>", file=code)
                 try:
                     for i in tag:
-                        if i != '':
+                        if i != 'unknown':
                             print("  <genre>" + i + "</genre>", file=code)
                 except Exception as error_info:
                     self.add_text_main('[-]Error in genre: ' + str(error_info))
                 if re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper():
                     print("  <genre>無碼</genre>", file=code)
-                if series != '':
+                if series != 'unknown':
                     print("  <genre>" + '系列:' + series + "</genre>", file=code)
-                if studio != '':
+                if studio != 'unknown':
                     print("  <genre>" + '製作:' + studio + "</genre>", file=code)
-                if publisher != '':
+                if publisher != 'unknown':
                     print("  <genre>" + '發行:' + publisher + "</genre>", file=code)
                 if cn_sub == 1:
                     print("  <genre>中文字幕</genre>", file=code)
                 print("  <num>" + number + "</num>", file=code)
-                if option == 'emby':
-                    print("  <premiered>" + release + "</premiered>", file=code)
-                elif option == 'kodi' or option == 'plex':
-                    print("  <release>" + release + "</release>", file=code)
+                if release != 'unknown':
+                    if option == 'emby':
+                        print("  <premiered>" + release + "</premiered>", file=code)
+                    elif option == 'kodi' or option == 'plex':
+                        print("  <release>" + release + "</release>", file=code)
                 print("  <cover>" + cover + "</cover>", file=code)
                 print("  <website>" + website + "</website>", file=code)
                 print("</movie>", file=code)
@@ -990,30 +1030,31 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             shutil.copy(path + '/' + naming_rule + '-fanart.jpg', path + '/Backdrop.jpg')
 
     # ========================================================================移动文件、字幕
-    def pasteFileToFolder(self, filepath, path, naming_rule, number, config):
-        houzhui = str(
-            re.search('[.](AVI|RMVB|WMV|MOV|MP4|MKV|FLV|TS|avi|rmvb|wmv|mov|mp4|mkv|flv|ts)$', filepath).group())
+    def pasteFileToFolder(self, filepath, path, naming_rule):
         try:
-            if config['common']['soft_link'] == '1':  # 如果soft_link=1 使用软链接
-                os.symlink(filepath, path + '/' + naming_rule + houzhui)
-                self.add_text_main('[+]Movie Linked!     ' + naming_rule + houzhui)
+            type = str(os.path.splitext(filepath)[1])
+            if os.path.exists(path + '/' + naming_rule + type):
+                raise FileExistsError
+            if self.Ui.radioButton_soft_on.isChecked():  # 如果使用软链接
+                os.symlink(filepath, path + '/' + naming_rule + type)
+                self.add_text_main('[+]Movie Linked!     ' + naming_rule + type)
             else:
-                os.rename(filepath, path + '/' + naming_rule + houzhui)
-                self.add_text_main('[+]Movie Moved!       ' + naming_rule + houzhui)
+                shutil.move(filepath, path + '/' + naming_rule + type)
+                self.add_text_main('[+]Movie Moved!       ' + naming_rule + type)
             path_old = filepath.replace(filepath.split('/')[-1], '')
             filename = filepath.split('/')[-1].split('.')[0]
-            if os.path.exists(path_old + '/' + filename + '.srt'):  # 字幕移动
-                os.rename(path_old + '/' + filename + '.srt', path + '/' + naming_rule + '.srt')
-                self.add_text_main('[+]Sub moved!         ' + naming_rule + '.srt')
-                return
-            elif os.path.exists(path_old + '/' + filename + '.ass'):  # 字幕移动
-                os.rename(path_old + '/' + filename + '.ass', path + '/' + naming_rule + '.ass')
-                self.add_text_main('[+]Sub moved!         ' + naming_rule + '.ass')
-                return
-            elif os.path.exists(path_old + '/' + filename + '.sub'):  # 字幕移动
-                os.rename(path_old + '/' + filename + '.sub', path + '/' + naming_rule + '.sub')
-                self.add_text_main('[+]Sub moved!         ' + naming_rule + '.sub')
-                return
+            sub_type = ['.srt', '.ass', '.sub']
+            for sub in sub_type:
+                if os.path.exists(path_old + '/' + filename + sub):  # 字幕移动
+                    shutil.move(path_old + '/' + filename + sub, path + '/' + naming_rule + sub)
+                    self.add_text_main('[+]Sub moved!         ' + naming_rule + sub)
+                    break
+        except FileExistsError:
+            failed_folder = self.Ui.lineEdit_fail.text()
+            self.moveFailedFolder(filepath, failed_folder)
+            self.add_text_main('[-]' + os.path.split(filepath)[1] + ' already exists!')
+        except PermissionError:
+            self.add_text_main('[-]PermissionError! Please run as Administrator!')
         except Exception as error_info:
             self.add_text_main('[-]Error in pasteFileToFolder: ' + str(error_info))
 
@@ -1034,7 +1075,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.label_percent.setText(str(value) + '%')
 
     # ========================================================================输出调试信息
-    def debug_mode(self, json_data, config):
+    def debug_mode(self, json_data):
         try:
             self.add_text_main('[+] ---Debug info---')
             for key, value in json_data.items():
@@ -1124,10 +1165,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         config_file = 'config.ini'
         Config = ConfigParser()
         Config.read(config_file, encoding='UTF-8')
-        try:
-            option = ReadMediaWarehouse(Config)
-        except Exception as error_info:
-            self.add_text_main('[-]Error in Core_Main: ' + str(error_info))
+        if self.Ui.radioButton_emby.isChecked():  # emby/jellyfin
+            option = 'emby'
+        elif self.Ui.radioButton_plex.isChecked():  # plex
+            option = 'plex'
+        elif self.Ui.radioButton_kodi.isChecked():  # kodi
+            option = 'kodi'
         program_mode = Config['common']['main_mode']  # 运行模式
         failed_folder = Config['common']['failed_output_folder']  # 失败输出目录
         success_folder = Config['common']['success_output_folder']  # 成功输出目录
@@ -1149,7 +1192,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             return 'not found'
         # =======================================================================调试模式
         if self.Ui.radioButton_debug_on.isChecked():
-            self.debug_mode(json_data, Config)
+            self.debug_mode(json_data)
         # =======================================================================判断-C,-CD后缀
         if '-CD' in filepath or '-cd' in filepath:
             multi_part = 1
@@ -1179,15 +1222,15 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             # imagecut 1 裁剪右半面，0 裁剪缩略图为封面，3 下载小封面
             self.fanartDownload(option, json_data, path, naming_rule, Config, filepath, failed_folder)
             if self.smallCoverDownload(path, naming_rule, json_data, option, Config, filepath,
-                                       failed_folder) == 'small_cover_error':  # 检查小封面
+                                       failed_folder) == 'small_cover_error':  # 下载小封面
                 json_data['imagecut'] = 0
             self.cutImage(option, json_data['imagecut'], path, naming_rule)  # 裁剪图
             self.copyRenameJpgToBackdrop(option, path, naming_rule)
             self.PrintFiles(option, path, naming_rule, cn_sub, json_data, filepath, failed_folder)  # 打印文件
-            self.pasteFileToFolder(filepath, path, naming_rule, number, Config)  # 移动文件
+            self.pasteFileToFolder(filepath, path, naming_rule)  # 移动文件
             # =======================================================================整理模式
         elif program_mode == '2':
-            self.pasteFileToFolder(filepath, path, naming_rule, number, Config)  # 移动文件
+            self.pasteFileToFolder(filepath, path, naming_rule)  # 移动文件
         # =======================================================================json添加封面项
         fanart_path = ''
         poster_path = ''
@@ -1210,11 +1253,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================检查更新
     def UpdateCheck(self):
         if self.Ui.radioButton_update_on.isChecked():
-            check = 1
             self.add_text_main('[!]Update Checking!')
-        else:
-            check = 0
-        if UpdateCheckSwitch(check) == '1':
             html2 = get_html('https://raw.githubusercontent.com/moyy996/AVDC/master/update_check.json')
             if html2 == 'ProxyError':
                 return 'ProxyError'
@@ -1225,6 +1264,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[*] ' + html['download'])
             else:
                 self.add_text_main('[!]No Newer Version Available!')
+            self.add_text_main("[*]======================================================")
         return 'True'
 
     # ========================================================================新建失败输出文件夹
@@ -1232,7 +1272,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if not os.path.exists(failed_folder + '/'):
             try:
                 os.makedirs(failed_folder + '/')
-                self.add_text_main('[+]Created ' + failed_folder + '!')
+                self.add_text_main('[+]Created folder named' + failed_folder + '!')
             except Exception as error_info:
                 self.add_text_main('[-]Error in CreatFailedFolder: ' + str(error_info))
 
@@ -1251,9 +1291,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         config_file = 'config.ini'
         config = ConfigParser()
         config.read(config_file, encoding='UTF-8')
-        success_folder = config['common']['success_output_folder']
-        failed_folder = config['common']['failed_output_folder']  # 失败输出目录
-        escape_folder = config['escape']['folders']  # 多级目录刮削需要排除的目录
+        success_folder = self.Ui.lineEdit_success.text()
+        failed_folder = self.Ui.lineEdit_fail.text()  # 失败输出目录
+        escape_folder = self.Ui.lineEdit_escape_dir.text()  # 多级目录刮削需要排除的目录
         mode = self.Ui.comboBox_website_all.currentIndex() + 1
         # =======================================================================检测更新,判断网络情况,新建failed目录,获取影片列表
         os.chdir(os.getcwd())
@@ -1266,7 +1306,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         movie_list = movie_lists(escape_folder)  # 获取所有需要刮削的影片列表
         count = 0
         count_all = str(len(movie_list))
-        self.add_text_main("[*]======================================================")
         self.add_text_main('[+]Find ' + count_all + ' movies')
         if count_all == 0:
             self.progressBarValue.emit(int(100))
@@ -1292,16 +1331,15 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 node.setText(0, str(count) + '.' + os.path.splitext(movie.split('/')[-1])[0])
                 self.item_fail.addChild(node)
                 self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
-                curr_path = str(os.getcwd()).replace('\\', '/')
                 if config['common']['soft_link'] == '1':
                     self.add_text_main('[-]Link ' + movie + ' to failed folder')
                     try:
-                        os.symlink(movie, curr_path + '/' + failed_folder + '/')
+                        os.symlink(movie, failed_folder + '/')
                     except Exception as error_info:
                         self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
                 else:
                     try:
-                        shutil.move(movie, curr_path + '/' + failed_folder + '/')
+                        shutil.move(movie, failed_folder + '/')
                         self.add_text_main('[-]Move ' + movie + ' to failed folder')
                     except shutil.Error as error_info:
                         self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))

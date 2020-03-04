@@ -3,12 +3,8 @@
 import re
 from lxml import etree
 import json
-from ADC_function import *
+from Function.getHtml import get_html
 
-
-# import sys
-# import io
-# sys.stdout = io.TextIOWrapper(sys.stdout.buffer, errors = 'replace', line_buffering = True)
 
 def getTitle(a):
     html = etree.fromstring(a, etree.HTMLParser())

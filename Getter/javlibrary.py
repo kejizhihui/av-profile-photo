@@ -1,7 +1,7 @@
 import re
 from lxml import etree
 import json
-from ADC_function import *
+from Function.getHtml import get_html
 
 
 def getTitle(htmlcode):

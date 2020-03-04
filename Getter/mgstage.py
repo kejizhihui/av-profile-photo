@@ -2,7 +2,7 @@ import re
 from lxml import etree
 import json
 from bs4 import BeautifulSoup
-from ADC_function import *
+from Function.getHtml import get_html
 
 
 def getTitle(a):

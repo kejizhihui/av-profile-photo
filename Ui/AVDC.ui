@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.8</string>
+   <string>AVDC-3.81</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page_avdc">
      <widget class="QPushButton" name="pushButton_start_cap">
@@ -874,439 +874,631 @@ p, li { white-space: pre-wrap; }
        <string>保存</string>
       </property>
      </widget>
-     <widget class="QGroupBox" name="groupBox_8">
+     <widget class="QTabWidget" name="tabWidget">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>550</y>
-        <width>761</width>
-        <height>111</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>命名规则</string>
-      </property>
-      <widget class="QWidget" name="formLayoutWidget_4">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>20</y>
-         <width>751</width>
-         <height>88</height>
-        </rect>
-       </property>
-       <layout class="QFormLayout" name="formLayout_6">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_43">
-          <property name="text">
-           <string>   目录命名：             </string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_dir_name"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_44">
-          <property name="text">
-           <string>   视频标题(媒体库中)：   </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_media_name"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_45">
-          <property name="text">
-           <string>   视频标题(本地文件)：   </string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="lineEdit_local_name"/>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_9">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>430</y>
-        <width>761</width>
-        <height>111</height>
-       </rect>
-      </property>
-      <property name="title">
-       <string>代理设置</string>
-      </property>
-      <widget class="QWidget" name="formLayoutWidget_2">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>20</y>
-         <width>751</width>
-         <height>88</height>
-        </rect>
-       </property>
-       <layout class="QFormLayout" name="formLayout_4">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_25">
-          <property name="text">
-           <string>   代理:                 </string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_proxy"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_26">
-          <property name="text">
-           <string>   超时重试时间：         </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_timeout"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_27">
-          <property name="text">
-           <string>   重试次数：             </string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="lineEdit_retry"/>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_10">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
+        <x>0</x>
         <y>10</y>
-        <width>761</width>
-        <height>411</height>
+        <width>781</width>
+        <height>661</height>
        </rect>
       </property>
-      <property name="title">
-       <string>普通设置</string>
+      <property name="currentIndex">
+       <number>0</number>
       </property>
-      <widget class="QWidget" name="formLayoutWidget_3">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>260</y>
-         <width>751</width>
-         <height>150</height>
-        </rect>
-       </property>
-       <layout class="QFormLayout" name="formLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_37">
-          <property name="text">
-           <string>   失败输出目录：         </string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QLineEdit" name="lineEdit_fail"/>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_39">
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="text">
-           <string>   成功输出目录：         </string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="lineEdit_success"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_40">
-          <property name="text">
-           <string>   排除目录：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="lineEdit_escape_dir"/>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_38">
-          <property name="text">
-           <string>   异常字符：             </string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="lineEdit_escape_char"/>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label_42">
-          <property name="text">
-           <string>   javlibraty网址(免翻)：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="lineEdit_javlibrary_url"/>
-        </item>
-       </layout>
+      <widget class="QWidget" name="tab">
+       <attribute name="title">
+        <string>普通设置</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_10">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>761</width>
+          <height>391</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>普通设置</string>
+        </property>
+        <widget class="QWidget" name="formLayoutWidget_3">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>320</y>
+           <width>751</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="text">
+             <string>   异常字符：             </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_escape_char"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_42">
+            <property name="text">
+             <string>   javlibraty网址(免翻)：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_javlibrary_url"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="verticalLayoutWidget_2">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>20</y>
+           <width>741</width>
+           <height>291</height>
+          </rect>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_3">
+          <item>
+           <widget class="QGroupBox" name="groupBox">
+            <property name="title">
+             <string>模式：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_common">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>普通模式</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_sort">
+             <property name="geometry">
+              <rect>
+               <x>510</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>整理模式</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_2">
+            <property name="title">
+             <string>软链接模式：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_soft_on">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>开</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_soft_off">
+             <property name="geometry">
+              <rect>
+               <x>510</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>关</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_3">
+            <property name="title">
+             <string>调试模式：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_debug_on">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>开</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_debug_off">
+             <property name="geometry">
+              <rect>
+               <x>510</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>关</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_4">
+            <property name="title">
+             <string>检测更新：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_update_on">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>开</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_update_off">
+             <property name="geometry">
+              <rect>
+               <x>510</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>关</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_15">
+            <property name="title">
+             <string>保存日志：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_log_on">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>开</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_log_off">
+             <property name="geometry">
+              <rect>
+               <x>510</x>
+               <y>10</y>
+               <width>81</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>关</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_5">
+            <property name="title">
+             <string>媒体库：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_emby">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>emby/jellyfin</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_plex">
+             <property name="geometry">
+              <rect>
+               <x>450</x>
+               <y>10</y>
+               <width>81</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>plex</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_kodi">
+             <property name="geometry">
+              <rect>
+               <x>630</x>
+               <y>10</y>
+               <width>81</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>kodi</string>
+             </property>
+            </widget>
+            <widget class="QGroupBox" name="groupBox_14">
+             <property name="geometry">
+              <rect>
+               <x>0</x>
+               <y>0</y>
+               <width>739</width>
+               <height>43</height>
+              </rect>
+             </property>
+             <property name="title">
+              <string>媒体库：</string>
+             </property>
+             <widget class="QRadioButton" name="radioButton_emby_2">
+              <property name="geometry">
+               <rect>
+                <x>200</x>
+                <y>10</y>
+                <width>181</width>
+                <height>19</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>emby/jellyfin</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="radioButton_plex_2">
+              <property name="geometry">
+               <rect>
+                <x>450</x>
+                <y>10</y>
+                <width>81</width>
+                <height>19</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>plex</string>
+              </property>
+             </widget>
+             <widget class="QRadioButton" name="radioButton_kodi_2">
+              <property name="geometry">
+               <rect>
+                <x>630</x>
+                <y>10</y>
+                <width>81</width>
+                <height>19</height>
+               </rect>
+              </property>
+              <property name="text">
+               <string>kodi</string>
+              </property>
+             </widget>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_11">
+            <property name="title">
+             <string>网站选择：</string>
+            </property>
+            <widget class="QComboBox" name="comboBox_website_all">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>481</width>
+               <height>21</height>
+              </rect>
+             </property>
+             <item>
+              <property name="text">
+               <string>All websites</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>javlibrary</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>mgstage</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>fc2club</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>javbus</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>javdb</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>avsox</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>dmm</string>
+              </property>
+             </item>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </widget>
-      <widget class="QWidget" name="verticalLayoutWidget_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>741</width>
-         <height>231</height>
-        </rect>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <item>
-         <widget class="QGroupBox" name="groupBox">
-          <property name="title">
-           <string>模式：</string>
-          </property>
-          <widget class="QRadioButton" name="radioButton_common">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>普通模式</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="radioButton_sort">
-           <property name="geometry">
-            <rect>
-             <x>510</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>整理模式</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_2">
-          <property name="title">
-           <string>软链接模式：</string>
-          </property>
-          <widget class="QRadioButton" name="radioButton_soft_on">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>开</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="radioButton_soft_off">
-           <property name="geometry">
-            <rect>
-             <x>510</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>关</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_3">
-          <property name="title">
-           <string>调试模式：</string>
-          </property>
-          <widget class="QRadioButton" name="radioButton_debug_on">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>开</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="radioButton_debug_off">
-           <property name="geometry">
-            <rect>
-             <x>510</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>关</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="title">
-           <string>检测更新：</string>
-          </property>
-          <widget class="QRadioButton" name="radioButton_update_on">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>开</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="radioButton_update_off">
-           <property name="geometry">
-            <rect>
-             <x>510</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>关</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_5">
-          <property name="title">
-           <string>媒体库：</string>
-          </property>
-          <widget class="QRadioButton" name="radioButton_emby">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>10</y>
-             <width>181</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>emby/jellyfin</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="radioButton_plex">
-           <property name="geometry">
-            <rect>
-             <x>450</x>
-             <y>10</y>
-             <width>81</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>plex</string>
-           </property>
-          </widget>
-          <widget class="QRadioButton" name="radioButton_kodi">
-           <property name="geometry">
-            <rect>
-             <x>630</x>
-             <y>10</y>
-             <width>81</width>
-             <height>19</height>
-            </rect>
-           </property>
-           <property name="text">
-            <string>kodi</string>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item>
-         <widget class="QGroupBox" name="groupBox_11">
-          <property name="title">
-           <string>网站选择：</string>
-          </property>
-          <widget class="QComboBox" name="comboBox_website_all">
-           <property name="geometry">
-            <rect>
-             <x>200</x>
-             <y>10</y>
-             <width>481</width>
-             <height>21</height>
-            </rect>
-           </property>
-           <item>
+      <widget class="QWidget" name="tab_2">
+       <attribute name="title">
+        <string>目录设置</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_8">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>761</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>命名规则</string>
+        </property>
+        <widget class="QWidget" name="formLayoutWidget_4">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>20</y>
+           <width>751</width>
+           <height>140</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout_6">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_43">
             <property name="text">
-             <string>All websites</string>
+             <string>   目录命名：             </string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_dir_name"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_44">
             <property name="text">
-             <string>javlibrary</string>
+             <string>   视频标题(媒体库中)：   </string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_media_name"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_45">
             <property name="text">
-             <string>mgstage</string>
+             <string>   视频标题(本地文件)：   </string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEdit_local_name"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_16">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>140</y>
+          <width>761</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>目录设置</string>
+        </property>
+        <widget class="QWidget" name="formLayoutWidget_5">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>20</y>
+           <width>751</width>
+           <height>91</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout_2">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_48">
             <property name="text">
-             <string>fc2club</string>
+             <string>   排除目录：</string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_escape_dir"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_46">
             <property name="text">
-             <string>javbus</string>
+             <string>   失败输出目录：         </string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_fail"/>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_47">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
             <property name="text">
-             <string>javdb</string>
+             <string>   成功输出目录：         </string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEdit_success"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_3">
+       <attribute name="title">
+        <string>代理设置</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_9">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>761</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>代理设置</string>
+        </property>
+        <widget class="QWidget" name="formLayoutWidget_2">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>20</y>
+           <width>751</width>
+           <height>90</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout_4">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_25">
             <property name="text">
-             <string>avsox</string>
+             <string>   代理:                 </string>
             </property>
-           </item>
-           <item>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_proxy"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_26">
             <property name="text">
-             <string>dmm</string>
+             <string>   超时重试时间：         </string>
             </property>
-           </item>
-          </widget>
-         </widget>
-        </item>
-       </layout>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_27">
+            <property name="text">
+             <string>   重试次数：             </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QSlider" name="horizontalSlider_timeout">
+              <property name="minimum">
+               <number>3</number>
+              </property>
+              <property name="maximum">
+               <number>10</number>
+              </property>
+              <property name="pageStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>7</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="lcdNumber_timeout">
+              <property name="intValue" stdset="0">
+               <number>7</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item row="2" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_retry">
+            <item>
+             <widget class="QSlider" name="horizontalSlider_retry">
+              <property name="minimum">
+               <number>2</number>
+              </property>
+              <property name="maximum">
+               <number>5</number>
+              </property>
+              <property name="pageStep">
+               <number>1</number>
+              </property>
+              <property name="value">
+               <number>3</number>
+              </property>
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLCDNumber" name="lcdNumber_retry">
+              <property name="intValue" stdset="0">
+               <number>3</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </widget>
      </widget>
     </widget>
