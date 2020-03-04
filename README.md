@@ -132,7 +132,7 @@
 
 ## 2.配置设置
 **设置界面**
-![](https://github.com/moyy996/AVDC/blob/master/readme/setting.png)
+![](https://github.com/moyy996/AVDC/blob/master/readme/setting.gif)
 
 ---
 ### 2.1.普通模式/整理模式
