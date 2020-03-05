@@ -9,8 +9,8 @@ from Ui.AVDC import *
 import sys
 import time
 import os.path
-from Getter.dmm import *
 from Function.Function import *
+from Function.getHtml import *
 import requests
 import shutil
 import base64
@@ -719,8 +719,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================语句添加到日志框
     def add_text_main(self, text):
         time.sleep(0.1)
+        if self.Ui.radioButton_log_on.isChecked():
+            self.log_txt.write((str(text) + '\n').encode('utf8'))
         self.Ui.textBrowser_log_main.append(text)
-        self.log_txt.write((str(text) + '\n').encode('utf8'))
         self.Ui.textBrowser_log_main.moveCursor(QTextCursor.End)
 
     # ========================================================================移动到失败文件夹
