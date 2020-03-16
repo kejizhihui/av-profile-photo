@@ -237,7 +237,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_local_name.setText(config['Name_Rule']['naming_file'])
         self.Ui.lineEdit_emby_url.setText(config['emby']['emby_url'])
         self.Ui.lineEdit_api_key.setText(config['emby']['api_key'])
-        self.Ui.lineEdit_movie_path.setText(config['media']['media_path'])
+        self.Ui.lineEdit_movie_path.setText(str(config['media']['media_path']).replace('\\', '/'))
         self.Ui.lineEdit_movie_type.setText(config['media']['media_type'])
 
     # ========================================================================显示版本号
@@ -1093,7 +1093,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if len(path) > 100:  # 文件夹名过长 取标题前70个字符
             self.add_text_main('[-]Error in Length of Path! Cut title!')
             path = path.replace(title, title[0:70])
-        path = self.Ui.lineEdit_movie_path.text() + '/' + success_folder + '/' + path
+        path = success_folder + '/' + path
         path = path.replace('//', '/').replace('--', '-').strip('-')
         if not os.path.exists(path):
             path = escapePath(path, config)
@@ -1158,7 +1158,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         elif self.Ui.radioButton_sort.isChecked():
             program_mode = 2
         movie_path = self.Ui.lineEdit_movie_path.text()
-        success_folder = self.Ui.lineEdit_success.text()  # 成功输出目录
+        success_folder = movie_path + '/' + self.Ui.lineEdit_success.text()  # 成功输出目录
         failed_folder = movie_path + '/' + self.Ui.lineEdit_fail.text()  # 失败输出目录
         # =======================================================================获取json_data
         json_data = self.get_json_data(mode, number, Config)
@@ -1251,20 +1251,20 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if self.Ui.radioButton_fail_move_on.isChecked() and not os.path.exists(failed_folder + '/'):
             try:
                 os.makedirs(failed_folder + '/')
-                self.add_text_main('[+]Created folder named' + failed_folder + '!')
+                self.add_text_main('[+]Created folder named ' + failed_folder + '!')
             except Exception as error_info:
                 self.add_text_main('[-]Error in CreatFailedFolder: ' + str(error_info))
 
     # ========================================================================删除空目录
     def CEF(self, path):
         if os.path.exists(path):
-            dirs = os.listdir(path)  # 获取路径下的子文件(夹)列表
-            for dir in dirs:
-                try:
-                    os.removedirs(path + '/' + dir)  # 删除这个空文件夹
-                    self.add_text_main('[+]Deleting empty folder ' + path + '/' + dir)
-                except:
-                    delete_empty_folder_failed = ''
+            for root, dirs, files in os.walk(path):
+                for dir in dirs:
+                    try:
+                        os.removedirs(root.replace('\\', '/') + '/' + dir)  # 删除这个空文件夹
+                        self.add_text_main('[+]Deleting empty folder ' + root.replace('\\', '/') + '/' + dir)
+                    except:
+                        delete_empty_folder_failed = ''
 
     def AVDC_Main(self):
         # =======================================================================初始化所需变量
@@ -1272,7 +1272,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         config = ConfigParser()
         config.read(config_file, encoding='UTF-8')
         movie_path = self.Ui.lineEdit_movie_path.text()
-        success_folder = self.Ui.lineEdit_success.text()
         failed_folder = movie_path + '/' + self.Ui.lineEdit_fail.text()  # 失败输出目录
         escape_folder = self.Ui.lineEdit_escape_dir.text()  # 多级目录刮削需要排除的目录
         mode = self.Ui.comboBox_website_all.currentIndex() + 1
@@ -1332,7 +1331,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main("[*]======================================================")
             self.progressBarValue.emit(int(value))
         self.Ui.pushButton_start_cap.setEnabled(True)
-        self.CEF(success_folder)
+        self.CEF(movie_path)
         self.add_text_main("[+]All finished!!!")
         self.add_text_main("[*]======================================================")
 
