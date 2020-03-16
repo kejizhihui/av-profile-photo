@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.81</string>
+   <string>AVDC-3.82</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -544,8 +544,8 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>程序所在目录的所有子目录(不包括排除目录)下的视频及同名字幕，
-移动到当前目录下。</string>
+        <string>‘视频目录’的所有子目录(不包括排除目录)下的视频及同名字幕，
+移动到‘视频目录’下的‘Movie_moved’目录下。</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_move_mp4">
@@ -607,7 +607,7 @@ p, li { white-space: pre-wrap; }
         </rect>
        </property>
        <property name="text">
-        <string>选择单个文件(程序目录下或者子目录下)，使用文件名做为番号进行刮削。</string>
+        <string>选择单个文件(‘视频目录’下或者子目录下),使用文件名做为番号进行刮削。</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_select_file">
@@ -635,11 +635,6 @@ p, li { white-space: pre-wrap; }
        <item>
         <property name="text">
          <string>All websites</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>javlibrary</string>
         </property>
        </item>
        <item>
@@ -896,7 +891,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>10</y>
           <width>761</width>
-          <height>391</height>
+          <height>421</height>
          </rect>
         </property>
         <property name="title">
@@ -906,7 +901,7 @@ p, li { white-space: pre-wrap; }
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>320</y>
+           <y>350</y>
            <width>751</width>
            <height>61</height>
           </rect>
@@ -923,14 +918,14 @@ p, li { white-space: pre-wrap; }
            <widget class="QLineEdit" name="lineEdit_escape_char"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_42">
+           <widget class="QLabel" name="label_39">
             <property name="text">
-             <string>   javlibraty网址(免翻)：</string>
+             <string>   多余字符串：             </string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit_javlibrary_url"/>
+           <widget class="QLineEdit" name="lineEdit_escape_string"/>
           </item>
          </layout>
         </widget>
@@ -940,7 +935,7 @@ p, li { white-space: pre-wrap; }
            <x>10</x>
            <y>20</y>
            <width>741</width>
-           <height>291</height>
+           <height>321</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -959,7 +954,7 @@ p, li { white-space: pre-wrap; }
               </rect>
              </property>
              <property name="text">
-              <string>普通模式</string>
+              <string>刮削模式</string>
              </property>
             </widget>
             <widget class="QRadioButton" name="radioButton_sort">
@@ -1077,7 +1072,7 @@ p, li { white-space: pre-wrap; }
            </widget>
           </item>
           <item>
-           <widget class="QGroupBox" name="groupBox_15">
+           <widget class="QGroupBox" name="groupBox_17">
             <property name="title">
              <string>保存日志：</string>
             </property>
@@ -1095,6 +1090,39 @@ p, li { white-space: pre-wrap; }
              </property>
             </widget>
             <widget class="QRadioButton" name="radioButton_log_off">
+             <property name="geometry">
+              <rect>
+               <x>510</x>
+               <y>10</y>
+               <width>81</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>关</string>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_15">
+            <property name="title">
+             <string>失败后移动文件：</string>
+            </property>
+            <widget class="QRadioButton" name="radioButton_fail_move_on">
+             <property name="geometry">
+              <rect>
+               <x>200</x>
+               <y>10</y>
+               <width>181</width>
+               <height>19</height>
+              </rect>
+             </property>
+             <property name="text">
+              <string>开</string>
+             </property>
+            </widget>
+            <widget class="QRadioButton" name="radioButton_fail_move_off">
              <property name="geometry">
               <rect>
                <x>510</x>
@@ -1176,11 +1204,6 @@ p, li { white-space: pre-wrap; }
              </item>
              <item>
               <property name="text">
-               <string>javlibrary</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
                <string>mgstage</string>
               </property>
              </item>
@@ -1255,7 +1278,7 @@ p, li { white-space: pre-wrap; }
           <item row="1" column="0">
            <widget class="QLabel" name="label_44">
             <property name="text">
-             <string>   视频标题(媒体库中)：   </string>
+             <string>   视频标题(媒体库中):      </string>
             </property>
            </widget>
           </item>
@@ -1281,7 +1304,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>140</y>
           <width>761</width>
-          <height>121</height>
+          <height>261</height>
          </rect>
         </property>
         <property name="title">
@@ -1293,31 +1316,41 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>20</y>
            <width>751</width>
-           <height>91</height>
+           <height>161</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="formLayout_2">
           <item row="0" column="0">
+           <widget class="QLabel" name="label_49">
+            <property name="text">
+             <string>   视频目录：</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_movie_path"/>
+          </item>
+          <item row="2" column="0">
            <widget class="QLabel" name="label_48">
             <property name="text">
              <string>   排除目录：</string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="2" column="1">
            <widget class="QLineEdit" name="lineEdit_escape_dir"/>
           </item>
-          <item row="1" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_46">
             <property name="text">
              <string>   失败输出目录：         </string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="3" column="1">
            <widget class="QLineEdit" name="lineEdit_fail"/>
           </item>
-          <item row="2" column="0">
+          <item row="4" column="0">
            <widget class="QLabel" name="label_47">
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
@@ -1327,10 +1360,35 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
-          <item row="2" column="1">
+          <item row="4" column="1">
            <widget class="QLineEdit" name="lineEdit_success"/>
           </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_40">
+            <property name="text">
+             <string>   视频类型：             </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_movie_type"/>
+          </item>
          </layout>
+        </widget>
+        <widget class="QLabel" name="label_7">
+         <property name="geometry">
+          <rect>
+           <x>20</x>
+           <y>180</y>
+           <width>731</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>说明：
+    1、‘排除目录’、‘成功输出目录’、‘失败输出目录’应为‘视频目录’下的目录。
+    2‘成功输出目录’、‘失败输出目录’不存在，则会在‘视频目录’下创建。、</string>
+         </property>
         </widget>
        </widget>
       </widget>

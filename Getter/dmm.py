@@ -124,6 +124,13 @@ def main(number):
     if '404 Not Found' in htmlcode:
         htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number)
         url = 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number
+    if '404 Not Found' in htmlcode:
+        dic = {
+            'title': '',
+            'website': '',
+        }
+        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))  # .encode('UTF-8')
+        return js
     try:
         actor = getActor(htmlcode)
         dic = {

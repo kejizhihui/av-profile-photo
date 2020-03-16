@@ -1,17 +1,22 @@
-from configparser import ConfigParser
 import requests
+import os
+from configparser import ConfigParser
 
 
 # ========================================================================网页请求
 def get_html(url, cookies=None):
-    config_file = 'config.ini'
+    config_file = ''
+    if os.path.exists('../config.ini'):
+        config_file = '../config.ini'
+    elif os.path.exists('config.ini'):
+        config_file = 'config.ini'
     config = ConfigParser()
     config.read(config_file, encoding='UTF-8')
     retry_count = 0
-    proxy = {}
+    proxy = ''
     timeout = 0
     try:
-        proxy = config['proxy']['proxy']
+        proxy = str(config['proxy']['proxy'])
         timeout = int(config['proxy']['timeout'])
         retry_count = int(config['proxy']['retry'])
     except:
@@ -19,7 +24,7 @@ def get_html(url, cookies=None):
     i = 0
     while i < retry_count:
         try:
-            if not str(config['proxy']['proxy']) == '':
+            if not proxy == '':
                 proxies = {"http": "http://" + proxy, "https": "https://" + proxy}
                 headers = {
                     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '

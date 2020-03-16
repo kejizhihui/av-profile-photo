@@ -7,17 +7,28 @@ import json
 from configparser import ConfigParser
 import requests
 from lxml import etree
-from Getter import avsox, javlibrary, javbus, javdb, fc2fans_club, mgstage, dmm
+from Getter import avsox, javbus, javdb, fc2fans_club, mgstage, dmm
+
+
+# ========================================================================获取config
+def get_config():
+    config_file = ''
+    if os.path.exists('../config.ini'):
+        config_file = '../config.ini'
+    elif os.path.exists('config.ini'):
+        config_file = 'config.ini'
+    config = ConfigParser()
+    config.read(config_file, encoding='UTF-8')
+    return config
 
 
 # ========================================================================获取视频列表
-def movie_lists(escape_folder):
+def movie_lists(escape_folder, movie_type, movie_path):
     if escape_folder != '':
         escape_folder = re.split('[,，]', escape_folder)
     total = []
-    file_type = ['.mp4', '.avi', '.rmvb', '.wmv', '.mov', '.mkv', '.flv', '.ts', '.MP4', '.AVI', '.RMVB', '.WMV',
-                 '.MOV', '.MKV', '.FLV', '.TS', ]
-    file_root = os.getcwd()
+    file_type = movie_type.split('|')
+    file_root = movie_path.replace('\\', '/')
     for root, dirs, files in os.walk(file_root):
         if escape_folder != '':
             flag_escape = 0
@@ -30,17 +41,20 @@ def movie_lists(escape_folder):
         for f in files:
             if os.path.splitext(f)[1] in file_type:
                 path = root + '/' + f
-                path = path.replace(file_root, '.')
+                # path = path.replace(file_root, '.')
                 path = path.replace("\\\\", "/").replace("\\", "/")
                 total.append(path)
     return total
 
 
 # ========================================================================获取番号
-def getNumber(filepath):
+def getNumber(filepath, escape_string):
     filepath = filepath.replace('-C.', '.').replace('-c.', '.')
     filename = os.path.splitext(filepath.split('/')[-1])[0]
-    # filename = filename.replace("_", "-")
+    escape_string_list = re.split('[,，]', escape_string)
+    for string in escape_string_list:
+        if string in filename:
+            filename = filename.replace(string, '')
     part = ''
     if re.search('-CD\d+', filename):
         part = re.findall('-CD\d+', filename)[0]
@@ -57,7 +71,7 @@ def getNumber(filepath):
             return os.path.splitext(filepath.split('/')[-1])[0]
     elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
-            filename = filename.replace('-PPV', '').replace('PPV-', '').replace('-ppv', '').replace('ppv-', '')
+            filename = filename.upper().replace('PPV', '').replace('--', '-')
         if re.search('\w+-\d+', filename):  # 提取类似mkbd-120番号
             file_number = re.search('\w+-\d+', filename).group()
         elif re.search('\d+[a-zA-Z]+-\d+', filename):  # 提取类似259luxu-1111番号
@@ -116,8 +130,7 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
                 json_data = json.loads(javbus.main(file_number))
         # =======================================================================FC2-111111
         elif 'FC2' in file_number.upper():
-            json_data = json.loads(fc2fans_club.main(
-                file_number.replace('fc2-', '').replace('fc2_', '').replace('FC2-', '').replace('fc2_', '')))
+            json_data = json.loads(fc2fans_club.main(re.search('\d{4,}', file_number).group()))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
         # =======================================================================ssni00321
@@ -132,38 +145,34 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
         else:
             json_data = json.loads(javbus.main(file_number))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javlibrary.main(file_number, config['javlibrary_url']['url']))
-            if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(avsox.main(file_number))
-    elif re.match('\D{2,}00\d{3,}', file_number) and mode != 8:
+    elif re.match('\D{2,}00\d{3,}', file_number) and mode != 7:
         json_data = {
             'title': '',
             'actor': '',
             'website': '',
         }
-    elif mode == 2:  # 仅从javlibrary
-        json_data = json.loads(javlibrary.main(file_number, config['javlibrary_url']['url']))
-    elif mode == 3:  # 仅从mgstage
+    elif mode == 2:  # 仅从mgstage
         json_data = json.loads(mgstage.main(file_number))
-    elif mode == 4:  # 仅从fc2club
+    elif mode == 3:  # 仅从fc2club
         json_data = json.loads(fc2fans_club.main(file_number))
-    elif mode == 5:  # 仅从javbus
+    elif mode == 4:  # 仅从javbus
         if re.match('^\d{5,}', file_number) or re.match('n\d{4}', file_number) or 'HEYZO' in file_number.upper():
             json_data = json.loads(javbus.main_uncensored(file_number))
         elif re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
             json_data = json.loads(javbus.main_us(file_number))
         else:
             json_data = json.loads(javbus.main(file_number))
-    elif mode == 6:  # 仅从javdb
+    elif mode == 5:  # 仅从javdb
         if re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
             json_data = json.loads(javdb.main_us(file_number))
         else:
             json_data = json.loads(javdb.main(file_number))
-    elif mode == 7:  # 仅从avsox
+    elif mode == 6:  # 仅从avsox
         json_data = json.loads(avsox.main(file_number))
-    elif mode == 8:  # 仅从dmm
+    elif mode == 7:  # 仅从dmm
         json_data = json.loads(dmm.main(file_number))
 
     # ================================================网站规则添加结束================================================
@@ -252,14 +261,20 @@ def get_info(json_data):
 # ========================================================================保存配置到config.ini
 def save_config(json_config):
     # json_config = json.loads(json_config)
-    with open("config.ini", "wt", encoding='UTF-8') as code:
+    config_file = ''
+    if os.path.exists('../config.ini'):
+        config_file = '../config.ini'
+    elif os.path.exists('config.ini'):
+        config_file = 'config.ini'
+    with open(config_file, "wt", encoding='UTF-8') as code:
         print("[common]", file=code)
         print("main_mode = " + str(json_config['main_mode']), file=code)
         print("failed_output_folder = " + json_config['failed_output_folder'], file=code)
         print("success_output_folder = " + json_config['success_output_folder'], file=code)
+        print("failed_file_move = " + str(json_config['failed_file_move']), file=code)
         print("soft_link = " + str(json_config['soft_link']), file=code)
         print("website = " + json_config['website'], file=code)
-        print("# all or javlibrary or mgstage or fc2club or javbus or javdb or avsox or dmm", file=code)
+        print("# all or mgstage or fc2club or javbus or javdb or avsox or dmm", file=code)
         print("", file=code)
         print("[proxy]", file=code)
         print("proxy = " + json_config['proxy'], file=code)
@@ -278,12 +293,15 @@ def save_config(json_config):
         print("save_log = " + str(json_config['save_log']), file=code)
         print("", file=code)
         print("[media]", file=code)
+        print("media_type = " + json_config['media_type'], file=code)
+        print("media_path = " + json_config['media_path'], file=code)
         print("media_warehouse = " + json_config['media_warehouse'], file=code)
         print("# emby or plex or kodi ,emby = jellyfin", file=code)
         print("", file=code)
         print("[escape]", file=code)
         print("literals = " + json_config['literals'], file=code)
         print("folders = " + json_config['folders'], file=code)
+        print("string = " + json_config['string'], file=code)
         print("", file=code)
         print("[debug_mode]", file=code)
         print("switch = " + str(json_config['switch_debug']), file=code)
@@ -291,9 +309,6 @@ def save_config(json_config):
         print("[emby]", file=code)
         print("emby_url = " + json_config['emby_url'], file=code)
         print("api_key = " + json_config['api_key'], file=code)
-        print("", file=code)
-        print("[javlibrary_url]", file=code)
-        print("url = " + json_config['javlib_url'], file=code)
     code.close()
 
 

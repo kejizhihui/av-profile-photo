@@ -118,6 +118,7 @@ def getOutline(htmlcode):
 
 
 def main(number):
+    htmlcode = ''
     try:
         htmlcode = get_html('https://javdb.com/search?q=' + number + '&f=all').replace(u'\xa0', u' ')
         html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
@@ -196,6 +197,7 @@ def main(number):
 
 
 def main_us(number):
+    htmlcode = ''
     try:
         htmlcode = get_html('https://javdb.com/search?q=' + number + '&f=all').replace(u'\xa0', u' ')
         html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()

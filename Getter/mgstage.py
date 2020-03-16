@@ -115,8 +115,8 @@ def getOutline(htmlcode):
     return result
 
 
-def main(number2):
-    number = number2.upper()
+def main(number):
+    number = number.upper()
     htmlcode = str(
         get_html('https://www.mgstage.com/product/product_detail/' + str(number) + '/', cookies={'adc': '1'}))
     soup = BeautifulSoup(htmlcode, 'lxml')
