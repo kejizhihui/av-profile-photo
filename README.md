@@ -190,7 +190,7 @@
 
 ---
 ### 5.4.8.媒体库选择 
-如果是PLEX，请安装插件：```XBMCnfoMoviesImporter```
+如果是PLEX，请安装插件：[**XBMCnfoMoviesImporter**](https://github.com/gboudreau/XBMCnfoMoviesImporter.bundle)
 
 ---
 ### 5.4.9.排除指定字符和目录，字符串
