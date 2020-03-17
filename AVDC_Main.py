@@ -1105,7 +1105,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if mode == 5:  # javdb模式
             self.add_text_main('[!]Please Wait Three Seconds！')
             time.sleep(3)
-            json_data = getDataFromJSON(number, config, 6)
+            json_data = getDataFromJSON(number, config, 5)
         else:
             json_data = getDataFromJSON(number, config, mode)
         return json_data
@@ -1166,7 +1166,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if json_data['website'] == 'timeout':
             self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
             return 'error'
-        elif mode == 6 and json_data['actor'] == 'N/A':
+        elif mode == 5 and json_data['actor'] == 'N/A':
             self.add_text_main('[-]Your IP Has Been Blocked By JAVDB!')
             return 'error'
         elif json_data['title'] == '':

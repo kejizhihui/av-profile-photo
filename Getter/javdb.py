@@ -111,10 +111,16 @@ def getDirector(htmlcode):
     return str(result1 + result2).strip('+').replace("', '", '').replace('"', '')
 
 
-def getOutline(htmlcode):
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath('//*[@id="introduction"]/dd/p[1]/text()')).strip(" ['']")
-    return result
+def getOutline(number):  # 获取简介
+    try:
+        dww_htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number.replace("-", '00'))
+        if '404 Not Found' in dww_htmlcode:
+            dww_htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number.replace("-", '00'))
+    except:
+        dww_htmlcode = ''
+    html = etree.fromstring(dww_htmlcode, etree.HTMLParser())
+    result = str(html.xpath("//div[@class='mg-b20 lh4']/text()")).strip(" ['']")
+    return result.replace('\n', '').replace('\\n', '').replace('\'', '').replace(',', '').replace(' ', '')
 
 
 def main(number):
@@ -136,7 +142,6 @@ def main(number):
         count = 1
         number_get = ''
         movie_found = 0
-        result_url = ''
         for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
             number_get = html.xpath(
                 '//div[@id=\'videos\']/div[@class=\'grid columns\']/div[@class=\'grid-item column\'][' + str(
@@ -151,6 +156,14 @@ def main(number):
         if len(actor) == 0 and 'FC2-' in number_get:
             actor.append('FC2-NoActor')
         if movie_found == 1:
+            imagecut = 1
+            cover_small = ''
+            outline = ''
+            if re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper():
+                imagecut = 3
+                cover_small = getCover_small(htmlcode, count - 1)
+            else:
+                outline = getOutline(number)
             dic = {
                 'actor': str(actor).strip(" [',']").replace('\'', ''),
                 'title': getTitle(b).replace('中文字幕', '').replace("\\n", '').replace('_', '-').replace(number_get,
@@ -158,14 +171,14 @@ def main(number):
                     ' ', '-').replace('--', '-'),
                 'studio': getStudio(b),
                 'publisher': getPublisher(b),
-                'outline': getOutline(b).replace('\n', ''),
+                'outline': outline,
                 'runtime': getRuntime(b).replace(' 分鍾', ''),
                 'director': getDirector(b),
                 'release': getRelease(b),
                 'number': number_get,
                 'cover': getCover(b),
-                'cover_small': getCover_small(htmlcode, count - 1),
-                'imagecut': 3,
+                'cover_small': cover_small,
+                'imagecut': imagecut,
                 'tag': getTag(b),
                 'series': getSeries(b),
                 'year': getYear(getRelease(b)),  # str(re.search('\d{4}',getRelease(htmlcode)).group()),

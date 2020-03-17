@@ -89,10 +89,16 @@ def getDirector(htmlcode):  # 获取导演
     return result
 
 
-def getOutline(htmlcode):  # 获取简介
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
+def getOutline(number):  # 获取简介
+    try:
+        dww_htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number.replace("-", '00'))
+        if '404 Not Found' in dww_htmlcode:
+            dww_htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number.replace("-", '00'))
+    except:
+        dww_htmlcode = ''
+    html = etree.fromstring(dww_htmlcode, etree.HTMLParser())
     result = str(html.xpath("//div[@class='mg-b20 lh4']/text()")).strip(" ['']")
-    return result
+    return result.replace('\n', '').replace('\\n', '').replace('\'', '').replace(',', '').replace(' ', '')
 
 
 def getSeries(htmlcode):
@@ -190,17 +196,13 @@ def main(number):
         return js
     htmlcode = get_html(result_url)
     try:
-        dww_htmlcode = get_html("https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=" + number.replace("-", '00'))
-    except:
-        dww_htmlcode = ''
-    try:
         number = getNum(htmlcode)
         dic = {
             'title': str(getTitle(htmlcode)).replace(number, '').strip().replace(' ', '-'),
             'studio': getStudio(htmlcode),
             'publisher': getPublisher(htmlcode),
             'year': getYear(getRelease(htmlcode)),
-            'outline': getOutline(dww_htmlcode).replace('\n', '').replace('\\n', '').replace('\'', '').replace(',', '').replace(' ', ''),
+            'outline': getOutline(number),
             'runtime': getRuntime(htmlcode).replace('分鐘', '').strip(),
             'director': getDirector(htmlcode),
             'actor': getActor(htmlcode),
