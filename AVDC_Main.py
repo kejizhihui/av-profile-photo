@@ -30,7 +30,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init_Ui()
         self.set_style()
         # 初始化需要的变量
-        self.version = '3.91'
+        self.version = '3.92'
         self.m_drag = False
         self.m_DragPosition = 0
         self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
@@ -239,6 +239,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_api_key.setText(config['emby']['api_key'])
         self.Ui.lineEdit_movie_path.setText(str(config['media']['media_path']).replace('\\', '/'))
         self.Ui.lineEdit_movie_type.setText(config['media']['media_type'])
+        self.Ui.lineEdit_sub_type.setText(config['media']['sub_type'])
 
     # ========================================================================显示版本号
     def show_version(self):
@@ -401,6 +402,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'api_key': self.Ui.lineEdit_api_key.text(),
             'media_path': self.Ui.lineEdit_movie_path.text(),
             'media_type': self.Ui.lineEdit_movie_type.text(),
+            'sub_type': self.Ui.lineEdit_sub_type.text(),
         }
         save_config(json_config)
 
@@ -528,7 +530,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     def move_file_thread(self):
         escape_dir = self.Ui.lineEdit_escape_dir_move.text()
-        sub_type = ['.srt', '.ass', '.sub']
+        sub_type = self.Ui.lineEdit_sub_type.text().split('|')
         movie_path = self.Ui.lineEdit_movie_path.text()
         movie_type = self.Ui.lineEdit_movie_type.text()
         movie_list = movie_lists(escape_dir, movie_type, movie_path)
@@ -748,9 +750,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================移动到失败文件夹
     def moveFailedFolder(self, filepath, failed_folder):
         if self.Ui.radioButton_fail_move_on.isChecked():
-            if not os.path.exists(failed_folder + '/' + os.path.split(filepath)[1]):
-                self.add_text_main('[-]Move to Failed output folder')
-                shutil.move(filepath, failed_folder + '/')
+            if self.Ui.radioButton_soft_off.isChecked():
+                try:
+                    shutil.move(filepath, failed_folder + '/')
+                    self.add_text_main('[-]Move ' + os.path.split(filepath)[1] + ' to Failed output folder Success')
+                except Exception as error_info:
+                    self.add_text_main('[-]Error in moveFailedFolder! ' + str(error_info))
 
     # ========================================================================下载文件
     def DownloadFileWithFilename(self, url, filename, path, Config, filepath, failed_folder):
@@ -793,16 +798,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                         code.write(r.content)
                     code.close()
                     return
-            except requests.exceptions.RequestException:
-                i += 1
-                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
-            except requests.exceptions.ConnectionError:
-                i += 1
-                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
-            except requests.exceptions.ProxyError:
-                i += 1
-                print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
-            except requests.exceptions.ConnectTimeout:
+            except :
                 i += 1
                 print('[-]Image Download :   Connect retry ' + str(i) + '/' + str(retry_count))
         self.add_text_main('[-]Connect Failed! Please check your Proxy or Network!')
@@ -1021,8 +1017,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================移动文件、字幕
     def pasteFileToFolder(self, filepath, path, naming_rule, failed_folder):
+        type = str(os.path.splitext(filepath)[1])
         try:
-            type = str(os.path.splitext(filepath)[1])
             if os.path.exists(path + '/' + naming_rule + type):
                 raise FileExistsError
             if self.Ui.radioButton_soft_on.isChecked():  # 如果使用软链接
@@ -1033,15 +1029,16 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main('[+]Movie Moved!       ' + naming_rule + type)
             path_old = filepath.replace(filepath.split('/')[-1], '')
             filename = filepath.split('/')[-1].split('.')[0]
-            sub_type = ['.srt', '.ass', '.sub']
+            sub_type = self.Ui.lineEdit_sub_type.text().split('|')
             for sub in sub_type:
                 if os.path.exists(path_old + '/' + filename + sub):  # 字幕移动
                     shutil.move(path_old + '/' + filename + sub, path + '/' + naming_rule + sub)
                     self.add_text_main('[+]Sub moved!         ' + naming_rule + sub)
                     break
         except FileExistsError:
-            self.moveFailedFolder(filepath, failed_folder)
-            self.add_text_main('[-]' + os.path.split(filepath)[1] + ' already exists!')
+            self.add_text_main('[+]Movie Existed!     ' + naming_rule + type)
+            if os.path.split(filepath)[0] != path:
+                self.moveFailedFolder(filepath, failed_folder)
         except PermissionError:
             self.add_text_main('[-]PermissionError! Please run as Administrator!')
         except Exception as error_info:
@@ -1177,6 +1174,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.item_fail.addChild(node)
             self.moveFailedFolder(filepath, failed_folder)
             return 'not found'
+        elif 'http' not in json_data['cover']:
+            raise Exception('Cover Url is None!')
+        elif json_data['imagecut'] == 3 and 'http' not in json_data['cover_small']:
+            raise Exception('Cover_small Url is None!')
+
         # =======================================================================调试模式
         if self.Ui.radioButton_debug_on.isChecked():
             self.debug_mode(json_data)
@@ -1249,7 +1251,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================新建失败输出文件夹
     def CreatFailedFolder(self, failed_folder):
-        if self.Ui.radioButton_fail_move_on.isChecked() and not os.path.exists(failed_folder + '/'):
+        if self.Ui.radioButton_fail_move_on.isChecked() and not os.path.exists(failed_folder):
             try:
                 os.makedirs(failed_folder + '/')
                 self.add_text_main('[+]Created folder named ' + failed_folder + '!')
@@ -1316,14 +1318,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 node.setText(0, str(count) + '.' + os.path.splitext(movie.split('/')[-1])[0])
                 self.item_fail.addChild(node)
                 self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
-                if self.Ui.radioButton_fail_move_on.isChecked():
-                    if config['common']['soft_link'] == '1':
-                        self.add_text_main('[-]Link ' + movie + ' to failed folder')
-                        try:
-                            os.symlink(movie, failed_folder + '/')
-                        except Exception as error_info:
-                            self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
-                    else:
+                if self.Ui.radioButton_fail_move_on.isChecked() and not os.path.exists(failed_folder + '/' + os.path.split(movie)[1]):
+                    if config['common']['soft_link'] == '0':
                         try:
                             shutil.move(movie, failed_folder + '/')
                             self.add_text_main('[-]Move ' + movie + ' to failed folder')

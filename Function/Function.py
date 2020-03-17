@@ -294,6 +294,7 @@ def save_config(json_config):
         print("", file=code)
         print("[media]", file=code)
         print("media_type = " + json_config['media_type'], file=code)
+        print("sub_type = " + json_config['sub_type'], file=code)
         print("media_path = " + json_config['media_path'], file=code)
         print("media_warehouse = " + json_config['media_warehouse'], file=code)
         print("# emby or plex or kodi ,emby = jellyfin", file=code)
