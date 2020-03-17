@@ -748,8 +748,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================移动到失败文件夹
     def moveFailedFolder(self, filepath, failed_folder):
         if self.Ui.radioButton_fail_move_on.isChecked():
-            self.add_text_main('[-]Move to Failed output folder')
-            shutil.move(filepath, failed_folder + '/')
+            if not os.path.exists(failed_folder + '/' + os.path.split(filepath)[1]):
+                self.add_text_main('[-]Move to Failed output folder')
+                shutil.move(filepath, failed_folder + '/')
 
     # ========================================================================下载文件
     def DownloadFileWithFilename(self, url, filename, path, Config, filepath, failed_folder):
