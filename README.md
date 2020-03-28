@@ -35,7 +35,7 @@
 <a title="Hits" target="_blank" href="https://github.com/moyy996/avdc"><img src="https://hits.b3log.org/moyy996/AVDC.svg"></a>
 ![](https://img.shields.io/badge/build-passing-brightgreen.svg?style=flat-square)
 ![](https://img.shields.io/github/downloads/moyy996/avdc/total.svg?style=flat-square)
-![](https://img.shields.io/github/license/yoshiko2/av_data_capture.svg?style=flat-square)
+![](https://img.shields.io/github/license/moyy996/avdc.svg?style=flat-square)
 ![](https://img.shields.io/github/release/moyy996/avdc.svg?style=flat-square)
 ![](https://img.shields.io/badge/Python-3.7-yellow.svg?style=flat-square&logo=python)
 ![](https://img.shields.io/badge/Pyqt-5-blue.svg?style=flat-square)<br>
