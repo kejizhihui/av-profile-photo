@@ -118,54 +118,57 @@ def getOutline(htmlcode):
     return result
 
 
+def getScore(htmlcode):
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    result = str(html.xpath("//p[@class='d-review__average']/strong/text()")[0]).replace('\\n', '').replace('\n', '').replace('点', '')
+    return result
+
+
 def main(number):
-    htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number)
-    url = 'https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number
-    if '404 Not Found' in htmlcode:
-        htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number)
-        url = 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number
-    if '404 Not Found' in htmlcode:
-        dic = {
-            'title': '',
-            'website': '',
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))  # .encode('UTF-8')
-        return js
     try:
+        htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number)
+        url = 'https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number
+        if '404 Not Found' in htmlcode:
+            htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number)
+            url = 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number
+        if '404 Not Found' in htmlcode:
+            raise Exception('Movie Data not found in dmm!')
+        if str(htmlcode) == 'ProxyError':
+            raise TimeoutError
         actor = getActor(htmlcode)
         dic = {
             'title': getTitle(htmlcode).strip(getActor(htmlcode)),
             'studio': getStudio(htmlcode),
             'publisher': getPublisher(htmlcode),
             'outline': getOutline(htmlcode),
+            'score': getScore(htmlcode),
             'runtime': getRuntime(htmlcode),
             'director': getDirector(htmlcode),
             'actor': actor,
             'release': getRelease(htmlcode),
             'number': getNum(htmlcode),
-            'cover': getCover(htmlcode, number),
-            'imagecut': 1,
             'tag': getTag(htmlcode),
-            'series': getSeries(htmlcode),
+            'series': getSeries(htmlcode).replace('-', ''),
             'year': getYear(getRelease(htmlcode)),  # str(re.search('\d{4}',getRelease(a)).group()),
             'actor_photo': getActorPhoto(actor),
+            'cover': getCover(htmlcode, number),
+            'imagecut': 1,
             'website': url,
             'source': 'dmm.py',
         }
-    except:
-        if htmlcode == 'ProxyError':
-            dic = {
-                'title': '',
-                'website': 'timeout',
-            }
-        else:
-            dic = {
-                'title': '',
-                'website': '',
-            }
+    except TimeoutError:
+        dic = {
+            'title': '',
+            'website': 'timeout',
+        }
+    except Exception as error_info:
+        print('Error in dmm.main : ' + str(error_info))
+        dic = {
+            'title': '',
+            'website': '',
+        }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'))  # .encode('UTF-8')
     return js
 
 # main('DV-1562')
-# input("[+][+]Press enter key exit, you can check the error messge before you exit.\n[+][+]按回车键结束，你可以在结束之前查看和错误信息。")
 # print(main('mide00139'))

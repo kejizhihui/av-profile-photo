@@ -1,12 +1,13 @@
 import re
-from pyquery import PyQuery as pq  # need install
-from lxml import etree  # need install
-from bs4 import BeautifulSoup  # need install
+from pyquery import PyQuery as pq
+from lxml import etree
+from bs4 import BeautifulSoup
 import json
 from Function.getHtml import get_html
+from Function.getHtml import post_html
 
 
-def getActorPhoto(htmlcode):  # //*[@id="star_qdt"]/li/a/img
+def getActorPhoto(htmlcode):
     soup = BeautifulSoup(htmlcode, 'lxml')
     a = soup.find_all(attrs={'class': 'star-name'})
     d = {}
@@ -89,16 +90,16 @@ def getDirector(htmlcode):  # 获取导演
     return result
 
 
-def getOutline(number):  # 获取简介
-    try:
-        dww_htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number.replace("-", '00'))
-        if '404 Not Found' in dww_htmlcode:
-            dww_htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number.replace("-", '00'))
-    except:
-        dww_htmlcode = ''
-    html = etree.fromstring(dww_htmlcode, etree.HTMLParser())
-    result = str(html.xpath("//div[@class='mg-b20 lh4']/text()")).strip(" ['']")
-    return result.replace('\n', '').replace('\\n', '').replace('\'', '').replace(',', '').replace(' ', '')
+def getOutlineScore(number):  # 获取简介
+    response = post_html("https://www.jav321.com/search", query={"sn": number})
+    detail_page = etree.fromstring(response, etree.HTMLParser())
+    outline = str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
+    if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
+        score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
+        score = str(float(score) / 10.0)
+    else:
+        score = str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+    return outline, score
 
 
 def getSeries(htmlcode):
@@ -109,21 +110,13 @@ def getSeries(htmlcode):
 
 def getCover_small(number):  # 从avsox获取封面图
     htmlcode = get_html('https://avsox.host/cn/search/' + number)
-    html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    result = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
-    if result == '' or result == 'null' or result == 'None':
-        htmlcode = get_html('https://avsox.host/cn/search/' + number.replace('-', '_'))
-        html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-        result = str(html.xpath('//*[@id="waterfall"]/div/a/@href')).strip(" ['']")
-        if result == '' or result == 'null' or result == 'None':
-            htmlcode = get_html('https://avsox.host/cn/search/' + number.replace('_', ''))
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     counts = len(html.xpath("//div[@id='waterfall']/div/a/div"))
     if counts == 0:
         return ''
     for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
         number_get = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-info']/span/date[1]/text()")
-        if len(number_get) > 0 and number_get[0] == number:
+        if len(number_get) > 0 and number_get[0].upper() == number.upper():
             cover_small = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-frame']/img/@src")[0]
             return cover_small
     return ''
@@ -142,7 +135,6 @@ def getTag(htmlcode):  # 获取标签
 
 def find_number(number):
     # =======================================================================有码搜索
-    counts = 0
     if not (re.match('^\d{4,}', number) or re.match('n\d{4}', number) or 'HEYZO' in number.upper()):
         htmlcode = get_html('https://www.javbus.com/search/' + number + '&type=1')
         html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
@@ -150,12 +142,9 @@ def find_number(number):
         if counts != 0:
             for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
                 number_get = html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
-                # number_get = number_get.replace('_', '-')
-                if number_get == number.upper() or number_get == number.upper().replace('-', '') or number_get == number.upper().replace('_', ''):
-                    result_url = html.xpath(
-                        "//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
-                    return result_url
-                elif number_get == number.lower() or number_get == number.lower().replace('-', '') or number_get == number.lower().replace('_', ''):
+                number_get = number_get.upper()
+                number = number.upper()
+                if number_get == number or number_get == number.replace('-', '') or number_get == number.replace('_', ''):
                     result_url = html.xpath(
                         "//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
                     return result_url
@@ -167,12 +156,9 @@ def find_number(number):
         return 'not found'
     for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
         number_get = html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
-        # number_get = number_get.replace('_', '-')
-        if number_get == number.upper() or number_get == number.upper().replace('-', '') or number_get == number.upper().replace('_', ''):
-            result_url = html.xpath(
-                "//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
-            return result_url
-        elif number_get == number.lower() or number_get == number.lower().replace('-', '') or number_get == number.lower().replace('_', ''):
+        number_get = number_get.upper()
+        number = number.upper()
+        if number_get == number or number_get == number.replace('-', '') or number_get == number.replace('_', ''):
             result_url = html.xpath(
                 "//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
             return result_url
@@ -184,25 +170,22 @@ def find_number(number):
 
 
 def main(number):
-    result_url = find_number(number)
-    if result_url == 'not found':
-        dic = {
-            'title': '',
-            'actor': '',
-            'website': '',
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
-                        separators=(',', ':'), )  # .encode('UTF-8')
-        return js
-    htmlcode = get_html(result_url)
     try:
+        result_url = find_number(number)
+        if result_url == 'not found':
+            raise Exception('Movie Data not found in javbus.main!')
+        htmlcode = get_html(result_url)
+        if str(htmlcode) == 'ProxyError':
+            raise TimeoutError
+        outline, score = getOutlineScore(number)
         number = getNum(htmlcode)
         dic = {
             'title': str(getTitle(htmlcode)).replace(number, '').strip().replace(' ', '-'),
             'studio': getStudio(htmlcode),
             'publisher': getPublisher(htmlcode),
             'year': getYear(getRelease(htmlcode)),
-            'outline': getOutline(number),
+            'outline': outline,
+            'score': score,
             'runtime': getRuntime(htmlcode).replace('分鐘', '').strip(),
             'director': getDirector(htmlcode),
             'actor': getActor(htmlcode),
@@ -216,42 +199,41 @@ def main(number):
             'website': result_url,
             'source': 'javbus.py',
         }
+    except TimeoutError:
+        dic = {
+            'title': '',
+            'website': 'timeout',
+        }
     except Exception as error_info:
-        print('Error in javbus.main :' + str(error_info))
-        if htmlcode == 'ProxyError':
-            dic = {
-                'title': '',
-                'website': 'timeout',
-            }
-        else:
-            dic = {
-                'title': '',
-                'website': '',
-            }
+        print('Error in javbus.main : ' + str(error_info))
+        dic = {
+            'title': '',
+            'website': '',
+        }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
 
 def main_uncensored(number):
-    result_url = find_number(number)
-    if result_url == 'not found':
-        dic = {
-            'title': '',
-            'actor': '',
-            'website': '',
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
-                        separators=(',', ':'), )  # .encode('UTF-8')
-        return js
-    htmlcode = get_html(result_url)
     try:
+        result_url = find_number(number)
+        if result_url == 'not found':
+            raise Exception('Movie Data not found in javbus.main_uncensored!')
+        htmlcode = get_html(result_url)
+        if str(htmlcode) == 'ProxyError':
+            raise TimeoutError
         number = getNum(htmlcode)
+        outline = ''
+        score = ''
+        if 'HEYZO' in number.upper():
+            outline, score = getOutlineScore(number)
         dic = {
             'title': getTitle(htmlcode).replace(number, '').strip().replace(' ', '-'),
             'studio': getStudio(htmlcode),
             'publisher': '',
             'year': getYear(getRelease(htmlcode)),
-            'outline': '',
+            'outline': outline,
+            'score': score,
             'runtime': getRuntime(htmlcode).replace('分鐘', '').strip(),
             'director': getDirector(htmlcode),
             'actor': getActor(htmlcode),
@@ -268,96 +250,90 @@ def main_uncensored(number):
         }
         if dic['cover_small'] == '':
             dic['imagecut'] = 0
+    except TimeoutError:
+        dic = {
+            'title': '',
+            'website': 'timeout',
+        }
     except Exception as error_info:
-        print('Error in javbus.main_uncensored :' + str(error_info))
-        if htmlcode == 'ProxyError':
-            dic = {
-                'title': '',
-                'website': 'timeout',
-            }
-        else:
-            dic = {
-                'title': '',
-                'website': '',
-            }
+        print('Error in javbus.main_uncensored : ' + str(error_info))
+        dic = {
+            'title': '',
+            'website': '',
+        }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
 
 def main_us(number):
-    htmlcode = get_html('https://www.javbus.zone/search/' + number)
-    html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-    counts = len(html.xpath("//div[@class='row']/div[@id='waterfall']/div"))
-    if counts == 0:
-        dic = {
-            'title': '',
-            'actor': '',
-            'website': '',
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
-                        separators=(',', ':'), )  # .encode('UTF-8')
-        return js
-    result_url = ''
-    cover_small = ''
-    for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
-        number_get = html.xpath("//div[@id='waterfall']/div[" + str(
-            count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
-        if number_get.upper() == number.upper() or number_get.replace('-', '').upper() == number.upper():
-            result_url = html.xpath(
-                "//div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
-            cover_small = html.xpath(
-                "//div[@id='waterfall']/div[" + str(
-                    count) + "]/a[@class='movie-box']/div[@class='photo-frame']/img[@class='img']/@src")[0]
-            break
-    if result_url == 'not found':
-        dic = {
-            'title': '',
-            'actor': '',
-            'website': '',
-        }
-        js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4,
-                        separators=(',', ':'), )  # .encode('UTF-8')
-        return js
-    htmlcode = get_html(result_url)
     try:
+        htmlcode = get_html('https://www.javbus.zone/search/' + number)
+        if str(htmlcode) == 'ProxyError':
+            raise TimeoutError
+        html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+        counts = len(html.xpath("//div[@class='row']/div[@id='waterfall']/div"))
+        if counts == 0:
+            raise Exception('Movie Data not found in javbus.main_us!')
+        result_url = ''
+        cover_small = ''
+        for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
+            number_get = html.xpath("//div[@id='waterfall']/div[" + str(
+                count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
+            if number_get.upper() == number.upper() or number_get.replace('-', '').upper() == number.upper():
+                result_url = html.xpath(
+                    "//div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
+                cover_small = html.xpath(
+                    "//div[@id='waterfall']/div[" + str(
+                        count) + "]/a[@class='movie-box']/div[@class='photo-frame']/img[@class='img']/@src")[0]
+                break
+        if result_url == '':
+            raise Exception('Movie Data not found in javbus.main_us!')
+        htmlcode = get_html(result_url)
+        if str(htmlcode) == 'ProxyError':
+            raise TimeoutError
         number = getNum(htmlcode)
         dic = {
             'title': getTitle(htmlcode).replace(number, '').strip(),
             'studio': getStudio(htmlcode),
-            'publisher': '',
             'year': getYear(getRelease(htmlcode)),
-            'outline': '',
             'runtime': getRuntime(htmlcode).replace('分鐘', '').strip(),
             'director': getDirector(htmlcode),
             'actor': getActor(htmlcode),
             'release': getRelease(htmlcode),
             'number': getNum(htmlcode),
-            'cover': getCover(htmlcode),
             'tag': getTag(htmlcode),
             'series': getSeries(htmlcode),
-            'imagecut': 3,
+            'cover': getCover(htmlcode),
             'cover_small': cover_small,
+            'imagecut': 3,
             'actor_photo': getActorPhoto(htmlcode),
+            'publisher': '',
+            'outline': '',
+            'score': '',
             'website': result_url,
             'source': 'javbus.py',
         }
+    except TimeoutError:
+        dic = {
+            'title': '',
+            'website': 'timeout',
+        }
     except Exception as error_info:
-        print('Error in javbus.main_us :' + str(error_info))
-        if htmlcode == 'ProxyError':
-            dic = {
-                'title': '',
-                'website': 'timeout',
-            }
-        else:
-            dic = {
-                'title': '',
-                'website': '',
-            }
+        print('Error in javbus.main_us : ' + str(error_info))
+        dic = {
+            'title': '',
+            'website': '',
+        }
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
-# print(find_number('KA-001'))
-# print(main('OFJE-175'))
-# print(main_uncensored('010115-001'))
-# print(main_uncensored('012715-793'))
-# print(main_us('sexart.15.06.10'))
+
+'''
+print(find_number('KA-001'))
+print(main_uncensored('010115-001'))
+print(main('ssni-644'))
+print(main_uncensored('012715-793'))
+print(main_us('sexart.15.06.10'))
+print(main_uncensored('heyzo-1031'))
+'''
+

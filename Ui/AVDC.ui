@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.92</string>
+   <string>AVDC-3.93</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -150,7 +150,7 @@ p, li { white-space: pre-wrap; }
         <number>7</number>
        </property>
        <item row="0" column="0">
-        <widget class="QLabel" name="label_fanart">
+        <widget class="QLabel" name="label_thumb">
          <property name="enabled">
           <bool>true</bool>
          </property>
@@ -663,6 +663,11 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <property name="text">
+         <string>jav321</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>javdb</string>
         </property>
        </item>
@@ -833,7 +838,7 @@ p, li { white-space: pre-wrap; }
       <property name="title">
        <string>裁剪封面图</string>
       </property>
-      <widget class="QPushButton" name="pushButton_select_fanart">
+      <widget class="QPushButton" name="pushButton_select_thumb">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -857,9 +862,8 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="text">
         <string>说明:
-  1、对有些封面图(.png)不满意,比例不对或者分辨率太低,可使用此工具。
-  2、此工具通过判断人脸位置，可以将缩略图(.jpg)裁剪为封面图。
-  3、不要选择Backdrop.jpg。</string>
+  1、对有些封面图(poster)不满意,比例不对或者分辨率太低,可使用此工具。
+  2、此工具通过判断人脸位置，可以将缩略图(thumb)裁剪为封面图。</string>
        </property>
       </widget>
      </widget>
@@ -900,44 +904,12 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>10</y>
           <width>761</width>
-          <height>421</height>
+          <height>351</height>
          </rect>
         </property>
         <property name="title">
          <string>普通设置</string>
         </property>
-        <widget class="QWidget" name="formLayoutWidget_3">
-         <property name="geometry">
-          <rect>
-           <x>0</x>
-           <y>350</y>
-           <width>751</width>
-           <height>61</height>
-          </rect>
-         </property>
-         <layout class="QFormLayout" name="formLayout">
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_38">
-            <property name="text">
-             <string>   异常字符：             </string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QLineEdit" name="lineEdit_escape_char"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="label_39">
-            <property name="text">
-             <string>   多余字符串：             </string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit_escape_string"/>
-          </item>
-         </layout>
-        </widget>
         <widget class="QWidget" name="verticalLayoutWidget_2">
          <property name="geometry">
           <rect>
@@ -953,31 +925,31 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>模式：</string>
             </property>
-            <widget class="QRadioButton" name="radioButton_common">
+            <widget class="QWidget" name="horizontalLayoutWidget_7">
              <property name="geometry">
               <rect>
-               <x>200</x>
+               <x>140</x>
                <y>10</y>
-               <width>181</width>
-               <height>19</height>
+               <width>591</width>
+               <height>31</height>
               </rect>
              </property>
-             <property name="text">
-              <string>刮削模式</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_sort">
-             <property name="geometry">
-              <rect>
-               <x>510</x>
-               <y>10</y>
-               <width>181</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>整理模式</string>
-             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_9">
+              <item>
+               <widget class="QRadioButton" name="radioButton_common">
+                <property name="text">
+                 <string>刮削模式</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_sort">
+                <property name="text">
+                 <string>整理模式</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -986,31 +958,31 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>软链接模式：</string>
             </property>
-            <widget class="QRadioButton" name="radioButton_soft_on">
+            <widget class="QWidget" name="horizontalLayoutWidget_8">
              <property name="geometry">
               <rect>
-               <x>200</x>
+               <x>140</x>
                <y>10</y>
-               <width>181</width>
-               <height>19</height>
+               <width>591</width>
+               <height>31</height>
               </rect>
              </property>
-             <property name="text">
-              <string>开</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_soft_off">
-             <property name="geometry">
-              <rect>
-               <x>510</x>
-               <y>10</y>
-               <width>181</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>关</string>
-             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <widget class="QRadioButton" name="radioButton_soft_on">
+                <property name="text">
+                 <string>开</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_soft_off">
+                <property name="text">
+                 <string>关</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -1019,31 +991,31 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>调试模式：</string>
             </property>
-            <widget class="QRadioButton" name="radioButton_debug_on">
+            <widget class="QWidget" name="horizontalLayoutWidget_9">
              <property name="geometry">
               <rect>
-               <x>200</x>
+               <x>140</x>
                <y>10</y>
-               <width>181</width>
-               <height>19</height>
+               <width>591</width>
+               <height>31</height>
               </rect>
              </property>
-             <property name="text">
-              <string>开</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_debug_off">
-             <property name="geometry">
-              <rect>
-               <x>510</x>
-               <y>10</y>
-               <width>181</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>关</string>
-             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_11">
+              <item>
+               <widget class="QRadioButton" name="radioButton_debug_on">
+                <property name="text">
+                 <string>开</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_debug_off">
+                <property name="text">
+                 <string>关</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -1052,31 +1024,31 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>检测更新：</string>
             </property>
-            <widget class="QRadioButton" name="radioButton_update_on">
+            <widget class="QWidget" name="horizontalLayoutWidget_10">
              <property name="geometry">
               <rect>
-               <x>200</x>
+               <x>140</x>
                <y>10</y>
-               <width>181</width>
-               <height>19</height>
+               <width>591</width>
+               <height>31</height>
               </rect>
              </property>
-             <property name="text">
-              <string>开</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_update_off">
-             <property name="geometry">
-              <rect>
-               <x>510</x>
-               <y>10</y>
-               <width>181</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>关</string>
-             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_12">
+              <item>
+               <widget class="QRadioButton" name="radioButton_update_on">
+                <property name="text">
+                 <string>开</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_update_off">
+                <property name="text">
+                 <string>关</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -1085,31 +1057,31 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>保存日志：</string>
             </property>
-            <widget class="QRadioButton" name="radioButton_log_on">
+            <widget class="QWidget" name="horizontalLayoutWidget_11">
              <property name="geometry">
               <rect>
-               <x>200</x>
+               <x>140</x>
                <y>10</y>
-               <width>181</width>
-               <height>19</height>
+               <width>591</width>
+               <height>31</height>
               </rect>
              </property>
-             <property name="text">
-              <string>开</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_log_off">
-             <property name="geometry">
-              <rect>
-               <x>510</x>
-               <y>10</y>
-               <width>81</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>关</string>
-             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_13">
+              <item>
+               <widget class="QRadioButton" name="radioButton_log_on">
+                <property name="text">
+                 <string>开</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_log_off">
+                <property name="text">
+                 <string>关</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
@@ -1118,133 +1090,98 @@ p, li { white-space: pre-wrap; }
             <property name="title">
              <string>失败后移动文件：</string>
             </property>
-            <widget class="QRadioButton" name="radioButton_fail_move_on">
+            <widget class="QWidget" name="horizontalLayoutWidget_12">
              <property name="geometry">
               <rect>
-               <x>200</x>
+               <x>140</x>
                <y>10</y>
-               <width>181</width>
-               <height>19</height>
+               <width>591</width>
+               <height>31</height>
               </rect>
              </property>
-             <property name="text">
-              <string>开</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_fail_move_off">
-             <property name="geometry">
-              <rect>
-               <x>510</x>
-               <y>10</y>
-               <width>81</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>关</string>
-             </property>
-            </widget>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_5">
-            <property name="title">
-             <string>媒体库：</string>
-            </property>
-            <widget class="QRadioButton" name="radioButton_emby">
-             <property name="geometry">
-              <rect>
-               <x>200</x>
-               <y>10</y>
-               <width>181</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>emby/jellyfin</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_plex">
-             <property name="geometry">
-              <rect>
-               <x>450</x>
-               <y>10</y>
-               <width>81</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>plex</string>
-             </property>
-            </widget>
-            <widget class="QRadioButton" name="radioButton_kodi">
-             <property name="geometry">
-              <rect>
-               <x>630</x>
-               <y>10</y>
-               <width>81</width>
-               <height>19</height>
-              </rect>
-             </property>
-             <property name="text">
-              <string>kodi</string>
-             </property>
-            </widget>
-           </widget>
-          </item>
-          <item>
-           <widget class="QGroupBox" name="groupBox_11">
-            <property name="title">
-             <string>网站选择：</string>
-            </property>
-            <widget class="QComboBox" name="comboBox_website_all">
-             <property name="geometry">
-              <rect>
-               <x>200</x>
-               <y>10</y>
-               <width>481</width>
-               <height>21</height>
-              </rect>
-             </property>
-             <item>
-              <property name="text">
-               <string>All websites</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>mgstage</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>fc2club</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>javbus</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>javdb</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>avsox</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>dmm</string>
-              </property>
-             </item>
+             <layout class="QHBoxLayout" name="horizontalLayout_14">
+              <item>
+               <widget class="QRadioButton" name="radioButton_fail_move_on">
+                <property name="text">
+                 <string>开</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_fail_move_off">
+                <property name="text">
+                 <string>关</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
             </widget>
            </widget>
           </item>
          </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_11">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>370</y>
+          <width>761</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>网站选择：</string>
+        </property>
+        <widget class="QComboBox" name="comboBox_website_all">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>20</y>
+           <width>591</width>
+           <height>21</height>
+          </rect>
+         </property>
+         <item>
+          <property name="text">
+           <string>All websites</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>mgstage</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>fc2club</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>javbus</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>jav321</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>javdb</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>avsox</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>dmm</string>
+          </property>
+         </item>
         </widget>
        </widget>
       </widget>
@@ -1339,20 +1276,30 @@ p, li { white-space: pre-wrap; }
           <item row="0" column="1">
            <widget class="QLineEdit" name="lineEdit_movie_path"/>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_48">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_40">
             <property name="text">
-             <string>   排除目录：</string>
+             <string>   视频类型：              </string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QLineEdit" name="lineEdit_movie_type"/>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_42">
+            <property name="text">
+             <string>   字幕类型：             </string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLineEdit" name="lineEdit_escape_dir"/>
+           <widget class="QLineEdit" name="lineEdit_sub_type"/>
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="label_46">
             <property name="text">
-             <string>   失败输出目录：         </string>
+             <string>   失败输出目录：           </string>
             </property>
            </widget>
           </item>
@@ -1373,24 +1320,14 @@ p, li { white-space: pre-wrap; }
            <widget class="QLineEdit" name="lineEdit_success"/>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label_40">
+           <widget class="QLabel" name="label_48">
             <property name="text">
-             <string>   视频类型：             </string>
+             <string>   排除目录：</string>
             </property>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QLineEdit" name="lineEdit_movie_type"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_42">
-            <property name="text">
-             <string>   字幕类型：             </string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QLineEdit" name="lineEdit_sub_type"/>
+           <widget class="QLineEdit" name="lineEdit_escape_dir"/>
           </item>
          </layout>
         </widget>
@@ -1411,9 +1348,257 @@ p, li { white-space: pre-wrap; }
         </widget>
        </widget>
       </widget>
+      <widget class="QWidget" name="tab_4">
+       <attribute name="title">
+        <string>水印设置</string>
+       </attribute>
+       <widget class="QGroupBox" name="groupBox_14">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>150</y>
+          <width>761</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>要添加的水印类型</string>
+        </property>
+        <widget class="QWidget" name="horizontalLayoutWidget_3">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>30</y>
+           <width>601</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <item>
+           <widget class="QCheckBox" name="checkBox_sub">
+            <property name="text">
+             <string>字幕</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_leak">
+            <property name="text">
+             <string>流出</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_uncensored">
+            <property name="text">
+             <string>无码</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_19">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>240</y>
+          <width>761</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>首个水印位置</string>
+        </property>
+        <widget class="QWidget" name="horizontalLayoutWidget_2">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>30</y>
+           <width>601</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_4">
+          <item>
+           <widget class="QRadioButton" name="radioButton_top_left">
+            <property name="text">
+             <string>左上</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_bottom_left">
+            <property name="text">
+             <string>左下</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_top_right">
+            <property name="text">
+             <string>右上</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_bottom_right">
+            <property name="text">
+             <string>右下</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_21">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>330</y>
+          <width>761</width>
+          <height>81</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>水印大小</string>
+        </property>
+        <widget class="QWidget" name="horizontalLayoutWidget_4">
+         <property name="geometry">
+          <rect>
+           <x>40</x>
+           <y>30</y>
+           <width>711</width>
+           <height>41</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QSlider" name="horizontalSlider_mark_size">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>5</number>
+            </property>
+            <property name="pageStep">
+             <number>1</number>
+            </property>
+            <property name="value">
+             <number>3</number>
+            </property>
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLCDNumber" name="lcdNumber_mark_size">
+            <property name="intValue" stdset="0">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_20">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>10</y>
+          <width>761</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>封面图添加水印</string>
+        </property>
+        <widget class="QWidget" name="horizontalLayoutWidget_5">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>20</y>
+           <width>601</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QRadioButton" name="radioButton_poster_mark_on">
+            <property name="text">
+             <string>开</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_poster_mark_off">
+            <property name="text">
+             <string>关</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QLabel" name="label_9">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>430</y>
+          <width>701</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>说明：
+    1、多个水印时,从首个水印,顺时针添加.
+    2、水印文件可自己替换,分辨率要求长宽 500x300,背景透明，png格式.</string>
+        </property>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_22">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>80</y>
+          <width>761</width>
+          <height>51</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>缩略图添加水印</string>
+        </property>
+        <widget class="QWidget" name="horizontalLayoutWidget_6">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>20</y>
+           <width>601</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <widget class="QRadioButton" name="radioButton_thumb_mark_on">
+            <property name="text">
+             <string>开</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_thumb_mark_off">
+            <property name="text">
+             <string>关</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </widget>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
-        <string>代理设置</string>
+        <string>其它设置</string>
        </attribute>
        <widget class="QGroupBox" name="groupBox_9">
         <property name="geometry">
@@ -1440,7 +1625,7 @@ p, li { white-space: pre-wrap; }
           <item row="0" column="0">
            <widget class="QLabel" name="label_25">
             <property name="text">
-             <string>   代理:                 </string>
+             <string>   代理:                </string>
             </property>
            </widget>
           </item>
@@ -1450,14 +1635,14 @@ p, li { white-space: pre-wrap; }
           <item row="1" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
-             <string>   超时重试时间：         </string>
+             <string>   超时重试时间：   </string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="label_27">
             <property name="text">
-             <string>   重试次数：             </string>
+             <string>   重试次数：          </string>
             </property>
            </widget>
           </item>
@@ -1524,7 +1709,167 @@ p, li { white-space: pre-wrap; }
          </layout>
         </widget>
        </widget>
+       <widget class="QGroupBox" name="groupBox_39">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>250</y>
+          <width>761</width>
+          <height>121</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>无码封面</string>
+        </property>
+        <widget class="QLabel" name="label_14">
+         <property name="geometry">
+          <rect>
+           <x>70</x>
+           <y>60</y>
+           <width>681</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>说明：
+    1、官方封面--完整、不清晰；裁剪封面--清晰、不完整。
+    2、官方无图，自动裁剪缩略图。</string>
+         </property>
+        </widget>
+        <widget class="QWidget" name="horizontalLayoutWidget_24">
+         <property name="geometry">
+          <rect>
+           <x>200</x>
+           <y>20</y>
+           <width>551</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_27">
+          <item>
+           <widget class="QRadioButton" name="radioButton_poster_official">
+            <property name="text">
+             <string>官方</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QRadioButton" name="radioButton_poster_cut">
+            <property name="text">
+             <string>裁剪</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_40">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>380</y>
+          <width>761</width>
+          <height>111</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>无码番号</string>
+        </property>
+        <widget class="QWidget" name="formLayoutWidget">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>30</y>
+           <width>751</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout_9">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>   无码番号前缀：        </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_uncensored_prefix"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QLabel" name="label_17">
+         <property name="geometry">
+          <rect>
+           <x>70</x>
+           <y>70</y>
+           <width>671</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>说明：只添加 HEYZO、n1111、111111-111之外的前缀。</string>
+         </property>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_18">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>140</y>
+          <width>761</width>
+          <height>101</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>排除设置</string>
+        </property>
+        <widget class="QWidget" name="formLayoutWidget_3">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>30</y>
+           <width>751</width>
+           <height>61</height>
+          </rect>
+         </property>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_38">
+            <property name="text">
+             <string>   异常字符:            </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLineEdit" name="lineEdit_escape_char"/>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_39">
+            <property name="text">
+             <string>   多余字符串:         </string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_escape_string"/>
+          </item>
+         </layout>
+        </widget>
+       </widget>
       </widget>
+     </widget>
+     <widget class="QPushButton" name="pushButton_init_config">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>680</y>
+        <width>71</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>恢复默认</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="page_about">

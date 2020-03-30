@@ -3,8 +3,8 @@ import os
 from configparser import ConfigParser
 
 
-# ========================================================================网页请求
-def get_html(url, cookies=None):
+# ========================================================================获取config
+def get_config():
     config_file = ''
     if os.path.exists('../config.ini'):
         config_file = '../config.ini'
@@ -12,6 +12,12 @@ def get_html(url, cookies=None):
         config_file = 'config.ini'
     config = ConfigParser()
     config.read(config_file, encoding='UTF-8')
+    return config
+
+
+# ========================================================================网页请求
+def get_html(url, cookies=None):
+    config = get_config()
     retry_count = 0
     proxy = ''
     timeout = 0
@@ -19,7 +25,8 @@ def get_html(url, cookies=None):
         proxy = str(config['proxy']['proxy'])
         timeout = int(config['proxy']['timeout'])
         retry_count = int(config['proxy']['retry'])
-    except:
+    except Exception as error_info:
+        print('Error in get_html :' + str(error_info))
         print('[-]Proxy config error! Please check the config.')
     i = 0
     while i < retry_count:
@@ -39,10 +46,40 @@ def get_html(url, cookies=None):
                 getweb = requests.get(str(url), headers=headers, timeout=timeout, cookies=cookies)
                 getweb.encoding = 'utf-8'
                 return getweb.text
-        except:
+        except Exception as error_info:
             i += 1
+            print('Error in get_html :' + str(error_info))
             print('[-]Connect retry ' + str(i) + '/' + str(retry_count))
     print('[-]Connect Failed! Please check your Proxy or Network!')
+    return 'ProxyError'
+
+
+def post_html(url: str, query: dict):
+    config = get_config()
+    retry_count = 3
+    proxy = ''
+    timeout = 10
+    try:
+        proxy = str(config['proxy']['proxy'])
+        timeout = int(config['proxy']['timeout'])
+        retry_count = int(config['proxy']['retry'])
+    except Exception as error_info:
+        print('Error in post_html :' + str(error_info))
+        print('[-]Proxy config error! Please check the config.')
+    if proxy:
+        proxies = {"http": "http://" + proxy, "https": "https://" + proxy}
+    else:
+        proxies = {}
+    for i in range(retry_count):
+        try:
+            result = requests.post(url, data=query, proxies=proxies, timeout=timeout)
+            result.encoding = 'utf-8'
+            result = result.text
+            return result
+        except Exception as error_info:
+            print('Error in post_html :' + str(error_info))
+            print("[-]Connect retry {}/{}".format(i + 1, retry_count))
+    print("[-]Connect Failed! Please check your Proxy or Network!")
     return 'ProxyError'
 
 
