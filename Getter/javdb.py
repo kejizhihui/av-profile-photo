@@ -128,14 +128,19 @@ def getScore(htmlcode):
 
 
 def getOutlineScore(number):  # 获取简介
-    response = post_html("https://www.jav321.com/search", query={"sn": number})
-    detail_page = etree.fromstring(response, etree.HTMLParser())
-    outline = str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
-    if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
-        score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
-        score = str(float(score) / 10.0)
-    else:
-        score = str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+    outline = ''
+    score = ''
+    try:
+        response = post_html("https://www.jav321.com/search", query={"sn": number})
+        detail_page = etree.fromstring(response, etree.HTMLParser())
+        outline = str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
+        if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
+            score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
+            score = str(float(score) / 10.0)
+        else:
+            score = str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+    except Exception as error_info:
+        print('Error in javdb.getOutlineScore : ' + str(error_info))
     return outline, score
 
 

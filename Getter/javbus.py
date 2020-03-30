@@ -91,14 +91,19 @@ def getDirector(htmlcode):  # 获取导演
 
 
 def getOutlineScore(number):  # 获取简介
-    response = post_html("https://www.jav321.com/search", query={"sn": number})
-    detail_page = etree.fromstring(response, etree.HTMLParser())
-    outline = str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
-    if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
-        score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
-        score = str(float(score) / 10.0)
-    else:
-        score = str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+    outline = ''
+    score = ''
+    try:
+        response = post_html("https://www.jav321.com/search", query={"sn": number})
+        detail_page = etree.fromstring(response, etree.HTMLParser())
+        outline = str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
+        if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
+            score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
+            score = str(float(score) / 10.0)
+        else:
+            score = str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+    except Exception as error_info:
+        print('Error in javbus.getOutlineScore : ' + str(error_info))
     return outline, score
 
 
@@ -109,16 +114,19 @@ def getSeries(htmlcode):
 
 
 def getCover_small(number):  # 从avsox获取封面图
-    htmlcode = get_html('https://avsox.host/cn/search/' + number)
-    html = etree.fromstring(htmlcode, etree.HTMLParser())
-    counts = len(html.xpath("//div[@id='waterfall']/div/a/div"))
-    if counts == 0:
-        return ''
-    for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
-        number_get = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-info']/span/date[1]/text()")
-        if len(number_get) > 0 and number_get[0].upper() == number.upper():
-            cover_small = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-frame']/img/@src")[0]
-            return cover_small
+    try:
+        htmlcode = get_html('https://avsox.host/cn/search/' + number)
+        html = etree.fromstring(htmlcode, etree.HTMLParser())
+        counts = len(html.xpath("//div[@id='waterfall']/div/a/div"))
+        if counts == 0:
+            return ''
+        for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
+            number_get = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-info']/span/date[1]/text()")
+            if len(number_get) > 0 and number_get[0].upper() == number.upper():
+                cover_small = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-frame']/img/@src")[0]
+                return cover_small
+    except Exception as error_info:
+        print('Error in javbus.getCover_small : ' + str(error_info))
     return ''
 
 
