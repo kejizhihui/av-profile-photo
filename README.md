@@ -44,8 +44,9 @@
 * **日本电影元数据 抓取工具 | 刮削器**，配合本地影片管理软件EMBY,KODI，PLEX等管理本地影片，该软件起到分类与元数据抓取作用，利用元数据信息来分类，供本地影片分类整理使用。<br>
 * 可**批量抓取**，也可**单个抓取**。可抓取**多集视频**（-cd1/-cd2）,带**字幕**作品（-c., -C.）。<br>
 * 可抓取**子目录下视频**：遍历**视频目录及子目录**（除指定的**排除目录**），对遍历到的所有视频进行刮削，成功则同**元数据、封面图**一起输出到**JAV_output**目录，失败移入**failed**目录。
-* 目前可抓取网站：**jav321、javbus,javdb,avsox,fc2club,dmm,mgstage**。<br>
+* 目前可抓取网站：**jav321,javbus,javdb,avsox,fc2club,dmm,mgstage**。<br>
 * 批量添加Emby演员头像。<br>
+* 封面可添加无码、字幕、流出水印。<br>
 
 # 2.反馈
 * 欢迎使用体验,有**程序BUG问题（带截图提问）、功能建议**,可进**电报群**反馈    [点击进群](https://t.me/joinchat/J54y1g3-a7nxJ_-WS4-KFQ)<br>
@@ -55,17 +56,17 @@
 **不区分大小写**<br>
 
 ### 1、标准有码
-* **Javdb、Javbus、Jav321**: SSNI-111
-* **Dmm**: ssni00111
+* **Javdb、Javbus、Jav321**:  SSNI-111
+* **Dmm**:  ssni00111
 ### 2、无码
-* **Javdb、Javbus、Avsox**: 111111-1111、111111_111、HEYZO-1111、n1111
+* **Javdb、Javbus、Avsox**:  111111-1111、111111_111、HEYZO-1111、n1111
 * **Ja321**: HEYZO-1111
 ### 3、素人
-* **Jav321、Mgstage**: 259LUXU-1111
-* **Jav321、Javdb**: LUXU-1111
-* **Fc2club**: FC2-111111、FC2-PPV-111111
+* **Jav321、Mgstage**:  259LUXU-1111
+* **Jav321、Javdb**:  LUXU-1111
+* **Fc2club**:  FC2-111111、FC2-PPV-111111
 ### 4、欧美
-* **Javdb、Javbus**:sexart.11.11.11(系列.年.月.日)
+* **Javdb、Javbus**:  sexart.11.11.11(系列.年.月.日)
 ### 5、自带字幕影片
 可以把电影命名为类似**ssni-xxx-c.mp4,ssni-xxx-C.mp4，abp-xxx-CD1-C.mp4**的规则。
 ### 6、多集影片
@@ -169,7 +170,7 @@
 如果刮削不到影片信息，可选择不移动视频，或者自动移动到**失败输出目录**中。<br>
 
 ### 5.4.7.网站选择
-可以使用**所有网站**，或者指定网站（**jav321、avsox,javbus,dmm,javdb,fc2club，mgstage**）进行刮削。<br>
+可以使用**所有网站**，或者指定网站（**jav321,avsox,javbus,dmm,javdb,fc2club，mgstage**）进行刮削。<br>
 **仅使用javdb进行刮削**，尽量不要用，刮削30左右会被JAVDB封IP一段时间。<br>
 
 ---
@@ -254,6 +255,10 @@
 * 查看命名是否符合[常见番号命名规范](#3常见番号命名规范)。<br>
 * 目前可以提取信息的网址:**JAV321、JAVBUS、JAVDB、AVSOX、dmm、FC2CLUB、mgstage**，请确保视频名能在这些网站找到<br>
 * 使用**工具页里的单个视频刮削**，选择**刮削网站**，进行刮削。<br>
+
+---
+## 7.5.PLEX不显示封面
+请安装插件：[**XBMCnfoMoviesImporter**](https://github.com/gboudreau/XBMCnfoMoviesImporter.bundle)
 
 
 # 8.关于群晖NAS
