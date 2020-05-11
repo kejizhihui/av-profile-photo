@@ -441,7 +441,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if int(config['extrafanart']['extrafanart_download']) == 1:
             self.Ui.radioButton_extrafanart_download_on.setChecked(True)
         elif int(config['extrafanart']['extrafanart_download']) == 0:
-            self.Ui.radioButton_extrafanart_download_off.setChecked(False)
+            self.Ui.radioButton_extrafanart_download_off.setChecked(True)
         self.Ui.lineEdit_extrafanart_dir.setText(config['extrafanart']['extrafanart_folder'])
 
     # ========================================================================读取设置页设置，保存在config.ini
