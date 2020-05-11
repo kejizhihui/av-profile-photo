@@ -94,7 +94,9 @@ def getTag(htmlcode):
 
 def getCover_small(htmlcode, count):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = html.xpath("//div[@class='grid-item column']/a[@class='box']/div/img/@src")[count]
+    result = html.xpath("//div[@class='grid-item column']/a[@class='box']/div/img/@data-src")[count]
+    if 'thumbs' not in result:
+        result = html.xpath("//div[@class='grid-item column']/a[@class='box']/div/img/@src")[count]
     if not 'https' in result:
         result = 'https:' + result
     return result
@@ -109,6 +111,12 @@ def getCover(htmlcode):
         if soup.img is not None:
             result = soup.img['src']
     return result
+
+
+def getExtraFanart(htmlcode):  # 获取封面链接
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    extrafanart_list = html.xpath("//div[@class='message-body']/div[@class='tile-images preview-images']/a/@href")
+    return extrafanart_list
 
 
 def getDirector(htmlcode):
@@ -138,7 +146,7 @@ def getOutlineScore(number):  # 获取简介
             score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
             score = str(float(score) / 10.0)
         else:
-            score = str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+            score = str(re.findall(r'<b>评分</b>: ([^<]+)<br>', response)).strip(" [',']").replace('\'', '')
     except Exception as error_info:
         print('Error in javdb.getOutlineScore : ' + str(error_info))
     return outline, score
@@ -206,6 +214,7 @@ def main(number, isuncensored=False):
             'number': number_get,
             'cover': getCover(html_info),
             'cover_small': cover_small,
+            'extrafanart': getExtraFanart(html_info),
             'imagecut': imagecut,
             'tag': getTag(html_info),
             'series': getSeries(html_info),
@@ -284,6 +293,7 @@ def main_us(number):
             'number': number,
             'cover': getCover(html_info),
             'cover_small': getCover_small(htmlcode, count - 1),
+            'extrafanart': getExtraFanart(html_info),
             'imagecut': 3,
             'tag': getTag(html_info),
             'series': getSeries(html_info),

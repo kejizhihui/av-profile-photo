@@ -103,6 +103,15 @@ def getCover(htmlcode, number):
     return result
 
 
+def getExtraFanart(htmlcode):
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    old_list = html.xpath("//div[@id='sample-image-block']/a[@name='sample-image']/img/@src")
+    new_list = []
+    for extrafanart in old_list:
+        new_list.append(extrafanart.replace('-', 'jp-'))
+    return new_list
+
+
 def getDirector(a):
     html = etree.fromstring(a, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     try:
@@ -149,9 +158,10 @@ def main(number):
             'number': getNum(htmlcode),
             'tag': getTag(htmlcode),
             'series': getSeries(htmlcode).replace('-', ''),
-            'year': getYear(getRelease(htmlcode)),  # str(re.search('\d{4}',getRelease(a)).group()),
+            'year': getYear(getRelease(htmlcode)),
             'actor_photo': getActorPhoto(actor),
             'cover': getCover(htmlcode, number),
+            'extrafanart': getExtraFanart(htmlcode),
             'imagecut': 1,
             'website': url,
             'source': 'dmm.py',
@@ -172,3 +182,4 @@ def main(number):
 
 # main('DV-1562')
 # print(main('mide00139'))
+# print(main('kawd00969'))

@@ -95,6 +95,7 @@ def main(number):
             'tag': getTag(htmlcode),
             'actor_photo': getActorPhoto(actor),
             'cover': getCover(htmlcode),
+            'extrafanart': '',
             'imagecut': 0,
             'director': '',
             'series': '',

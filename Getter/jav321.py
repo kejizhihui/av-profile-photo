@@ -23,7 +23,7 @@ def getActor(response):
         return str(re.findall(r'<a href="/heyzo_star/\S+">(\S+)</a> &nbsp;', response)).strip(" [',']").replace('\'',
                                                                                                                 '')
     else:
-        return str(re.findall(r'<b>女优</b>: (.+) &nbsp; <br>', response)).strip(" [',']").replace('\'', '')
+        return str(re.findall(r'<b>女优</b>: ([^<]+) &nbsp; <br>', response)).strip(" [',']").replace('\'', '')
 
 
 def getStudio(response):
@@ -51,7 +51,7 @@ def getScore(response):
         score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
         return str(float(score) / 10.0)
     else:
-        return str(re.findall(r'<b>评分</b>: (.+)<br>', response)).strip(" [',']").replace('\'', '')
+        return str(re.findall(r'<b>评分</b>: ([^<]+)<br>', response)).strip(" [',']").replace('\'', '')
 
 
 def getYear(release):
@@ -73,6 +73,11 @@ def getCover(detail_page):
         cover_url = str(
             detail_page.xpath("//*[@id='vjs_sample_player']/@poster")).strip(" ['']")
     return cover_url
+
+
+def getExtraFanart(htmlcode):
+    extrafanart_list = htmlcode.xpath("/html/body/div[@class='row'][2]/div[@class='col-md-3']/div[@class='col-xs-12 col-md-12']/p/a/img[@class='img-responsive']/@src")
+    return extrafanart_list
 
 
 def getCoverSmall(detail_page):
@@ -119,6 +124,7 @@ def main(number, isuncensored=False):
             'year': getYear(release),
             'actor_photo': getActorPhoto(actor.split(',')),
             'cover': getCover(detail_page),
+            'extrafanart': getExtraFanart(detail_page),
             'cover_small': cover_small,
             'imagecut': imagecut,
             'director': '',
@@ -149,4 +155,5 @@ print(main('sivr-038'))
 print(main('ara-415'))
 print(main('luxu-1257'))
 print(main('heyzo-1031'))
+print(main('ABP-905'))
 '''

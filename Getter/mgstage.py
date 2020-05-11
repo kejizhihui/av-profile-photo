@@ -92,6 +92,12 @@ def getCover(htmlcode):
     return result
 
 
+def getExtraFanart(htmlcode):  # 获取封面链接
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    extrafanart_list = html.xpath("//dl[@id='sample-photo']/dd/ul/li/a[@class='sample_image']/@href")
+    return extrafanart_list
+
+
 def getOutline(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result = str(html.xpath('//*[@id="introduction"]/dd/p[1]/text()')).strip(" ['']")
@@ -122,6 +128,7 @@ def main(number):
             'release': getRelease(htmlcode),
             'number': getNum(htmlcode),
             'cover': getCover(htmlcode),
+            'extrafanart': getExtraFanart(htmlcode),
             'imagecut': 0,
             'tag': getTag(htmlcode).strip(','),
             'series': getSeries(htmlcode).strip(','),

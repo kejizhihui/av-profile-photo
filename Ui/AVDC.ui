@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.93</string>
+   <string>AVDC-3.95</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -678,6 +678,11 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <property name="text">
+         <string>xcity</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>dmm</string>
         </property>
        </item>
@@ -904,7 +909,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>10</y>
           <width>761</width>
-          <height>351</height>
+          <height>381</height>
          </rect>
         </property>
         <property name="title">
@@ -916,7 +921,7 @@ p, li { white-space: pre-wrap; }
            <x>10</x>
            <y>20</y>
            <width>741</width>
-           <height>321</height>
+           <height>351</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -1118,6 +1123,39 @@ p, li { white-space: pre-wrap; }
             </widget>
            </widget>
           </item>
+          <item>
+           <widget class="QGroupBox" name="groupBox_23">
+            <property name="title">
+             <string>下载剧照：</string>
+            </property>
+            <widget class="QWidget" name="horizontalLayoutWidget_13">
+             <property name="geometry">
+              <rect>
+               <x>140</x>
+               <y>10</y>
+               <width>591</width>
+               <height>31</height>
+              </rect>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_15">
+              <item>
+               <widget class="QRadioButton" name="radioButton_extrafanart_download_on">
+                <property name="text">
+                 <string>开</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QRadioButton" name="radioButton_extrafanart_download_off">
+                <property name="text">
+                 <string>关</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
          </layout>
         </widget>
        </widget>
@@ -1125,13 +1163,13 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>370</y>
+          <y>470</y>
           <width>761</width>
           <height>61</height>
          </rect>
         </property>
         <property name="title">
-         <string>网站选择：</string>
+         <string>网站选择</string>
         </property>
         <widget class="QComboBox" name="comboBox_website_all">
          <property name="geometry">
@@ -1179,9 +1217,67 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <property name="text">
+           <string>xcity</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>dmm</string>
           </property>
          </item>
+        </widget>
+       </widget>
+       <widget class="QGroupBox" name="groupBox_24">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>400</y>
+          <width>761</width>
+          <height>61</height>
+         </rect>
+        </property>
+        <property name="title">
+         <string>下载文件</string>
+        </property>
+        <widget class="QWidget" name="horizontalLayoutWidget_14">
+         <property name="geometry">
+          <rect>
+           <x>150</x>
+           <y>20</y>
+           <width>591</width>
+           <height>31</height>
+          </rect>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_16">
+          <item>
+           <widget class="QCheckBox" name="checkBox_download_nfo">
+            <property name="text">
+             <string>nfo</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_download_poster">
+            <property name="text">
+             <string>poster</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_download_fanart">
+            <property name="text">
+             <string>fanart</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_download_thumb">
+            <property name="text">
+             <string>thumb</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </widget>
       </widget>
@@ -1250,7 +1346,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>140</y>
           <width>761</width>
-          <height>281</height>
+          <height>321</height>
          </rect>
         </property>
         <property name="title">
@@ -1262,7 +1358,7 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>20</y>
            <width>751</width>
-           <height>181</height>
+           <height>221</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="formLayout_2">
@@ -1329,13 +1425,26 @@ p, li { white-space: pre-wrap; }
           <item row="1" column="1">
            <widget class="QLineEdit" name="lineEdit_escape_dir"/>
           </item>
+          <item row="6" column="0">
+           <widget class="QLabel" name="label_50">
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="text">
+             <string>   剧照目录：         </string>
+            </property>
+           </widget>
+          </item>
+          <item row="6" column="1">
+           <widget class="QLineEdit" name="lineEdit_extrafanart_dir"/>
+          </item>
          </layout>
         </widget>
         <widget class="QLabel" name="label_7">
          <property name="geometry">
           <rect>
            <x>10</x>
-           <y>210</y>
+           <y>250</y>
            <width>731</width>
            <height>61</height>
           </rect>

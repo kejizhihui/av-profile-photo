@@ -3,8 +3,9 @@
 import re
 import os
 import json
+from PIL import Image
 from configparser import ConfigParser
-from Getter import avsox, javbus, javdb, fc2fans_club, mgstage, dmm, jav321
+from Getter import avsox, javbus, javdb, fc2fans_club, mgstage, dmm, jav321, xcity
 
 
 # ========================================================================获取config
@@ -65,7 +66,11 @@ def movie_lists(escape_folder, movie_type, movie_path):
             if flag_escape == 1:
                 continue
         for f in files:
-            if os.path.splitext(f)[1] in file_type:
+            file_type_current = os.path.splitext(f)[1]
+            file_name = os.path.splitext(f)[0]
+            if re.search(r'^\..+', file_name):
+                continue
+            if file_type_current in file_type:
                 path = root + '/' + f
                 # path = path.replace(file_root, '.')
                 path = path.replace("\\\\", "/").replace("\\", "/")
@@ -89,23 +94,26 @@ def getNumber(filepath, escape_string):
     filename = filename.replace(part, '')
     filename = str(re.sub("-\d{4}-\d{1,2}-\d{1,2}", "", filename))  # 去除文件名中时间
     filename = str(re.sub("\d{4}-\d{1,2}-\d{1,2}-", "", filename))  # 去除文件名中时间
-    if re.search('^\D+.\d{2}.\d{2}.\d{2}', filename):  # 提取欧美番号 sexart.11.11.11
+    if re.search('^\D+\.\d{2}\.\d{2}\.\d{2}', filename):  # 提取欧美番号 sexart.11.11.11
         try:
-            file_number = re.search('\D+.\d{2}.\d{2}.\d{2}', filename).group()
+            file_number = re.search('\D+\.\d{2}\.\d{2}\.\d{2}', filename).group()
             return file_number
         except:
             return os.path.splitext(filepath.split('/')[-1])[0]
+    elif re.search('XXX-AV-\d{4,}', filename.upper()):  # 提取xxx-av-11111
+        file_number = re.search('XXX-AV-\d{4,}', filename.upper()).group()
+        return file_number
     elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
             filename = filename.upper().replace('PPV', '').replace('--', '-')
-        if re.search('\w+-\d+', filename):  # 提取类似mkbd-120番号
+        if re.search('[a-zA-Z]+-\d+', filename):  # 提取类似mkbd-120番号
             file_number = re.search('\w+-\d+', filename).group()
         elif re.search('\d+[a-zA-Z]+-\d+', filename):  # 提取类似259luxu-1111番号
             file_number = re.search('\d+[a-zA-Z]+-\d+', filename).group()
-        elif re.search('\w+-\w\d+', filename):  # 提取类似mkbd-s120番号
-            file_number = re.search('\w+-\w\d+', filename).group()
-        elif re.search('\d+-\w+', filename):  # 提取类似 111111-MMMM 番号
-            file_number = re.search('\d+-\w+', filename).group()
+        elif re.search('[a-zA-Z]+-[a-zA-Z]\d+', filename):  # 提取类似mkbd-s120番号
+            file_number = re.search('[a-zA-Z]+-[a-zA-Z]\d+', filename).group()
+        elif re.search('\d+-[a-zA-Z]+', filename):  # 提取类似 111111-MMMM 番号
+            file_number = re.search('\d+-[a-zA-Z]+', filename).group()
         elif re.search('\d+-\d+', filename):  # 提取类似 111111-000 番号
             file_number = re.search('\d+-\d+', filename).group()
         elif re.search('\d+_\d+', filename):  # 提取类似 111111_000 番号
@@ -159,7 +167,7 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
         elif re.match('\D{2,}00\d{3,}', file_number) and '-' not in file_number and '_' not in file_number:
             json_data = json.loads(dmm.main(file_number))
         # =======================================================================sexart.15.06.14
-        elif re.search('[a-zA-Z]+.\d{2}.\d{2}.\d{2}', file_number):
+        elif re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
             json_data = json.loads(javdb.main_us(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javbus.main_us(file_number))
@@ -168,6 +176,8 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
             json_data = json.loads(javbus.main(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(jav321.main(file_number))
+            if getDataState(json_data) == 0:
+                json_data = json.loads(xcity.main(file_number))
             if getDataState(json_data) == 0:
                 json_data = json.loads(javdb.main(file_number))
             if getDataState(json_data) == 0:
@@ -185,20 +195,22 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
     elif mode == 4:  # 仅从javbus
         if isuncensored:
             json_data = json.loads(javbus.main_uncensored(file_number))
-        elif re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+        elif re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
             json_data = json.loads(javbus.main_us(file_number))
         else:
             json_data = json.loads(javbus.main(file_number))
     elif mode == 5:  # 仅从jav321
         json_data = json.loads(jav321.main(file_number, isuncensored))
     elif mode == 6:  # 仅从javdb
-        if re.search('\D+.\d{2}.\d{2}.\d{2}', file_number):
+        if re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
             json_data = json.loads(javdb.main_us(file_number))
         else:
             json_data = json.loads(javdb.main(file_number, isuncensored))
     elif mode == 7:  # 仅从avsox
         json_data = json.loads(avsox.main(file_number))
-    elif mode == 8:  # 仅从dmm
+    elif mode == 8:  # 仅从xcity
+        json_data = json.loads(xcity.main(file_number))
+    elif mode == 9:  # 仅从dmm
         json_data = json.loads(dmm.main(file_number))
 
     # ================================================网站规则添加结束================================================
@@ -301,7 +313,7 @@ def save_config(json_config):
         print("soft_link = " + str(json_config['soft_link']), file=code)
         print("show_poster = " + str(json_config['show_poster']), file=code)
         print("website = " + json_config['website'], file=code)
-        print("# all or mgstage or fc2club or javbus or jav321 or javdb or avsox or dmm", file=code)
+        print("# all or mgstage or fc2club or javbus or jav321 or javdb or avsox or xcity or dmm", file=code)
         print("", file=code)
         print("[proxy]", file=code)
         print("proxy = " + json_config['proxy'], file=code)
@@ -350,5 +362,25 @@ def save_config(json_config):
         print("uncensored_prefix = " + str(json_config['uncensored_prefix']), file=code)
         print("uncensored_poster = " + str(json_config['uncensored_poster']), file=code)
         print("# 0 : official, 1 : cut", file=code)
+        print("", file=code)
+        print("[file_download]", file=code)
+        print("nfo = " + str(json_config['nfo_download']), file=code)
+        print("poster = " + str(json_config['poster_download']), file=code)
+        print("fanart = " + str(json_config['fanart_download']), file=code)
+        print("thumb = " + str(json_config['thumb_download']), file=code)
+        print("", file=code)
+        print("[extrafanart]", file=code)
+        print("extrafanart_download = " + str(json_config['extrafanart_download']), file=code)
+        print("extrafanart_folder = " + str(json_config['extrafanart_folder']), file=code)
 
     code.close()
+
+
+def check_pic(path_pic):
+    try:
+        img = Image.open(path_pic)
+        img.load()
+        return True
+    except (FileNotFoundError, OSError):
+        # print('文件损坏')
+        return False

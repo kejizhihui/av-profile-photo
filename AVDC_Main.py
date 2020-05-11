@@ -15,11 +15,11 @@ import shutil
 import base64
 import re
 from aip import AipBodyAnalysis
-from PIL import Image
+from PIL import Image, ImageFilter
 import os
 from configparser import ConfigParser
 from Ui.AVDC import Ui_AVDV
-from Function.Function import save_config, movie_lists, get_info, getDataFromJSON, escapePath, getNumber
+from Function.Function import save_config, movie_lists, get_info, getDataFromJSON, escapePath, getNumber, check_pic
 from Function.getHtml import get_html
 
 
@@ -33,7 +33,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init_Ui()
         self.set_style()
         # 初始化需要的变量
-        self.version = '3.93'
+        self.version = '3.95'
         self.m_drag = False
         self.m_DragPosition = 0
         self.count_claw = 0  # 批量刮削次数
@@ -89,6 +89,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             ''')
         self.Ui.centralwidget.setStyleSheet(
             '''
+            * {
+                    font-size:15px;
+            }            
             QWidget#centralwidget{
                     background:gray;
                     border:1px solid gray;
@@ -296,10 +299,16 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'poster_mark': 1,
             'thumb_mark': 1,
             'mark_size': 3,
-            'mark_type': 'SUB, LEAK, UNCENSORED',
+            'mark_type': 'SUB,LEAK,UNCENSORED',
             'mark_pos': 'top_left',
             'uncensored_poster': 0,
             'uncensored_prefix': 'S2M|BT|LAF|SMD',
+            'nfo_download': 1,
+            'poster_download': 1,
+            'fanart_download': 1,
+            'thumb_download': 1,
+            'extrafanart_download': 0,
+            'extrafanart_folder': 'extrafanart',
         }
         save_config(json_config)
         self.Load_Config()
@@ -340,8 +349,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.Ui.comboBox_website_all.setCurrentIndex(5)
         elif config['common']['website'] == 'avsox':
             self.Ui.comboBox_website_all.setCurrentIndex(6)
-        elif config['common']['website'] == 'dmm':
+        elif config['common']['website'] == 'xcity':
             self.Ui.comboBox_website_all.setCurrentIndex(7)
+        elif config['common']['website'] == 'dmm':
+            self.Ui.comboBox_website_all.setCurrentIndex(8)
         self.Ui.lineEdit_success.setText(config['common']['success_output_folder'])
         self.Ui.lineEdit_fail.setText(config['common']['failed_output_folder'])
         # ========================================================================proxy
@@ -389,11 +400,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         elif int(config['mark']['thumb_mark']) == 0:
             self.Ui.radioButton_thumb_mark_off.setChecked(True)
         self.Ui.horizontalSlider_mark_size.setValue(int(config['mark']['mark_size']))
-        if 'SUB' in config['mark']['mark_type']:
+        if 'SUB' in str(config['mark']['mark_type']).upper():
             self.Ui.checkBox_sub.setChecked(True)
-        if 'LEAK' in config['mark']['mark_type']:
+        if 'LEAK' in str(config['mark']['mark_type']).upper():
             self.Ui.checkBox_leak.setChecked(True)
-        if 'UNCENSORED' in config['mark']['mark_type']:
+        if 'UNCENSORED' in str(config['mark']['mark_type']).upper():
             self.Ui.checkBox_uncensored.setChecked(True)
         if 'top_left' == config['mark']['mark_pos']:
             self.Ui.radioButton_top_left.setChecked(True)
@@ -409,6 +420,29 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         elif int(config['uncensored']['uncensored_poster']) == 0:
             self.Ui.radioButton_poster_official.setChecked(True)
         self.Ui.lineEdit_uncensored_prefix.setText(config['uncensored']['uncensored_prefix'])
+        # ========================================================================file_download
+        if int(config['file_download']['nfo']) == 1:
+            self.Ui.checkBox_download_nfo.setChecked(True)
+        elif int(config['file_download']['nfo']) == 0:
+            self.Ui.checkBox_download_nfo.setChecked(False)
+        if int(config['file_download']['poster']) == 1:
+            self.Ui.checkBox_download_poster.setChecked(True)
+        elif int(config['file_download']['poster']) == 0:
+            self.Ui.checkBox_download_poster.setChecked(False)
+        if int(config['file_download']['fanart']) == 1:
+            self.Ui.checkBox_download_fanart.setChecked(True)
+        elif int(config['file_download']['fanart']) == 0:
+            self.Ui.checkBox_download_fanart.setChecked(False)
+        if int(config['file_download']['thumb']) == 1:
+            self.Ui.checkBox_download_thumb.setChecked(True)
+        elif int(config['file_download']['thumb']) == 0:
+            self.Ui.checkBox_download_thumb.setChecked(False)
+        # ========================================================================extrafanart
+        if int(config['extrafanart']['extrafanart_download']) == 1:
+            self.Ui.radioButton_extrafanart_download_on.setChecked(True)
+        elif int(config['extrafanart']['extrafanart_download']) == 0:
+            self.Ui.radioButton_extrafanart_download_off.setChecked(False)
+        self.Ui.lineEdit_extrafanart_dir.setText(config['extrafanart']['extrafanart_folder'])
 
     # ========================================================================读取设置页设置，保存在config.ini
     def pushButton_save_config_clicked(self):
@@ -432,6 +466,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         mark_type = ''
         mark_pos = ''
         uncensored_poster = 0
+        nfo_download = 0
+        poster_download = 0
+        fanart_download = 0
+        thumb_download = 0
+        extrafanart_download = 0
+        extrafanart_folder = ''
         # ========================================================================common
         if self.Ui.radioButton_common.isChecked():  # 普通模式
             main_mode = 1
@@ -453,6 +493,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             save_log = 1
         elif self.Ui.radioButton_log_off.isChecked():  # 关闭日志
             save_log = 0
+        if self.Ui.checkBox_cover.isChecked():  # 显示封面
+            show_poster = 1
+        else:  # 关闭封面
+            show_poster = 0
         if self.Ui.radioButton_fail_move_on.isChecked():  # 失败移动开
             failed_file_move = 1
         elif self.Ui.radioButton_fail_move_off.isChecked():  # 失败移动关
@@ -471,12 +515,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             website = 'javdb'
         elif self.Ui.comboBox_website_all.currentText() == 'avsox':  # avsox
             website = 'avsox'
+        elif self.Ui.comboBox_website_all.currentText() == 'xcity':  # xcity
+            website = 'xcity'
         elif self.Ui.comboBox_website_all.currentText() == 'dmm':  # dmm
             website = 'dmm'
-        if self.Ui.checkBox_cover.isChecked():  # 显示封面
-            show_poster = 1
-        else:  # 关闭封面
-            show_poster = 0
         # ========================================================================水印
         if self.Ui.radioButton_poster_mark_on.isChecked():  # 封面添加水印
             poster_mark = 1
@@ -504,11 +546,32 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             uncensored_poster = 0
         elif self.Ui.radioButton_poster_cut.isChecked():  # 裁剪
             uncensored_poster = 1
+        # ========================================================================下载文件，剧照
+        if self.Ui.checkBox_download_nfo.isChecked():
+            nfo_download = 1
+        else:
+            nfo_download = 0
+        if self.Ui.checkBox_download_poster.isChecked():
+            poster_download = 1
+        else:
+            poster_download = 0
+        if self.Ui.checkBox_download_fanart.isChecked():
+            fanart_download = 1
+        else:
+            fanart_download = 0
+        if self.Ui.checkBox_download_thumb.isChecked():
+            thumb_download = 1
+        else:
+            thumb_download = 0
+        if self.Ui.radioButton_extrafanart_download_on.isChecked():  # 下载剧照
+            extrafanart_download = 1
+        else:  # 关闭封面
+            extrafanart_download = 0
         json_config = {
-            'show_poster': show_poster,
             'main_mode': main_mode,
             'soft_link': soft_link,
             'switch_debug': switch_debug,
+            'show_poster': show_poster,
             'failed_file_move': failed_file_move,
             'update_check': update_check,
             'save_log': save_log,
@@ -536,6 +599,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'mark_pos': mark_pos,
             'uncensored_poster': uncensored_poster,
             'uncensored_prefix': self.Ui.lineEdit_uncensored_prefix.text(),
+            'nfo_download': nfo_download,
+            'poster_download': poster_download,
+            'fanart_download': fanart_download,
+            'thumb_download': thumb_download,
+            'extrafanart_download': extrafanart_download,
+            'extrafanart_folder': self.Ui.lineEdit_extrafanart_dir.text(),
         }
         save_config(json_config)
 
@@ -543,12 +612,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     def pushButton_select_file_clicked(self):
         path = self.Ui.lineEdit_movie_path.text()
         filepath, filetype = QtWidgets.QFileDialog.getOpenFileName(self, "选取视频文件", path, "Movie Files(*.mp4 "
-                                                                                              "*.avi *.rmvb *.wmv "
-                                                                                              "*.mov *.mkv *.flv *.ts "
-                                                                                              "*.webm *.MP4 *.AVI "
-                                                                                              "*.RMVB *.WMV *.MOV "
-                                                                                              "*.MKV *.FLV *.TS "
-                                                                                              "*.WEBM);;All Files(*)")
+                                                                                         "*.avi *.rmvb *.wmv "
+                                                                                         "*.mov *.mkv *.flv *.ts "
+                                                                                         "*.webm *.MP4 *.AVI "
+                                                                                         "*.RMVB *.WMV *.MOV "
+                                                                                         "*.MKV *.FLV *.TS "
+                                                                                         "*.WEBM);;All Files(*)")
         if filepath != '':
             self.Ui.stackedWidget.setCurrentIndex(0)
             try:
@@ -882,11 +951,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================语句添加到日志框
     def add_text_main(self, text):
-        time.sleep(0.1)
-        if self.Ui.radioButton_log_on.isChecked():
-            self.log_txt.write((str(text) + '\n').encode('utf8'))
-        self.Ui.textBrowser_log_main.append(text)
-        self.Ui.textBrowser_log_main.moveCursor(QTextCursor.End)
+        try:
+            time.sleep(0.1)
+            if self.Ui.radioButton_log_on.isChecked():
+                self.log_txt.write((str(text) + '\n').encode('utf8'))
+            self.Ui.textBrowser_log_main.append(text)
+            self.Ui.textBrowser_log_main.moveCursor(QTextCursor.End)
+        except Exception as error_info:
+            self.Ui.textBrowser_log_main.append('[-]Error in add_text_main' + str(error_info))
 
     # ========================================================================移动到失败文件夹
     def moveFailedFolder(self, filepath, failed_folder):
@@ -894,7 +966,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             if self.Ui.radioButton_soft_off.isChecked():
                 try:
                     shutil.move(filepath, failed_folder + '/')
-                    self.add_text_main('[-]Move ' + os.path.split(filepath)[1] + ' to Failed output folder Success')
+                    self.add_text_main('[-]Move ' + os.path.split(filepath)[1] + ' to Failed output folder Success!')
                 except Exception as error_info:
                     self.add_text_main('[-]Error in moveFailedFolder! ' + str(error_info))
 
@@ -943,16 +1015,25 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         while i <= int(Config['proxy']['retry']):
             self.DownloadFileWithFilename(json_data['cover'], thumb_name, path, Config, filepath,
                                           failed_folder)
-            if os.path.getsize(path + '/' + thumb_name) < 10240:
+            if not check_pic(path + '/' + thumb_name):
                 print('[!]Image Download Failed! Trying again. ' + str(i) + '/' + Config['proxy']['retry'])
                 i = i + 1
             else:
                 break
-        if os.path.getsize(path + '/' + thumb_name) >= 10240:
+        if check_pic(path + '/' + thumb_name):
             self.add_text_main('[+]Thumb Downloaded!  ' + thumb_name)
         else:
             os.remove(path + '/' + thumb_name)
             raise Exception("The Size of Thumb is Error! Deleted " + thumb_name + '!')
+
+    def deletethumb(self,path, naming_rule):
+        try:
+            thumb_path = path + '/' + naming_rule + '-thumb.jpg'
+            if (not self.Ui.checkBox_download_thumb.isChecked()) and os.path.exists(thumb_path):
+                os.remove(thumb_path)
+                self.add_text_main('[+]Thumb Delete!      ' + naming_rule + '-thumb.jpg')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in deletethumb: ' + str(error_info))
 
     # ========================================================================无码片下载封面图
     def smallCoverDownload(self, path, naming_rule, json_data, Config, filepath, failed_folder):
@@ -965,14 +1046,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.DownloadFileWithFilename(json_data['cover_small'], 'cover_small.jpg', path, Config, filepath,
                                           failed_folder)
             try:
-                if os.path.getsize(path + '/cover_small.jpg') < 10240:
+                if not check_pic(path + '/cover_small.jpg'):
                     raise Exception("The Size of smallcover is Error! Deleted cover_small.jpg!")
                 fp = open(path + '/cover_small.jpg', 'rb')
                 is_pic_open = 1
                 img = Image.open(fp)
                 w = img.width
                 h = img.height
-                if not (1.4 <= h/w <= 1.6):
+                if not (1.4 <= h / w <= 1.6):
                     self.add_text_main('[-]The size of cover_small.jpg is unfit, Try to cut thumb!')
                     fp.close()
                     os.remove(path + '/cover_small.jpg')
@@ -986,8 +1067,33 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 if is_pic_open:
                     fp.close()
                 os.remove(path + '/cover_small.jpg')
-                self.add_text_main('[+]Try to cut thumb!')
+                self.add_text_main('[+]Try to cut cover!')
                 return 'small_cover_error'
+
+    # ========================================================================下载剧照
+    def extrafanartDownload(self, json_data, path, Config, filepath, failed_folder):
+        if self.Ui.radioButton_extrafanart_download_on.isChecked():
+            self.add_text_main('[+]ExtraFanart Downloading!')
+            extrafanart_folder = self.Ui.lineEdit_extrafanart_dir.text()
+            if extrafanart_folder == '':
+                extrafanart_folder = 'extrafanart'
+            extrafanart_path = path + '/' + extrafanart_folder
+            extrafanart_list = json_data['extrafanart']
+            if not os.path.exists(extrafanart_path):
+                os.makedirs(extrafanart_path)
+            extrafanart_count = 0
+            for extrafanart_url in extrafanart_list:
+                extrafanart_count += 1
+                if not os.path.exists(extrafanart_path + '/fanart' + str(extrafanart_count) + '.jpg'):
+                    i = 1
+                    while i <= int(Config['proxy']['retry']):
+                        self.DownloadFileWithFilename(extrafanart_url, 'fanart' + str(extrafanart_count) + '.jpg',
+                                                      extrafanart_path, Config, filepath, failed_folder)
+                        if not check_pic(extrafanart_path + '/fanart' + str(extrafanart_count) + '.jpg'):
+                            print('[!]Image Download Failed! Trying again. ' + str(i) + '/' + Config['proxy']['retry'])
+                            i = i + 1
+                        else:
+                            break
 
     # ========================================================================打印NFO
     def PrintFiles(self, path, name_file, cn_sub, leak, json_data, filepath, failed_folder):
@@ -1012,7 +1118,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 print("  <set>", file=code)
                 print("  </set>", file=code)
                 try:
-                    if str(json_data['score']) != 'unknown' and str(json_data['score']) != '' and float(json_data['score']) != 0.0:
+                    if str(json_data['score']) != 'unknown' and str(json_data['score']) != '' and float(
+                            json_data['score']) != 0.0:
                         print("  <rating>" + str(json_data['score']) + "</rating>", file=code)
                 except Exception as err:
                     print("Error in json_data score!" + str(err))
@@ -1029,7 +1136,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     print("  <director>" + director + "</director>", file=code)
                 print("  <poster>" + name_file + "-poster.jpg</poster>", file=code)
                 print("  <thumb>" + name_file + "-thumb.jpg</thumb>", file=code)
-                print("  <fanart>" + name_file + '-fanart.jpg' + "</fanart>", file=code)
+                print("  <fanart>" + name_file + "-fanart.jpg</fanart>", file=code)
                 try:
                     for key, value in actor_photo.items():
                         if str(key) != 'unknown' and str(key) != '':
@@ -1095,95 +1202,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[-]Error in PrintFiles: ' + str(error_info))
             self.moveFailedFolder(filepath, failed_folder)
 
-    # ========================================================================有码片裁剪封面
-    def cutImage(self, imagecut, path, naming_rule):
-        if imagecut != 3:
-            thumb_name = naming_rule + '-thumb.jpg'
-            poster_name = naming_rule + '-poster.jpg'
-            if os.path.exists(path + '/' + poster_name):
-                self.add_text_main('[+]Poster Existed!    ' + poster_name)
-                return
-            if imagecut == 1:
-                try:
-                    img = Image.open(path + '/' + thumb_name)
-                    w = img.width
-                    h = img.height
-                    img2 = img.crop((w / 1.9, 0, w, h))
-                    img2.save(path + '/' + poster_name)
-                    self.add_text_main('[+]Poster Cut!        ' + poster_name)
-                except:
-                    self.add_text_main('[-]Cover cut failed!')
-            elif imagecut == 0:
-                self.image_cut(path, thumb_name)
-
-    # ========================================================================加水印
-    def add_mark(self, poster_path, thumb_path, cn_sub, leak, uncensored, config):
-        mark_type = ''
-        if cn_sub:
-            mark_type += ',字幕'
-        if leak:
-            mark_type += ',流出'
-        if uncensored:
-            mark_type += ',无码'
-        if self.Ui.radioButton_thumb_mark_on.isChecked() and mark_type != '':
-            self.add_mark_thread(thumb_path, cn_sub, leak, uncensored)
-            self.add_text_main('[+]Thumb Add Mark:    ' + mark_type.strip(','))
-        if self.Ui.radioButton_poster_mark_on.isChecked() and mark_type != '':
-            self.add_mark_thread(poster_path, cn_sub, leak, uncensored)
-            self.add_text_main('[+]Poster Add Mark:   ' + mark_type.strip(','))
-
-    def add_mark_thread(self, pic_path, cn_sub, leak, uncensored):
-        size = 14 - int(self.Ui.horizontalSlider_mark_size.value())  # 获取自定义大小的值
-        img_pic = Image.open(pic_path)
-        count = 0  # 获取自定义位置，取余配合pos达到顺时针添加的效果
-        if self.Ui.radioButton_top_left.isChecked():
-            count = 0
-        elif self.Ui.radioButton_top_right.isChecked():
-            count = 1
-        elif self.Ui.radioButton_bottom_right.isChecked():
-            count = 2
-        elif self.Ui.radioButton_bottom_left.isChecked():
-            count = 3
-        if self.Ui.checkBox_sub.isChecked() and cn_sub == 1:
-            self.add_to_pic(pic_path, img_pic, size, count, 1)  # 添加
-            count = (count + 1) % 4
-        if self.Ui.checkBox_leak.isChecked() and leak == 1:
-            self.add_to_pic(pic_path, img_pic, size, count, 2)
-            count = (count + 1) % 4
-        if self.Ui.checkBox_uncensored.isChecked() and uncensored == 1:
-            self.add_to_pic(pic_path, img_pic, size, count, 3)
-        img_pic.close()
-
-
-    def add_to_pic(self, pic_path, img_pic, size, count, mode):
-        mark_pic_path = ''
-        if mode == 1:
-            mark_pic_path = 'Img/SUB.png'
-        elif mode == 2:
-            mark_pic_path = 'Img/LEAK.png'
-        elif mode == 3:
-            mark_pic_path = 'Img/UNCENSORED.png'
-        img_subt = Image.open(mark_pic_path)
-        scroll_high = int(img_pic.height / size)
-        scroll_wide = int(scroll_high * img_subt.width / img_subt.height)
-        img_subt = img_subt.resize((scroll_wide, scroll_high), Image.ANTIALIAS)
-        r, g, b, a = img_subt.split()  # 获取颜色通道，保持png的透明性
-        # 封面四个角的位置
-        pos = [
-            {'x': 0, 'y': 0},
-            {'x': img_pic.width - scroll_wide, 'y': 0},
-            {'x': img_pic.width - scroll_wide, 'y': img_pic.height - scroll_high},
-            {'x': 0, 'y': img_pic.height - scroll_high},
-        ]
-        img_pic.paste(img_subt, (pos[count]['x'], pos[count]['y']), mask=a)
-        img_pic.save(pic_path, quality=95)
-
     # ========================================================================thumb复制为fanart
     def copyRenameJpgToFanart(self, path, naming_rule):
         if not os.path.exists(path + '/' + naming_rule + '-fanart.jpg'):
             shutil.copy(path + '/' + naming_rule + '-thumb.jpg', path + '/' + naming_rule + '-fanart.jpg')
 
-    # ========================================================================移动文件、字幕
+    # ========================================================================移动视频、字幕
     def pasteFileToFolder(self, filepath, path, naming_rule, failed_folder):
         type = str(os.path.splitext(filepath)[1])
         try:
@@ -1213,6 +1237,101 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.add_text_main('[-]Error in pasteFileToFolder: ' + str(error_info))
         return False
 
+    # ========================================================================有码片裁剪封面
+    def cutImage(self, imagecut, path, naming_rule):
+        if imagecut != 3:
+            thumb_name = naming_rule + '-thumb.jpg'
+            poster_name = naming_rule + '-poster.jpg'
+            if os.path.exists(path + '/' + poster_name):
+                self.add_text_main('[+]Poster Existed!    ' + poster_name)
+                return
+            if imagecut == 0:
+                self.image_cut(path, thumb_name)
+            else:
+                try:
+                    img = Image.open(path + '/' + thumb_name)
+                    w = img.width
+                    h = img.height
+                    img2 = img.crop((w / 1.9, 0, w, h))
+                    img2.save(path + '/' + poster_name)
+                    self.add_text_main('[+]Poster Cut!        ' + poster_name)
+                except:
+                    self.add_text_main('[-]Thumb cut failed!')
+
+    def fix_size(self, path, naming_rule):
+        try:
+            poster_path = path + '/' + naming_rule + '-poster.jpg'
+            pic = Image.open(poster_path)
+            (width, height) = pic.size
+            if not 2 / 3 - 0.05 <= width / height <= 2 / 3 + 0.05:  # 仅处理会过度拉伸的图片
+                fixed_pic = pic.resize((int(width), int(3 / 2 * width)))  # 拉伸图片
+                fixed_pic = fixed_pic.filter(ImageFilter.GaussianBlur(radius=50))  # 高斯模糊
+                fixed_pic.paste(pic, (0, int((3 / 2 * width - height) / 2)))  # 粘贴原图
+                fixed_pic.save(poster_path)
+        except Exception as error_info:
+            self.add_text_main('[-]Error in fix_size: ' + str(error_info))
+
+    # ========================================================================加水印
+    def add_mark(self, poster_path, thumb_path, cn_sub, leak, uncensored, config):
+        mark_type = ''
+        if self.Ui.checkBox_sub.isChecked() and cn_sub:
+            mark_type += ',字幕'
+        if self.Ui.checkBox_leak.isChecked() and leak:
+            mark_type += ',流出'
+        if self.Ui.checkBox_uncensored.isChecked() and uncensored:
+            mark_type += ',无码'
+        if self.Ui.radioButton_thumb_mark_on.isChecked() and mark_type != '' and self.Ui.checkBox_download_thumb.isChecked():
+            self.add_mark_thread(thumb_path, cn_sub, leak, uncensored)
+            self.add_text_main('[+]Thumb Add Mark:    ' + mark_type.strip(','))
+        if self.Ui.radioButton_poster_mark_on.isChecked() and mark_type != '' and self.Ui.checkBox_download_poster.isChecked():
+            self.add_mark_thread(poster_path, cn_sub, leak, uncensored)
+            self.add_text_main('[+]Poster Add Mark:   ' + mark_type.strip(','))
+
+    def add_mark_thread(self, pic_path, cn_sub, leak, uncensored):
+        size = 14 - int(self.Ui.horizontalSlider_mark_size.value())  # 获取自定义大小的值
+        img_pic = Image.open(pic_path)
+        count = 0  # 获取自定义位置，取余配合pos达到顺时针添加的效果
+        if self.Ui.radioButton_top_left.isChecked():
+            count = 0
+        elif self.Ui.radioButton_top_right.isChecked():
+            count = 1
+        elif self.Ui.radioButton_bottom_right.isChecked():
+            count = 2
+        elif self.Ui.radioButton_bottom_left.isChecked():
+            count = 3
+        if self.Ui.checkBox_sub.isChecked() and cn_sub == 1:
+            self.add_to_pic(pic_path, img_pic, size, count, 1)  # 添加
+            count = (count + 1) % 4
+        if self.Ui.checkBox_leak.isChecked() and leak == 1:
+            self.add_to_pic(pic_path, img_pic, size, count, 2)
+            count = (count + 1) % 4
+        if self.Ui.checkBox_uncensored.isChecked() and uncensored == 1:
+            self.add_to_pic(pic_path, img_pic, size, count, 3)
+        img_pic.close()
+
+    def add_to_pic(self, pic_path, img_pic, size, count, mode):
+        mark_pic_path = ''
+        if mode == 1:
+            mark_pic_path = 'Img/SUB.png'
+        elif mode == 2:
+            mark_pic_path = 'Img/LEAK.png'
+        elif mode == 3:
+            mark_pic_path = 'Img/UNCENSORED.png'
+        img_subt = Image.open(mark_pic_path)
+        scroll_high = int(img_pic.height / size)
+        scroll_wide = int(scroll_high * img_subt.width / img_subt.height)
+        img_subt = img_subt.resize((scroll_wide, scroll_high), Image.ANTIALIAS)
+        r, g, b, a = img_subt.split()  # 获取颜色通道，保持png的透明性
+        # 封面四个角的位置
+        pos = [
+            {'x': 0, 'y': 0},
+            {'x': img_pic.width - scroll_wide, 'y': 0},
+            {'x': img_pic.width - scroll_wide, 'y': img_pic.height - scroll_high},
+            {'x': 0, 'y': img_pic.height - scroll_high},
+        ]
+        img_pic.paste(img_subt, (pos[count]['x'], pos[count]['y']), mask=a)
+        img_pic.save(pic_path, quality=95)
+
     # ========================================================================获取分集序号
     def get_part(self, filepath, failed_folder):
         try:
@@ -1234,7 +1353,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         try:
             self.add_text_main('[+] ---Debug info---')
             for key, value in json_data.items():
-                if value == '' or key == 'actor_photo':
+                if value == '' or key == 'actor_photo' or key == 'extrafanart':
                     continue
                 if key == 'tag' and len(value) == 0:
                     continue
@@ -1376,7 +1495,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         elif json_data['title'] == '':
             self.add_text_main('[-]Movie Data not found!')
             node = QTreeWidgetItem(self.item_fail)
-            node.setText(0, str(self.count_claw) + '-' + str(count) + '.' + os.path.splitext(filepath.split('/')[-1])[0])
+            node.setText(0,
+                         str(self.count_claw) + '-' + str(count) + '.' + os.path.splitext(filepath.split('/')[-1])[0])
             self.item_fail.addChild(node)
             self.moveFailedFolder(filepath, failed_folder)
             return 'not found'
@@ -1418,14 +1538,21 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         if program_mode == 1:
             # imagecut 0 判断人脸位置裁剪缩略图为封面，1 裁剪右半面，3 下载小封面
             self.thumbDownload(json_data, path, naming_rule, Config, filepath, failed_folder)
-            if self.smallCoverDownload(path, naming_rule, json_data, Config, filepath,
-                                       failed_folder) == 'small_cover_error':  # 下载小封面
-                json_data['imagecut'] = 0
-            self.cutImage(json_data['imagecut'], path, naming_rule)  # 裁剪图
-            self.copyRenameJpgToFanart(path, naming_rule)
+            if self.Ui.checkBox_download_poster.isChecked():
+                if self.smallCoverDownload(path, naming_rule, json_data, Config, filepath,
+                                           failed_folder) == 'small_cover_error':  # 下载小封面
+                    json_data['imagecut'] = 0
+                self.cutImage(json_data['imagecut'], path, naming_rule)  # 裁剪图
+                self.fix_size(path, naming_rule)
+            self.deletethumb(path, naming_rule)
+            if self.Ui.checkBox_download_fanart.isChecked():
+                self.copyRenameJpgToFanart(path, naming_rule)
             if self.pasteFileToFolder(filepath, path, naming_rule, failed_folder):  # 移动文件,True 为有外挂字幕
                 cn_sub = 1
-            self.PrintFiles(path, naming_rule, cn_sub, leak, json_data, filepath, failed_folder)  # 打印文件
+            if self.Ui.checkBox_download_nfo.isChecked():
+                self.PrintFiles(path, naming_rule, cn_sub, leak, json_data, filepath, failed_folder)  # 打印文件
+            if self.Ui.radioButton_extrafanart_download_on.isChecked():
+                self.extrafanartDownload(json_data, path, Config, filepath, failed_folder)
             self.add_mark(poster_path, thumb_path, cn_sub, leak, uncensored, Config)
         # =======================================================================整理模式
         elif program_mode == 2:
@@ -1458,7 +1585,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.Ui.pushButton_start_cap.setEnabled(True)
             self.add_text_main("[*]======================================================")
             return
-        self.CreatFailedFolder(failed_folder)  # 新建failed文件夹
+        if self.Ui.radioButton_fail_move_on.isChecked():
+            self.CreatFailedFolder(failed_folder)  # 新建failed文件夹
         movie_list = movie_lists(escape_folder, movie_type, movie_path)  # 获取所有需要刮削的影片列表
         count = 0
         count_all = str(len(movie_list))
@@ -1473,7 +1601,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.Ui.label_progress.setText('当前: ' + str(count) + '/' + str(count_all))
             percentage = str(count / int(count_all) * 100)[:4] + '%'
             value = int(count / int(count_all) * 100)
-            self.add_text_main('[!] - ' + str(self.count_claw) + ' - ' + percentage + ' - [' + str(count) + '/' + count_all + '] -')
+            self.add_text_main(
+                '[!] - ' + str(self.count_claw) + ' - ' + percentage + ' - [' + str(count) + '/' + count_all + '] -')
             try:
                 movie_number = getNumber(movie, escape_string)
                 self.add_text_main("[!]Making Data for   [" + movie + "], the number is [" + movie_number + "]")
@@ -1487,10 +1616,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                 self.add_text_main("[*]======================================================")
             except Exception as error_info:
                 node = QTreeWidgetItem(self.item_fail)
-                node.setText(0, str(self.count_claw) + '-' + str(count) + '.' + os.path.splitext(movie.split('/')[-1])[0])
+                node.setText(0,
+                             str(self.count_claw) + '-' + str(count) + '.' + os.path.splitext(movie.split('/')[-1])[0])
                 self.item_fail.addChild(node)
                 self.add_text_main('[-]Error in AVDC_Main: ' + str(error_info))
-                if self.Ui.radioButton_fail_move_on.isChecked() and not os.path.exists(failed_folder + '/' + os.path.split(movie)[1]):
+                if self.Ui.radioButton_fail_move_on.isChecked() and not os.path.exists(
+                        failed_folder + '/' + os.path.split(movie)[1]):
                     if config['common']['soft_link'] == '0':
                         try:
                             shutil.move(movie, failed_folder + '/')

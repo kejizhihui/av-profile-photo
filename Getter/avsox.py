@@ -132,6 +132,7 @@ def main(number):
             'actor_photo': getActorPhoto(web),
             'cover': getCover(web),
             'cover_small': getCover_small(response, count),
+            'extrafanart': '',
             'imagecut': 3,
             'director': '',
             'publisher': '',
