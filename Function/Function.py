@@ -106,7 +106,9 @@ def getNumber(filepath, escape_string):
     elif '-' in filename or '_' in filename:  # 普通提取番号 主要处理包含减号-和_的番号
         if 'FC2' or 'fc2' in filename:
             filename = filename.upper().replace('PPV', '').replace('--', '-')
-        if re.search('[a-zA-Z]+-\d+', filename):  # 提取类似mkbd-120番号
+        if re.search('FC2-\d{5,}', filename):  # 提取类似mkbd-120番号
+            file_number = re.search('FC2-\d{5,}', filename).group()
+        elif re.search('[a-zA-Z]+-\d+', filename):  # 提取类似mkbd-120番号
             file_number = re.search('\w+-\d+', filename).group()
         elif re.search('\d+[a-zA-Z]+-\d+', filename):  # 提取类似259luxu-1111番号
             file_number = re.search('\d+[a-zA-Z]+-\d+', filename).group()

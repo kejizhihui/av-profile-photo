@@ -33,7 +33,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init_Ui()
         self.set_style()
         # 初始化需要的变量
-        self.version = '3.95'
+        self.version = '3.96'
         self.m_drag = False
         self.m_DragPosition = 0
         self.count_claw = 0  # 批量刮削次数
@@ -282,7 +282,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'website': 'all',
             'failed_output_folder': 'failed',
             'success_output_folder': 'JAV_output',
-            'proxy': '127.0.0.1:10809',
+            'proxy': '',
             'timeout': 7,
             'retry': 3,
             'folder_name': 'actor/number-title-release',
@@ -292,7 +292,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'folders': 'failed,JAV_output',
             'string': '1080p,720p,22-sht.me,-HD',
             'emby_url': 'localhost:8096',
-            'api_key': 'bb2e96d99cbf471ea83065d40b229fc1',
+            'api_key': '',
             'media_path': 'E:/TEMP',
             'media_type': '.mp4|.avi|.rmvb|.wmv|.mov|.mkv|.flv|.ts|.webm|.MP4|.AVI|.RMVB|.WMV|.MOV|.MKV|.FLV|.TS|.WEBM',
             'sub_type': '.smi|.srt|.idx|.sub|.sup|.psb|.ssa|.ass|.txt|.usf|.xss|.ssf|.rt|.lrc|.sbv|.vtt|.ttml',

@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.95</string>
+   <string>AVDC-3.96</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="page_avdc">
      <widget class="QPushButton" name="pushButton_start_cap">
@@ -711,7 +711,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="title">
-       <string>Emby-女优头像</string>
+       <string>Emby-演员头像</string>
       </property>
       <widget class="QPushButton" name="pushButton_add_actor_pic">
        <property name="geometry">
@@ -811,22 +811,22 @@ p, li { white-space: pre-wrap; }
        </property>
        <item>
         <property name="text">
-         <string>可添加头像的女优</string>
+         <string>可添加头像的演员</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>没有头像的女优</string>
+         <string>没有头像的演员</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>已有头像的女优</string>
+         <string>已有头像的演员</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>所有女优</string>
+         <string>所有演员</string>
         </property>
        </item>
       </widget>
