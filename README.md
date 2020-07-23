@@ -226,6 +226,7 @@
 对于多影片重命名，可以用[ReNamer](http://www.den4b.com/products/renamer)来批量重命名<br><br>
 **3、Emby批量添加头像**：头像文件放在程序所在目录的Actor目录下，填写emby网址、api密钥即可使用。[头像包下载](https://github.com/moyy996/AVDC/releases/tag/%E5%A4%B4%E5%83%8F%E5%8C%85-2)<br>
 可查看有头像，无头像女优，可往emby添加头像的女优。<br><br>
+**功能更强大、头像更丰富的头像仓库及上传工具 ===>>> [GFriend头像库](https://github.com/xinxin8816/gfriends)**<br><br>
 **4、裁剪封面**：针对封面图比例错误，分辨率低的情况，判断人脸位置，裁剪缩略图(thumb)为封面图(poster)。<br><br>
 
 # 7.异常处理（重要）
