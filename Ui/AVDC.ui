@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.96</string>
+   <string>AVDC-3.961</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">

@@ -104,10 +104,10 @@ def getCover_small(htmlcode, count):
 
 def getCover(htmlcode):
     html = etree.fromstring(htmlcode, etree.HTMLParser())
-    result = str(html.xpath("//img[@class='box video-cover']/@src")).strip(" ['']")
+    result = str(html.xpath("//img[@class='video-cover']/@src")).strip(" ['']")
     # 有时xpath找不到元素，所以要用bs4
     if not result:
-        soup = BeautifulSoup(htmlcode, 'lxml', parse_only=SoupStrainer('img', {'class': 'box video-cover'}))
+        soup = BeautifulSoup(htmlcode, 'lxml', parse_only=SoupStrainer('img', {'class': 'video-cover'}))
         if soup.img is not None:
             result = soup.img['src']
     return result
