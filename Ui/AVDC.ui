@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AVDC-3.961</string>
+   <string>AVDC-3.963</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>../Img/ico.png</normaloff>../Img/ico.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -600,7 +604,7 @@ p, li { white-space: pre-wrap; }
         <x>10</x>
         <y>140</y>
         <width>751</width>
-        <height>111</height>
+        <height>171</height>
        </rect>
       </property>
       <property name="title">
@@ -610,13 +614,14 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>60</y>
+         <y>120</y>
          <width>511</width>
          <height>41</height>
         </rect>
        </property>
        <property name="text">
-        <string>选择单个文件(‘视频目录’下或者子目录下),使用文件名做为番号进行刮削。</string>
+        <string>选择单个文件(‘视频目录’下或者子目录下)。
+不指定番号，则默认使用文件名做为番号进行刮削。</string>
        </property>
       </widget>
       <widget class="QPushButton" name="pushButton_select_file">
@@ -636,7 +641,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>310</x>
-         <y>30</y>
+         <y>90</y>
          <width>431</width>
          <height>22</height>
         </rect>
@@ -691,7 +696,7 @@ p, li { white-space: pre-wrap; }
        <property name="geometry">
         <rect>
          <x>230</x>
-         <y>30</y>
+         <y>90</y>
          <width>72</width>
          <height>21</height>
         </rect>
@@ -700,12 +705,71 @@ p, li { white-space: pre-wrap; }
         <string>刮削网站:</string>
        </property>
       </widget>
+      <widget class="QLineEdit" name="lineEdit_appoint_url">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>60</y>
+         <width>431</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_10">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>60</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>刮削网址：</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="lineEdit_movie_number">
+       <property name="geometry">
+        <rect>
+         <x>310</x>
+         <y>30</y>
+         <width>431</width>
+         <height>21</height>
+        </rect>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_12">
+       <property name="geometry">
+        <rect>
+         <x>230</x>
+         <y>30</y>
+         <width>72</width>
+         <height>15</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>影片番号：</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="pushButton_start_single_file">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>201</width>
+         <height>41</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>刮削</string>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_12">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>270</y>
+        <y>340</y>
         <width>751</width>
         <height>191</height>
        </rect>
@@ -835,7 +899,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>470</y>
+        <y>540</y>
         <width>751</width>
         <height>111</height>
        </rect>
@@ -1715,7 +1779,7 @@ p, li { white-space: pre-wrap; }
           <x>10</x>
           <y>10</y>
           <width>761</width>
-          <height>121</height>
+          <height>151</height>
          </rect>
         </property>
         <property name="title">
@@ -1727,35 +1791,35 @@ p, li { white-space: pre-wrap; }
            <x>0</x>
            <y>20</y>
            <width>751</width>
-           <height>90</height>
+           <height>119</height>
           </rect>
          </property>
          <layout class="QFormLayout" name="formLayout_4">
-          <item row="0" column="0">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_25">
             <property name="text">
-             <string>   代理:                </string>
+             <string>   IP+端口号:                </string>
             </property>
            </widget>
           </item>
-          <item row="0" column="1">
+          <item row="1" column="1">
            <widget class="QLineEdit" name="lineEdit_proxy"/>
           </item>
-          <item row="1" column="0">
+          <item row="2" column="0">
            <widget class="QLabel" name="label_26">
             <property name="text">
              <string>   超时重试时间：   </string>
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
+          <item row="3" column="0">
            <widget class="QLabel" name="label_27">
             <property name="text">
              <string>   重试次数：          </string>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="2" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_3">
             <item>
              <widget class="QSlider" name="horizontalSlider_timeout">
@@ -1785,7 +1849,7 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </item>
-          <item row="2" column="1">
+          <item row="3" column="1">
            <layout class="QHBoxLayout" name="horizontalLayout_retry">
             <item>
              <widget class="QSlider" name="horizontalSlider_retry">
@@ -1815,6 +1879,38 @@ p, li { white-space: pre-wrap; }
             </item>
            </layout>
           </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_19">
+            <property name="text">
+             <string>   代理：        </string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <layout class="QHBoxLayout" name="horizontalLayout_17">
+            <item>
+             <widget class="QRadioButton" name="radioButton_proxy_http">
+              <property name="text">
+               <string>http</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radioButton_proxy_socks5">
+              <property name="text">
+               <string>socks5</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QRadioButton" name="radioButton_proxy_nouse">
+              <property name="text">
+               <string>不使用</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
          </layout>
         </widget>
        </widget>
@@ -1822,7 +1918,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>250</y>
+          <y>280</y>
           <width>761</width>
           <height>121</height>
          </rect>
@@ -1876,7 +1972,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>380</y>
+          <y>410</y>
           <width>761</width>
           <height>111</height>
          </rect>
@@ -1924,7 +2020,7 @@ p, li { white-space: pre-wrap; }
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>140</y>
+          <y>170</y>
           <width>761</width>
           <height>101</height>
          </rect>

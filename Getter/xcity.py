@@ -115,7 +115,9 @@ def getScore(htmlcode):
     return result
 
 
-def find_number(number):
+def find_number(number, appoint_url):
+    if appoint_url:
+        return appoint_url, get_html(appoint_url)
     htmlcode = get_html('https://xcity.jp/result_published/?q=' + number.replace('-', ''))
     if '該当する作品はみつかりませんでした' in htmlcode:
         return 'not found', ''
@@ -132,9 +134,9 @@ def find_number(number):
     return 'not found', ''
 
 
-def main(number):
+def main(number, appoint_url):
     try:
-        url, detail_page = find_number(number)
+        url, detail_page = find_number(number, appoint_url)
         if url == 'not found':
             raise Exception('Movie Data not found in xcity!')
         actor = getActor(detail_page)
@@ -184,3 +186,4 @@ print(main('xc-1298'))
 print(main('DMOW185'))
 print(main('EMOT007'))
 '''
+# print(main('EMOT007', "https://xcity.jp/avod/detail/?id=147036"))

@@ -108,15 +108,18 @@ def getScore(htmlcode):
     return str(re.findall(r'5点満点中 (\S+)点', htmlcode)).strip(" ['']")
 
 
-def main(number):
+def main(number, appoint_url):
     try:
         number = number.upper()
-        htmlcode = str(
-            get_html('https://www.mgstage.com/product/product_detail/' + str(number) + '/', cookies={'adc': '1'}))
+        url = 'https://www.mgstage.com/product/product_detail/' + str(number) + '/'
+        if appoint_url != '':
+            url = appoint_url
+        htmlcode = str(get_html(url, cookies={'adc': '1'}))
         htmlcode = htmlcode.replace('ahref', 'a href')  # 针对a标签、属性中间未分开
         if str(htmlcode) == 'ProxyError':
             raise TimeoutError
         actor = getActor(htmlcode).replace(' ', '')
+        release = getRelease(htmlcode)
         dic = {
             'title': getTitle(htmlcode).replace("\\n", '').replace('        ', '').strip(','),
             'studio': getStudio(htmlcode).strip(','),
@@ -125,17 +128,17 @@ def main(number):
             'score': getScore(htmlcode).strip(','),
             'runtime': getRuntime(htmlcode).strip(','),
             'actor': actor.strip(','),
-            'release': getRelease(htmlcode).strip(','),
+            'release': release.strip(',').replace('/', '-'),
             'number': getNum(htmlcode).strip(','),
             'cover': getCover(htmlcode).strip(','),
-            'extrafanart': getExtraFanart(htmlcode).strip(','),
+            'extrafanart': getExtraFanart(htmlcode),
             'imagecut': 0,
             'tag': getTag(htmlcode).strip(','),
             'series': getSeries(htmlcode).strip(','),
-            'year': getYear(getRelease(htmlcode)).strip(','),
+            'year': getYear(release).strip(','),
             'actor_photo': getActorPhoto(actor.split(',')),
             'director': '',
-            'website': 'https://www.mgstage.com/product/product_detail/' + str(number) + '/',
+            'website': url,
             'source': 'mgstage.py',
         }
     except TimeoutError:
@@ -156,3 +159,5 @@ print(main('200GANA-2240'))
 print(main('SIRO-4042'))
 print(main('300MIUM-382'))
 '''
+# print(main('300MIUM-382', ''))
+# print(main('300MIUM-382', 'https://www.mgstage.com/product/product_detail/300MIUM-382/'))

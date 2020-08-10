@@ -12,40 +12,46 @@ def get_config():
         config_file = 'config.ini'
     config = ConfigParser()
     config.read(config_file, encoding='UTF-8')
-    return config
+    proxy_type = str(config['proxy']['type'])
+    proxy = str(config['proxy']['proxy'])
+    timeout = int(config['proxy']['timeout'])
+    retry_count = int(config['proxy']['retry'])
+    return proxy_type, proxy, timeout, retry_count
+
+
+# ========================================================================获取proxies
+def get_proxies(proxy_type, proxy):
+    proxies = {}
+    if proxy == '' or proxy_type == '' or proxy_type == 'no':
+        proxies = {}
+    elif proxy_type == 'http':
+        proxies = {"http": "http://" + proxy, "https": "https://" + proxy}
+    elif proxy_type == 'socks5':
+        proxies = {"http": "socks5://" + proxy, "https": "socks5://" + proxy}
+    return proxies
 
 
 # ========================================================================网页请求
 def get_html(url, cookies=None):
-    config = get_config()
+    proxy_type = ''
     retry_count = 0
     proxy = ''
     timeout = 0
     try:
-        proxy = str(config['proxy']['proxy'])
-        timeout = int(config['proxy']['timeout'])
-        retry_count = int(config['proxy']['retry'])
+        proxy_type, proxy, timeout, retry_count = get_config()
     except Exception as error_info:
         print('Error in get_html :' + str(error_info))
         print('[-]Proxy config error! Please check the config.')
+    proxies = get_proxies(proxy_type, proxy)
     i = 0
     while i < retry_count:
         try:
-            if not proxy == '':
-                proxies = {"http": "http://" + proxy, "https": "https://" + proxy}
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                  'Chrome/60.0.3100.0 Safari/537.36'}
-                getweb = requests.get(str(url), headers=headers, timeout=timeout, proxies=proxies, cookies=cookies)
-                getweb.encoding = 'utf-8'
-                return getweb.text
-            else:
-                headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
-                                  'Chrome/68.0.3440.106 Safari/537.36'}
-                getweb = requests.get(str(url), headers=headers, timeout=timeout, cookies=cookies)
-                getweb.encoding = 'utf-8'
-                return getweb.text
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                              'Chrome/60.0.3100.0 Safari/537.36'}
+            getweb = requests.get(str(url), headers=headers, timeout=timeout, proxies=proxies, cookies=cookies)
+            getweb.encoding = 'utf-8'
+            return getweb.text
         except Exception as error_info:
             i += 1
             print('Error in get_html :' + str(error_info))
@@ -55,21 +61,16 @@ def get_html(url, cookies=None):
 
 
 def post_html(url: str, query: dict):
-    config = get_config()
-    retry_count = 3
+    proxy_type = ''
+    retry_count = 0
     proxy = ''
-    timeout = 10
+    timeout = 0
     try:
-        proxy = str(config['proxy']['proxy'])
-        timeout = int(config['proxy']['timeout'])
-        retry_count = int(config['proxy']['retry'])
+        proxy_type, proxy, timeout, retry_count = get_config()
     except Exception as error_info:
         print('Error in post_html :' + str(error_info))
         print('[-]Proxy config error! Please check the config.')
-    if proxy:
-        proxies = {"http": "http://" + proxy, "https": "https://" + proxy}
-    else:
-        proxies = {}
+    proxies = get_proxies(proxy_type, proxy)
     for i in range(retry_count):
         try:
             result = requests.post(url, data=query, proxies=proxies, timeout=timeout)
@@ -81,5 +82,3 @@ def post_html(url: str, query: dict):
             print("[-]Connect retry {}/{}".format(i + 1, retry_count))
     print("[-]Connect Failed! Please check your Proxy or Network!")
     return 'ProxyError'
-
-

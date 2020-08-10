@@ -133,10 +133,16 @@ def getScore(htmlcode):
     return result
 
 
-def main(number):
+def main(number, appoint_url):
     try:
-        htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number)
-        url = 'https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number
+        htmlcode = ''
+        url = ''
+        if appoint_url:
+            htmlcode = get_html(appoint_url)
+            url = appoint_url
+        else:
+            htmlcode = get_html('https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number)
+            url = 'https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=' + number
         if '404 Not Found' in htmlcode:
             htmlcode = get_html('https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number)
             url = 'https://www.dmm.co.jp/mono/dvd/-/detail/=/cid=' + number
@@ -181,5 +187,6 @@ def main(number):
     return js
 
 # main('DV-1562')
-# print(main('mide00139'))
+# print(main('mide00139', "https://www.dmm.co.jp/digital/videoa/-/detail/=/cid=mide00139"))
+# print(main('mide00139', ""))
 # print(main('kawd00969'))

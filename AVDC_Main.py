@@ -20,7 +20,7 @@ import os
 from configparser import ConfigParser
 from Ui.AVDC import Ui_AVDV
 from Function.Function import save_config, movie_lists, get_info, getDataFromJSON, escapePath, getNumber, check_pic
-from Function.getHtml import get_html
+from Function.getHtml import get_html, get_proxies, get_config
 
 
 class MyMAinWindow(QMainWindow, Ui_AVDV):
@@ -33,12 +33,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init_Ui()
         self.set_style()
         # 初始化需要的变量
-        self.version = '3.961'
+        self.version = '3.963'
         self.m_drag = False
         self.m_DragPosition = 0
         self.count_claw = 0  # 批量刮削次数
         self.item_succ = self.Ui.treeWidget_number.topLevelItem(0)
         self.item_fail = self.Ui.treeWidget_number.topLevelItem(1)
+        self.select_file_path = ''
         self.json_array = {}
         self.Init()
         self.Load_Config()
@@ -135,7 +136,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     border-radius:20px;
                     padding:2px 4px;
             }
-            QPushButton#pushButton_add_actor_pic{
+            QPushButton#pushButton_add_actor_pic,#pushButton_start_single_file{
                     font-size:20px;
                     background:#F0F8FF;
                     border:2px solid white;
@@ -176,6 +177,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.pushButton_show_pic_actor.clicked.connect(self.pushButton_show_pic_actor_clicked)
         self.Ui.pushButton_select_thumb.clicked.connect(self.pushButton_select_thumb_clicked)
         self.Ui.pushButton_log.clicked.connect(self.pushButton_show_log_clicked)
+        self.Ui.pushButton_start_single_file.clicked.connect(self.pushButton_start_single_file_clicked)
         self.Ui.checkBox_cover.stateChanged.connect(self.cover_change)
         self.Ui.horizontalSlider_timeout.valueChanged.connect(self.lcdNumber_timeout_change)
         self.Ui.horizontalSlider_retry.valueChanged.connect(self.lcdNumber_retry_change)
@@ -356,6 +358,12 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Ui.lineEdit_success.setText(config['common']['success_output_folder'])
         self.Ui.lineEdit_fail.setText(config['common']['failed_output_folder'])
         # ========================================================================proxy
+        if config['proxy']['type'] == 'no' or config['proxy']['type'] == '':
+            self.Ui.radioButton_proxy_nouse.setChecked(True)
+        elif config['proxy']['type'] == 'http':
+            self.Ui.radioButton_proxy_http.setChecked(True)
+        elif config['proxy']['type'] == 'socks5':
+            self.Ui.radioButton_proxy_socks5.setChecked(True)
         self.Ui.lineEdit_proxy.setText(config['proxy']['proxy'])
         self.Ui.horizontalSlider_timeout.setValue(int(config['proxy']['timeout']))
         self.Ui.horizontalSlider_retry.setValue(int(config['proxy']['retry']))
@@ -472,6 +480,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         thumb_download = 0
         extrafanart_download = 0
         extrafanart_folder = ''
+        proxy_type = ''
         # ========================================================================common
         if self.Ui.radioButton_common.isChecked():  # 普通模式
             main_mode = 1
@@ -519,6 +528,13 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             website = 'xcity'
         elif self.Ui.comboBox_website_all.currentText() == 'dmm':  # dmm
             website = 'dmm'
+        # ========================================================================proxy
+        if self.Ui.radioButton_proxy_http.isChecked():  # http proxy
+            proxy_type = 'http'
+        elif self.Ui.radioButton_proxy_socks5.isChecked():  # socks5 proxy
+            proxy_type = 'socks5'
+        elif self.Ui.radioButton_proxy_nouse.isChecked():  # nouse proxy
+            proxy_type = 'no'
         # ========================================================================水印
         if self.Ui.radioButton_poster_mark_on.isChecked():  # 封面添加水印
             poster_mark = 1
@@ -578,6 +594,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             'website': website,
             'failed_output_folder': self.Ui.lineEdit_fail.text(),
             'success_output_folder': self.Ui.lineEdit_success.text(),
+            'type': proxy_type,
             'proxy': self.Ui.lineEdit_proxy.text(),
             'timeout': self.Ui.horizontalSlider_timeout.value(),
             'retry': self.Ui.horizontalSlider_retry.value(),
@@ -618,31 +635,42 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                                                                                          "*.RMVB *.WMV *.MOV "
                                                                                          "*.MKV *.FLV *.TS "
                                                                                          "*.WEBM);;All Files(*)")
-        if filepath != '':
+        self.select_file_path = filepath
+
+    def pushButton_start_single_file_clicked(self):
+        if self.select_file_path != '':
             self.Ui.stackedWidget.setCurrentIndex(0)
             try:
-                t = threading.Thread(target=self.select_file_thread, args=(filepath,))
+                t = threading.Thread(target=self.select_file_thread)
                 t.start()  # 启动线程,即让线程开始执行
             except Exception as error_info:
-                self.add_text_main('[-]Error in pushButton_select_file_clicked: ' + str(error_info))
+                self.add_text_main('[-]Error in pushButton_start_single_file_clicked: ' + str(error_info))
 
-    def select_file_thread(self, file_name):
+    def select_file_thread(self):
+        file_name = self.select_file_path
         file_root = os.getcwd().replace("\\\\", "/").replace("\\", "/")
         file_path = file_name.replace(file_root, '.').replace("\\\\", "/").replace("\\", "/")
+        # 获取去掉拓展名的文件名做为番号
         file_name = os.path.splitext(file_name.split('/')[-1])[0]
         mode = self.Ui.comboBox_website.currentIndex() + 1
+        # 指定的网址
+        appoint_url = self.Ui.lineEdit_appoint_url.text()
+        appoint_number = self.Ui.lineEdit_movie_number.text()
         try:
-            if '-CD' in file_name or '-cd' in file_name:
-                part = ''
-                if re.search('-CD\d+', file_name):
-                    part = re.findall('-CD\d+', file_name)[0]
-                elif re.search('-cd\d+', file_name):
-                    part = re.findall('-cd\d+', file_name)[0]
-                file_name = file_name.replace(part, '')
-            if '-c.' in file_path or '-C.' in file_path:
-                file_name = file_name[0:-2]
+            if appoint_number:
+                file_name = appoint_number
+            else:
+                if '-CD' in file_name or '-cd' in file_name:
+                    part = ''
+                    if re.search('-CD\d+', file_name):
+                        part = re.findall('-CD\d+', file_name)[0]
+                    elif re.search('-cd\d+', file_name):
+                        part = re.findall('-cd\d+', file_name)[0]
+                    file_name = file_name.replace(part, '')
+                if '-c.' in file_path or '-C.' in file_path:
+                    file_name = file_name[0:-2]
             self.add_text_main("[!]Making Data for   [" + file_path + "], the number is [" + file_name + "]")
-            self.Core_Main(file_path, file_name, mode, 0)
+            self.Core_Main(file_path, file_name, mode, 0, appoint_url)
         except Exception as error_info:
             self.add_text_main('[-]Error in select_file_thread: ' + str(error_info))
         self.add_text_main("[*]======================================================")
@@ -972,30 +1000,27 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================下载文件
     def DownloadFileWithFilename(self, url, filename, path, Config, filepath, failed_folder):
+        proxy_type = ''
         retry_count = 0
         proxy = ''
         timeout = 0
         try:
-            proxy = Config['proxy']['proxy']
-            timeout = int(Config['proxy']['timeout'])
-            retry_count = int(Config['proxy']['retry'])
+            proxy_type, proxy, timeout, retry_count = get_config()
         except Exception as error_info:
             print('[-]Error in DownloadFileWithFilename! ' + str(error_info))
             self.add_text_main('[-]Error in DownloadFileWithFilename! Proxy config error! Please check the config.')
+        proxies = get_proxies(proxy_type, proxy)
         i = 0
         while i < retry_count:
             try:
                 if not os.path.exists(path):
                     os.makedirs(path)
                 headers = {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'}
-                if not proxy == '':
-                    r = requests.get(url, headers=headers, timeout=timeout,
-                                     proxies={"http": "http://" + str(proxy), "https": "https://" + str(proxy)})
-                else:
-                    r = requests.get(url, timeout=timeout, headers=headers)
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                                  'Chrome/68.0.3440.106 Safari/537.36'}
+                result = requests.get(str(url), headers=headers, timeout=timeout, proxies=proxies)
                 with open(str(path) + "/" + filename, "wb") as code:
-                    code.write(r.content)
+                    code.write(result.content)
                 code.close()
                 return
             except Exception as error_info:
@@ -1026,7 +1051,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             os.remove(path + '/' + thumb_name)
             raise Exception("The Size of Thumb is Error! Deleted " + thumb_name + '!')
 
-    def deletethumb(self,path, naming_rule):
+    def deletethumb(self, path, naming_rule):
         try:
             thumb_path = path + '/' + naming_rule + '-thumb.jpg'
             if (not self.Ui.checkBox_download_thumb.isChecked()) and os.path.exists(thumb_path):
@@ -1038,6 +1063,8 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
     # ========================================================================无码片下载封面图
     def smallCoverDownload(self, path, naming_rule, json_data, Config, filepath, failed_folder):
         if json_data['imagecut'] == 3:
+            if json_data['cover_small'] == '':
+                return 'small_cover_error'
             is_pic_open = 0
             poster_name = naming_rule + '-poster.jpg'
             if os.path.exists(path + '/' + poster_name):
@@ -1072,7 +1099,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================下载剧照
     def extrafanartDownload(self, json_data, path, Config, filepath, failed_folder):
-        if self.Ui.radioButton_extrafanart_download_on.isChecked():
+        if len(json_data['extrafanart']) == 0:
+            json_data['extrafanart'] = ''
+        if self.Ui.radioButton_extrafanart_download_on.isChecked() and str(json_data['extrafanart']) != '':
             self.add_text_main('[+]ExtraFanart Downloading!')
             extrafanart_folder = self.Ui.lineEdit_extrafanart_dir.text()
             if extrafanart_folder == '':
@@ -1387,11 +1416,11 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         return path
 
     # ========================================================================从指定网站获取json_data
-    def get_json_data(self, mode, number, config):
+    def get_json_data(self, mode, number, config, appoint_url):
         if mode == 6:  # javdb模式
             self.add_text_main('[!]Please Wait Three Seconds！')
             time.sleep(3)
-        json_data = getDataFromJSON(number, config, mode)
+        json_data = getDataFromJSON(number, config, mode, appoint_url)
         return json_data
 
     # ========================================================================json_data添加到主界面
@@ -1462,7 +1491,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     except:
                         delete_empty_folder_failed = ''
 
-    def Core_Main(self, filepath, number, mode, count):
+    def Core_Main(self, filepath, number, mode, count, appoint_url=''):
         # =======================================================================初始化所需变量
         leak = 0
         uncensored = 0
@@ -1484,7 +1513,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         failed_folder = movie_path + '/' + self.Ui.lineEdit_fail.text()  # 失败输出目录
         success_folder = movie_path + '/' + self.Ui.lineEdit_success.text()  # 成功输出目录
         # =======================================================================获取json_data
-        json_data = self.get_json_data(mode, number, Config)
+        json_data = self.get_json_data(mode, number, Config, appoint_url)
         # =======================================================================调试模式
         if self.Ui.radioButton_debug_on.isChecked():
             self.debug_mode(json_data)

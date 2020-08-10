@@ -194,9 +194,12 @@ def find_number(number):
     return 'not found'
 
 
-def main(number):
+def main(number, appoint_url):
     try:
-        result_url = find_number(number)
+        if appoint_url:
+            result_url = appoint_url
+        else:
+            result_url = find_number(number)
         if result_url == 'not found':
             raise Exception('Movie Data not found in javbus.main!')
         htmlcode = get_html(result_url)
@@ -240,9 +243,13 @@ def main(number):
     return js
 
 
-def main_uncensored(number):
+def main_uncensored(number, appoint_url):
     try:
-        result_url = find_number(number)
+        result_url = ''
+        if appoint_url == '':
+            result_url = find_number(number)
+        else:
+            result_url = appoint_url
         if result_url == 'not found':
             raise Exception('Movie Data not found in javbus.main_uncensored!')
         htmlcode = get_html(result_url)
@@ -270,7 +277,7 @@ def main_uncensored(number):
             'tag': getTag(htmlcode),
             'series': getSeries(htmlcode),
             'imagecut': 3,
-            'cover_small': getCover_small(number),
+            'cover_small': getCover_small(number),  # 从avsox获取封面图
             'actor_photo': getActorPhoto(htmlcode),
             'website': result_url,
             'source': 'javbus.py',
@@ -292,29 +299,33 @@ def main_uncensored(number):
     return js
 
 
-def main_us(number):
+def main_us(number, appoint_url):
     try:
-        htmlcode = get_html('https://www.javbus.zone/search/' + number)
-        if str(htmlcode) == 'ProxyError':
-            raise TimeoutError
-        html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
-        counts = len(html.xpath("//div[@class='row']/div[@id='waterfall']/div"))
-        if counts == 0:
-            raise Exception('Movie Data not found in javbus.main_us!')
         result_url = ''
-        cover_small = ''
-        for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
-            number_get = html.xpath("//div[@id='waterfall']/div[" + str(
-                count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
-            if number_get.upper() == number.upper() or number_get.replace('-', '').upper() == number.upper():
-                result_url = html.xpath(
-                    "//div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
-                cover_small = html.xpath(
-                    "//div[@id='waterfall']/div[" + str(
-                        count) + "]/a[@class='movie-box']/div[@class='photo-frame']/img[@class='img']/@src")[0]
-                break
-        if result_url == '':
-            raise Exception('Movie Data not found in javbus.main_us!')
+        if appoint_url:
+            result_url = appoint_url
+        else:
+            htmlcode = get_html('https://www.javbus.one/search/' + number)
+            if str(htmlcode) == 'ProxyError':
+                raise TimeoutError
+            html = etree.fromstring(htmlcode, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
+            counts = len(html.xpath("//div[@class='row']/div[@id='waterfall']/div"))
+            if counts == 0:
+                raise Exception('Movie Data not found in javbus.main_us!')
+            result_url = ''
+            cover_small = ''
+            for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
+                number_get = html.xpath("//div[@id='waterfall']/div[" + str(
+                    count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
+                if number_get.upper() == number.upper() or number_get.replace('-', '').upper() == number.upper():
+                    result_url = html.xpath(
+                        "//div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
+                    cover_small = html.xpath(
+                        "//div[@id='waterfall']/div[" + str(
+                            count) + "]/a[@class='movie-box']/div[@class='photo-frame']/img[@class='img']/@src")[0]
+                    break
+            if result_url == '':
+                raise Exception('Movie Data not found in javbus.main_us!')
         htmlcode = get_html(result_url)
         if str(htmlcode) == 'ProxyError':
             raise TimeoutError
@@ -332,8 +343,8 @@ def main_us(number):
             'series': getSeries(htmlcode),
             'cover': getCover(htmlcode),
             'extrafanart': getExtraFanart(htmlcode),
-            'cover_small': cover_small,
-            'imagecut': 3,
+            'cover_small': '',
+            'imagecut': 0,
             'actor_photo': getActorPhoto(htmlcode),
             'publisher': '',
             'outline': '',
@@ -365,3 +376,6 @@ print(main_us('sexart.15.06.10'))
 print(main_uncensored('heyzo-1031'))
 '''
 
+# print(main('ssni-644', "https://www.javbus.com/SSNI-644"))
+# print(main('ssni-802', ""))
+# print(main_us('DirtyMasseur.20.07.26', "https://www.javbus.one/DirtyMasseur-20-07-26"))

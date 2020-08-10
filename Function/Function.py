@@ -136,54 +136,54 @@ def getNumber(filepath, escape_string):
 
 
 # ========================================================================根据番号获取数据
-def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
+def getDataFromJSON(file_number, config, mode, appoint_url):  # 从JSON返回元数据
     # ================================================网站规则添加开始================================================
     isuncensored = is_uncensored(file_number)
     json_data = {}
     if mode == 1:  # 从全部网站刮削
         # =======================================================================无码抓取:111111-111,n1111,HEYZO-1111,SMD-115
         if isuncensored:
-            json_data = json.loads(javbus.main_uncensored(file_number))
+            json_data = json.loads(javbus.main_uncensored(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javdb.main(file_number, True))
+                json_data = json.loads(javdb.main(file_number, appoint_url, True))
             if getDataState(json_data) == 0 and 'HEYZO' in file_number.upper():
-                json_data = json.loads(jav321.main(file_number, True))
+                json_data = json.loads(jav321.main(file_number, appoint_url, True))
             if getDataState(json_data) == 0:
-                json_data = json.loads(avsox.main(file_number))
+                json_data = json.loads(avsox.main(file_number, appoint_url))
         # =======================================================================259LUXU-1111
         elif re.match('\d+[a-zA-Z]+-\d+', file_number) or 'SIRO' in file_number.upper():
-            json_data = json.loads(mgstage.main(file_number))
+            json_data = json.loads(mgstage.main(file_number, appoint_url))
             file_number = re.search('[a-zA-Z]+-\d+', file_number).group()
             if getDataState(json_data) == 0:
-                json_data = json.loads(jav321.main(file_number))
+                json_data = json.loads(jav321.main(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javdb.main(file_number))
+                json_data = json.loads(javdb.main(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javbus.main(file_number))
+                json_data = json.loads(javbus.main(file_number, appoint_url))
         # =======================================================================FC2-111111
         elif 'FC2' in file_number.upper():
-            json_data = json.loads(fc2fans_club.main(re.search('\d{4,}', file_number).group()))
+            json_data = json.loads(fc2fans_club.main(re.search('\d{4,}', file_number).group(), appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javdb.main(file_number))
+                json_data = json.loads(javdb.main(file_number, appoint_url))
         # =======================================================================ssni00321
         elif re.match('\D{2,}00\d{3,}', file_number) and '-' not in file_number and '_' not in file_number:
-            json_data = json.loads(dmm.main(file_number))
+            json_data = json.loads(dmm.main(file_number, appoint_url))
         # =======================================================================sexart.15.06.14
         elif re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
-            json_data = json.loads(javdb.main_us(file_number))
+            json_data = json.loads(javdb.main_us(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javbus.main_us(file_number))
+                json_data = json.loads(javbus.main_us(file_number, appoint_url))
         # =======================================================================MIDE-139
         else:
-            json_data = json.loads(javbus.main(file_number))
+            json_data = json.loads(javbus.main(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(jav321.main(file_number))
+                json_data = json.loads(jav321.main(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(xcity.main(file_number))
+                json_data = json.loads(xcity.main(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(javdb.main(file_number))
+                json_data = json.loads(javdb.main(file_number, appoint_url))
             if getDataState(json_data) == 0:
-                json_data = json.loads(avsox.main(file_number))
+                json_data = json.loads(avsox.main(file_number, appoint_url))
     elif re.match('\D{2,}00\d{3,}', file_number) and mode != 7:
         json_data = {
             'title': '',
@@ -191,29 +191,29 @@ def getDataFromJSON(file_number, config, mode):  # 从JSON返回元数据
             'website': '',
         }
     elif mode == 2:  # 仅从mgstage
-        json_data = json.loads(mgstage.main(file_number))
+        json_data = json.loads(mgstage.main(file_number, appoint_url))
     elif mode == 3:  # 仅从fc2club
-        json_data = json.loads(fc2fans_club.main(file_number))
+        json_data = json.loads(fc2fans_club.main(file_number, appoint_url))
     elif mode == 4:  # 仅从javbus
         if isuncensored:
-            json_data = json.loads(javbus.main_uncensored(file_number))
+            json_data = json.loads(javbus.main_uncensored(file_number, appoint_url))
         elif re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
-            json_data = json.loads(javbus.main_us(file_number))
+            json_data = json.loads(javbus.main_us(file_number, appoint_url))
         else:
-            json_data = json.loads(javbus.main(file_number))
+            json_data = json.loads(javbus.main(file_number, appoint_url))
     elif mode == 5:  # 仅从jav321
-        json_data = json.loads(jav321.main(file_number, isuncensored))
+        json_data = json.loads(jav321.main(file_number, isuncensored, appoint_url))
     elif mode == 6:  # 仅从javdb
         if re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
-            json_data = json.loads(javdb.main_us(file_number))
+            json_data = json.loads(javdb.main_us(file_number, appoint_url))
         else:
-            json_data = json.loads(javdb.main(file_number, isuncensored))
+            json_data = json.loads(javdb.main(file_number, isuncensored, appoint_url))
     elif mode == 7:  # 仅从avsox
-        json_data = json.loads(avsox.main(file_number))
+        json_data = json.loads(avsox.main(file_number, appoint_url))
     elif mode == 8:  # 仅从xcity
-        json_data = json.loads(xcity.main(file_number))
+        json_data = json.loads(xcity.main(file_number, appoint_url))
     elif mode == 9:  # 仅从dmm
-        json_data = json.loads(dmm.main(file_number))
+        json_data = json.loads(dmm.main(file_number, appoint_url))
 
     # ================================================网站规则添加结束================================================
     # print(json_data)
@@ -318,9 +318,11 @@ def save_config(json_config):
         print("# all or mgstage or fc2club or javbus or jav321 or javdb or avsox or xcity or dmm", file=code)
         print("", file=code)
         print("[proxy]", file=code)
+        print("type = " + json_config['type'], file=code)
         print("proxy = " + json_config['proxy'], file=code)
         print("timeout = " + str(json_config['timeout']), file=code)
         print("retry = " + str(json_config['retry']), file=code)
+        print("# type: no, http, socks5", file=code)
         print("", file=code)
         print("[Name_Rule]", file=code)
         print("folder_name = " + json_config['folder_name'], file=code)

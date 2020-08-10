@@ -62,6 +62,16 @@ def getScore(htmlcode):  # 获取评分 #
         return str(score)
 
 
+def getExtraFanart(htmlcode):  # 获取剧照
+    html = etree.fromstring(htmlcode, etree.HTMLParser())
+    list_tmp = html.xpath("//div[@id='slider']/ul[@class='slides']/li/img[@class='responsive']/@src")
+    extrafanart_list = []
+    for extrafanart in list_tmp:
+        extrafanart = 'https://fc2club.com' + extrafanart
+        extrafanart_list.append(extrafanart)
+    return extrafanart_list
+
+
 def getTag(htmlcode):  # 获取番号
     html = etree.fromstring(htmlcode, etree.HTMLParser())
     result = str(html.xpath('/html/body/div[2]/div/div[1]/h5[4]/a/text()'))
@@ -76,9 +86,12 @@ def getYear(release):
         return ''
 
 
-def main(number):
+def main(number, appoint_url):
     try:
-        htmlcode = get_html('https://fc2club.com//html/FC2-' + number + '.html')
+        url = 'https://fc2club.com//html/FC2-' + number + '.html'
+        if appoint_url:
+            url = appoint_url
+        htmlcode = get_html(url)
         if str(htmlcode) == 'ProxyError':
             raise TimeoutError
         actor = getActor(htmlcode)
@@ -95,7 +108,7 @@ def main(number):
             'tag': getTag(htmlcode),
             'actor_photo': getActorPhoto(actor),
             'cover': getCover(htmlcode),
-            'extrafanart': '',
+            'extrafanart': getExtraFanart(htmlcode),
             'imagecut': 0,
             'director': '',
             'series': '',
@@ -119,6 +132,6 @@ def main(number):
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )
     return js
 
-
-# print(main('1251689'))
-# print(main('674239'))
+# print(main('1251689', ''))
+# print(main('674239', ""))
+# print(main('674239', "https://fc2club.com//html/FC2-674239.html"))

@@ -93,9 +93,12 @@ def getOutline(detail_page):
     return str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
 
 
-def main(number, isuncensored=False):
+def main(number, appoint_url, isuncensored=False):
     try:
-        response = post_html("https://www.jav321.com/search", query={"sn": number})
+        result_url = "https://www.jav321.com/search"
+        if appoint_url != '':
+            result_url = appoint_url
+        response = post_html(result_url, query={"sn": number})
         if str(response) == 'ProxyError':
             raise TimeoutError
         if '未找到您要找的AV' in response:
@@ -157,3 +160,5 @@ print(main('luxu-1257'))
 print(main('heyzo-1031'))
 print(main('ABP-905'))
 '''
+# print(main('heyzo-1031', ''))
+# print(main('ymdd-173', 'https://www.jav321.com/video/ymdd00173'))

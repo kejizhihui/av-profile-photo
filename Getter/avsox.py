@@ -101,18 +101,22 @@ def getUrl(number):
     url_list = html.xpath('//*[@id="waterfall"]/div/a/@href')
     if len(url_list) > 0:
         for i in range(1, len(url_list) + 1):
-            number_get = str(html.xpath('//*[@id="waterfall"]/div[' + str(i) + ']/a/div[@class="photo-info"]/span/date[1]/text()')).strip(" ['']")
+            number_get = str(html.xpath(
+                '//*[@id="waterfall"]/div[' + str(i) + ']/a/div[@class="photo-info"]/span/date[1]/text()')).strip(
+                " ['']")
             if number.upper() == number_get.upper():
                 return i, response, str(html.xpath('//*[@id="waterfall"]/div[' + str(i) + ']/a/@href')).strip(" ['']")
-    return response, ''
+    return 0, response, ''
 
 
-def main(number):
+def main(number, appoint_url):
     try:
         count, response, url = getUrl(number)
         if str(response) == 'ProxyError':
             raise TimeoutError
-        if url == '':
+        if appoint_url != '':
+            url = appoint_url
+        elif url == '':
             raise Exception('Movie Data not found in avsox!')
         web = get_html(url)
         soup = BeautifulSoup(web, 'lxml')
@@ -155,5 +159,7 @@ def main(number):
     js = json.dumps(dic, ensure_ascii=False, sort_keys=True, indent=4, separators=(',', ':'), )  # .encode('UTF-8')
     return js
 
+
 # print(main('051119-917'))
 # print(main('032620_001'))
+# print(main('032620_001', 'https://avsox.host/cn/movie/cb8d28437cff4e90'))
