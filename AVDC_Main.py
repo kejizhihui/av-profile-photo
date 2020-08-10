@@ -1309,10 +1309,10 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             mark_type += ',流出'
         if self.Ui.checkBox_uncensored.isChecked() and uncensored:
             mark_type += ',无码'
-        if self.Ui.radioButton_thumb_mark_on.isChecked() and mark_type != '' and self.Ui.checkBox_download_thumb.isChecked():
+        if self.Ui.radioButton_thumb_mark_on.isChecked() and mark_type != '' and self.Ui.checkBox_download_thumb.isChecked() and os.path.exists(thumb_path):
             self.add_mark_thread(thumb_path, cn_sub, leak, uncensored)
             self.add_text_main('[+]Thumb Add Mark:    ' + mark_type.strip(','))
-        if self.Ui.radioButton_poster_mark_on.isChecked() and mark_type != '' and self.Ui.checkBox_download_poster.isChecked():
+        if self.Ui.radioButton_poster_mark_on.isChecked() and mark_type != '' and self.Ui.checkBox_download_poster.isChecked() and os.path.exists(poster_path):
             self.add_mark_thread(poster_path, cn_sub, leak, uncensored)
             self.add_text_main('[+]Poster Add Mark:   ' + mark_type.strip(','))
 
@@ -1573,9 +1573,9 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
                     json_data['imagecut'] = 0
                 self.cutImage(json_data['imagecut'], path, naming_rule)  # 裁剪图
                 self.fix_size(path, naming_rule)
-            self.deletethumb(path, naming_rule)
             if self.Ui.checkBox_download_fanart.isChecked():
                 self.copyRenameJpgToFanart(path, naming_rule)
+            self.deletethumb(path, naming_rule)
             if self.pasteFileToFolder(filepath, path, naming_rule, failed_folder):  # 移动文件,True 为有外挂字幕
                 cn_sub = 1
             if self.Ui.checkBox_download_nfo.isChecked():
