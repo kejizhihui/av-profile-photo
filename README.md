@@ -19,7 +19,7 @@
 * [8.关于群晖NAS](#8关于群晖NAS)
 * [9.FAQ](#9FAQ)
 * [10.故事](#10故事)
-* [11.声明](#11声明)
+* [11.申明](#11申明)
 * [12.写在后面](#12写在后面)
 
 
@@ -278,14 +278,45 @@
 # 10.故事
 [点击跳转至原作者博客文章](https://yoshiko2.github.io/2019/10/18/AVDC/)
 
-# 11.声明
-* 本软件仅供**技术交流，学术交流**使用<br>
-* 本软件作者编写出该软件旨在学习Python3，提高编程水平<br>
-* 用户在使用该软件前，请用户自觉遵守当地法律法规，如果该软件使用过程中存在违反当地法律法规的行为，请勿使用该软件<br>
-* 用户使用该软件时，若产生一切违法行为由用户承担<br>
-* 严禁用户使用于商业和个人其他意图<br>
-* 本软件作者保留最终决定权和最终解释权<br>
-**若用户不同意上述条款任意一条，请勿使用该软件**<br>
+# 11.申明
+当你查阅、下载了本项目源代码或二进制程序，即代表你接受了以下条款
+
+* 本软件仅供技术交流，学术交流使用
+* **请勿在热门的社交平台上宣传此项目**
+* 本软件作者编写出该软件旨在学习 Python ，提高编程水平
+* 本软件不提供任何影片下载的线索
+* 用户在使用本软件前，请用户了解并遵守当地法律法规，如果本软件使用过程中存在违反当地法律法规的行为，请勿使用该软件
+* 用户在使用本软件时，若用户在当地产生一切违法行为由用户承担
+* 严禁用户将本软件使用于商业和个人其他意图
+* 源代码和二进制程序请在下载后24小时内删除
+* 本软件作者yoshiko2保留最终决定权和最终解释权
+* 若用户不同意上述条款任意一条，请勿使用本软件
+---
+When you run the software, you accept the following terms
+
+* This software is only for technical exchange and academic exchange
+* **Please do not promote this project on popular social platforms**
+* The software author wrote this software to learn Python and improve programming
+* This software does not provide any clues for video download
+* Before using this software, please understand and abide by local laws and regulations. If there is any violation of local laws and regulations during the use of this software, * please do not use this software
+* When the user uses this software, if the user has any illegal acts in the local area, the user shall bear
+* It is strictly forbidden for users to use this software for commercial and personal intentions
+* Please delete the source code and binary program within 24 hours after downloading
+* The author of this software yoshiko2 reserves the right of final decision and final interpretation
+* If the user does not agree with any of the above terms, please do not use this software
+---
+このソフトウェアを実行すると、次の条件に同意したことになります
+
+* このソフトウェアは、技術交換、学術交換専用です。
+* **人気のソーシャルプラットフォームでこのプロジェクトを宣伝しないでください**
+* ソフトウェアの作成者は、Pythonを学習してプログラミングを改善するためにこのソフトウェアを作成しました
+* このソフトウェアは、ビデオダウンロードの手がかりを提供しません
+* 本ソフトウェアを使用する前に、現地の法令を理解し、遵守してください本ソフトウェアの使用中に現地の法令に違反する場合は、本ソフトウェアを使用しないでください
+* 本ソフトウェアをご利用の際、地域で違法行為を行った場合は、お客様の負担となります。
+* ユーザーがこのソフトウェアを商業的および個人的な目的で使用することは固く禁じられています
+* ダウンロード後24時間以内にソースコードとバイナリプログラムを削除してください
+* このソフトウェアの作者yoshiko2は、最終決定および最終解釈の権利を留保します。
+* ユーザーが上記の条件のいずれかに同意しない場合は、このソフトウェアを使用しないでください
 
 # 12.写在后面
 怎么样，看着自己的日本电影被这样完美地管理，是不是感觉成就感爆棚呢?<br>
