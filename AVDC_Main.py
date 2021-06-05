@@ -33,7 +33,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
         self.Init_Ui()
         self.set_style()
         # 初始化需要的变量
-        self.version = '3.963'
+        self.version = '3.964'
         self.m_drag = False
         self.m_DragPosition = 0
         self.count_claw = 0  # 批量刮削次数
@@ -341,20 +341,18 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             self.Ui.comboBox_website_all.setCurrentIndex(0)
         elif config['common']['website'] == 'mgstage':
             self.Ui.comboBox_website_all.setCurrentIndex(1)
-        elif config['common']['website'] == 'fc2club':
-            self.Ui.comboBox_website_all.setCurrentIndex(2)
         elif config['common']['website'] == 'javbus':
-            self.Ui.comboBox_website_all.setCurrentIndex(3)
+            self.Ui.comboBox_website_all.setCurrentIndex(2)
         elif config['common']['website'] == 'jav321':
-            self.Ui.comboBox_website_all.setCurrentIndex(4)
+            self.Ui.comboBox_website_all.setCurrentIndex(3)
         elif config['common']['website'] == 'javdb':
-            self.Ui.comboBox_website_all.setCurrentIndex(5)
+            self.Ui.comboBox_website_all.setCurrentIndex(4)
         elif config['common']['website'] == 'avsox':
-            self.Ui.comboBox_website_all.setCurrentIndex(6)
+            self.Ui.comboBox_website_all.setCurrentIndex(5)
         elif config['common']['website'] == 'xcity':
-            self.Ui.comboBox_website_all.setCurrentIndex(7)
+            self.Ui.comboBox_website_all.setCurrentIndex(6)
         elif config['common']['website'] == 'dmm':
-            self.Ui.comboBox_website_all.setCurrentIndex(8)
+            self.Ui.comboBox_website_all.setCurrentIndex(7)
         self.Ui.lineEdit_success.setText(config['common']['success_output_folder'])
         self.Ui.lineEdit_fail.setText(config['common']['failed_output_folder'])
         # ========================================================================proxy
@@ -514,8 +512,6 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
             website = 'all'
         elif self.Ui.comboBox_website_all.currentText() == 'mgstage':  # mgstage
             website = 'mgstage'
-        elif self.Ui.comboBox_website_all.currentText() == 'fc2club':  # fc2club
-            website = 'fc2club'
         elif self.Ui.comboBox_website_all.currentText() == 'javbus':  # javbus
             website = 'javbus'
         elif self.Ui.comboBox_website_all.currentText() == 'jav321':  # jav321
@@ -1233,8 +1229,14 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================thumb复制为fanart
     def copyRenameJpgToFanart(self, path, naming_rule):
-        if not os.path.exists(path + '/' + naming_rule + '-fanart.jpg'):
-            shutil.copy(path + '/' + naming_rule + '-thumb.jpg', path + '/' + naming_rule + '-fanart.jpg')
+        try:
+            if not os.path.exists(path + '/' + naming_rule + '-fanart.jpg'):
+                shutil.copy(path + '/' + naming_rule + '-thumb.jpg', path + '/' + naming_rule + '-fanart.jpg')
+                self.add_text_main('[+]Fanart Copied!     ' + naming_rule + '-fanart.jpg')
+            else:
+                self.add_text_main('[+]Fanart Existed!    ' + naming_rule + '-fanart.jpg')
+        except Exception as error_info:
+            self.add_text_main('[-]Error in copyRenameJpgToFanart: ' + str(error_info))
 
     # ========================================================================移动视频、字幕
     def pasteFileToFolder(self, filepath, path, naming_rule, failed_folder):
@@ -1417,7 +1419,7 @@ class MyMAinWindow(QMainWindow, Ui_AVDV):
 
     # ========================================================================从指定网站获取json_data
     def get_json_data(self, mode, number, config, appoint_url):
-        if mode == 6:  # javdb模式
+        if mode == 5:  # javdb模式
             self.add_text_main('[!]Please Wait Three Seconds！')
             time.sleep(3)
         json_data = getDataFromJSON(number, config, mode, appoint_url)

@@ -15,7 +15,7 @@ def getActorPhoto(htmlcode):
         l = i.a['href']
         t = i.get_text()
         html = etree.fromstring(get_html(l), etree.HTMLParser())
-        p = str(html.xpath('//*[@id="waterfall"]/div[1]/div/div[1]/img/@src')).strip(" ['']")
+        p = 'https://javbus.com' + str(html.xpath('//*[@id="waterfall"]/div[1]/div/div[1]/img/@src')).strip(" ['']")
         p2 = {t: p}
         d.update(p2)
     return d
@@ -54,7 +54,7 @@ def getYear(getRelease):  # 获取年份
 def getCover(htmlcode):  # 获取封面链接
     doc = pq(htmlcode)
     image = doc('a.bigImage')
-    return image.attr('href')
+    return 'https://javbus.com' + image.attr('href')
 
 
 def getExtraFanart(htmlcode):  # 获取封面链接
@@ -103,11 +103,11 @@ def getOutlineScore(number):  # 获取简介
         response = post_html("https://www.jav321.com/search", query={"sn": number})
         detail_page = etree.fromstring(response, etree.HTMLParser())
         outline = str(detail_page.xpath('/html/body/div[2]/div[1]/div[1]/div[2]/div[3]/div/text()')).strip(" ['']")
-        if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
-            score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
+        if re.search(r'<b>平均評価</b>: <img data-original="/img/(\d+).gif" />', response):
+            score = re.findall(r'<b>平均評価</b>: <img data-original="/img/(\d+).gif" />', response)[0]
             score = str(float(score) / 10.0)
         else:
-            score = str(re.findall(r'<b>评分</b>: ([^<]+)<br>', response)).strip(" [',']").replace('\'', '')
+            score = str(re.findall(r'<b>平均評価</b>: ([^<]+)<br>', response)).strip(" [',']").replace('\'', '')
         if outline == '':
             dmm_htmlcode = get_html(
                 "https://www.dmm.co.jp/search/=/searchstr=" + number.replace('-', '') + "/sort=ranking/")
@@ -118,7 +118,9 @@ def getOutlineScore(number):  # 获取简介
                 if url_detail != '':
                     dmm_detail = get_html(url_detail)
                     html = etree.fromstring(dmm_detail, etree.HTMLParser())
-                    outline = str(html.xpath('//*[@class="mg-t0 mg-b20"]/text()')).strip(" ['']").replace('\\n', '').replace('\n', '')
+                    outline = str(html.xpath('//*[@class="mg-t0 mg-b20"]/text()')).strip(" ['']").replace('\\n',
+                                                                                                          '').replace(
+                        '\n', '')
     except Exception as error_info:
         print('Error in javbus.getOutlineScore : ' + str(error_info))
     return outline, score
@@ -132,15 +134,17 @@ def getSeries(htmlcode):
 
 def getCover_small(number):  # 从avsox获取封面图
     try:
-        htmlcode = get_html('https://avsox.host/cn/search/' + number)
+        htmlcode = get_html('https://avsox.website/cn/search/' + number)
         html = etree.fromstring(htmlcode, etree.HTMLParser())
         counts = len(html.xpath("//div[@id='waterfall']/div/a/div"))
         if counts == 0:
             return ''
         for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
-            number_get = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-info']/span/date[1]/text()")
+            number_get = html.xpath(
+                "//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-info']/span/date[1]/text()")
             if len(number_get) > 0 and number_get[0].upper() == number.upper():
-                cover_small = html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-frame']/img/@src")[0]
+                cover_small = \
+                html.xpath("//div[@id='waterfall']/div[" + str(count) + "]/a/div[@class='photo-frame']/img/@src")[0]
                 return cover_small
     except Exception as error_info:
         print('Error in javbus.getCover_small : ' + str(error_info))
@@ -166,12 +170,15 @@ def find_number(number):
         counts = len(html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div"))
         if counts != 0:
             for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
-                number_get = html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
+                number_get = html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div[" + str(
+                    count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
                 number_get = number_get.upper()
                 number = number.upper()
-                if number_get == number or number_get == number.replace('-', '') or number_get == number.replace('_', ''):
+                if number_get == number or number_get == number.replace('-', '') or number_get == number.replace('_',
+                                                                                                                 ''):
                     result_url = html.xpath(
-                        "//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/@href")[0]
+                        "//div[@id='waterfall']/div[@id='waterfall']/div[" + str(
+                            count) + "]/a[@class='movie-box']/@href")[0]
                     return result_url
     # =======================================================================无码搜索
     htmlcode = get_html('https://www.javbus.com/uncensored/search/' + number + '&type=1')
@@ -180,7 +187,8 @@ def find_number(number):
     if counts == 0:
         return 'not found'
     for count in range(1, counts + 1):  # 遍历搜索结果，找到需要的番号
-        number_get = html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div[" + str(count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
+        number_get = html.xpath("//div[@id='waterfall']/div[@id='waterfall']/div[" + str(
+            count) + "]/a[@class='movie-box']/div[@class='photo-info']/span/date[1]/text()")[0]
         number_get = number_get.upper()
         number = number.upper()
         if number_get == number or number_get == number.replace('-', '') or number_get == number.replace('_', ''):
@@ -299,9 +307,8 @@ def main_uncensored(number, appoint_url):
     return js
 
 
-def main_us(number, appoint_url):
+def main_us(number, appoint_url=''):
     try:
-        result_url = ''
         if appoint_url:
             result_url = appoint_url
         else:

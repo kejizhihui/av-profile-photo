@@ -96,7 +96,7 @@ def getTag(a):  # 获取演员
 
 
 def getUrl(number):
-    response = get_html('https://avsox.host/cn/search/' + number)
+    response = get_html('https://avsox.website/cn/search/' + number)
     html = etree.fromstring(response, etree.HTMLParser())  # //table/tr[1]/td[1]/text()
     url_list = html.xpath('//*[@id="waterfall"]/div/a/@href')
     if len(url_list) > 0:
@@ -105,11 +105,12 @@ def getUrl(number):
                 '//*[@id="waterfall"]/div[' + str(i) + ']/a/div[@class="photo-info"]/span/date[1]/text()')).strip(
                 " ['']")
             if number.upper() == number_get.upper():
-                return i, response, str(html.xpath('//*[@id="waterfall"]/div[' + str(i) + ']/a/@href')).strip(" ['']")
+                page_url = 'https:' + url_list[i-1]
+                return i, response, page_url
     return 0, response, ''
 
 
-def main(number, appoint_url):
+def main(number, appoint_url=''):
     try:
         count, response, url = getUrl(number)
         if str(response) == 'ProxyError':
@@ -122,7 +123,6 @@ def main(number, appoint_url):
         soup = BeautifulSoup(web, 'lxml')
         info = str(soup.find(attrs={'class': 'row movie'}))
         number = getNum(web)
-        print(1)
         dic = {
             'actor': getActor(web),
             'title': getTitle(web).strip(number).strip().replace(' ', '-'),
@@ -143,7 +143,7 @@ def main(number, appoint_url):
             'outline': '',
             'score': '',
             'website': url,
-            'source': 'avsox.py',
+            'source': 'avsox.website',
         }
     except TimeoutError:
         dic = {
@@ -162,4 +162,4 @@ def main(number, appoint_url):
 
 # print(main('051119-917'))
 # print(main('032620_001'))
-# print(main('032620_001', 'https://avsox.host/cn/movie/cb8d28437cff4e90'))
+# print(main('032620_001', 'https://avsox.website/cn/movie/cb8d28437cff4e90'))

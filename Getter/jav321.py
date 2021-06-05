@@ -23,7 +23,7 @@ def getActor(response):
         return str(re.findall(r'<a href="/heyzo_star/\S+">(\S+)</a> &nbsp;', response)).strip(" [',']").replace('\'',
                                                                                                                 '')
     else:
-        return str(re.findall(r'<b>女优</b>: ([^<]+) &nbsp; <br>', response)).strip(" [',']").replace('\'', '')
+        return str(re.findall(r'<b>出演者</b>: ([^<]+) &nbsp; <br>', response)).strip(" [',']").replace('\'', '')
 
 
 def getStudio(response):
@@ -31,7 +31,7 @@ def getStudio(response):
 
 
 def getRuntime(response):
-    return str(re.findall(r'<b>播放时长</b>: (\d+) \S+<br>', response)).strip(" ['']")
+    return str(re.findall(r'<b>収録時間</b>: (\d+) \S+<br>', response)).strip(" ['']")
 
 
 def getSeries(response):
@@ -43,15 +43,15 @@ def getWebsite(detail_page):
 
 
 def getNum(response):
-    return str(re.findall(r'<b>番号</b>: (\S+)<br>', response)).strip(" ['']").upper()
+    return str(re.findall(r'<b>品番</b>: (\S+)<br>', response)).strip(" ['']").upper()
 
 
 def getScore(response):
-    if re.search(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response):
-        score = re.findall(r'<b>评分</b>: <img data-original="/img/(\d+).gif" />', response)[0]
+    if re.search(r'<b>平均評価</b>: <img data-original="/img/(\d+).gif" />', response):
+        score = re.findall(r'<b>平均評価</b>: <img data-original="/img/(\d+).gif" />', response)[0]
         return str(float(score) / 10.0)
     else:
-        return str(re.findall(r'<b>评分</b>: ([^<]+)<br>', response)).strip(" [',']").replace('\'', '')
+        return str(re.findall(r'<b>平均評価</b>: ([^<]+)<br>', response)).strip(" [',']").replace('\'', '')
 
 
 def getYear(release):
@@ -63,7 +63,7 @@ def getYear(release):
 
 
 def getRelease(response):
-    return str(re.findall(r'<b>发行日期</b>: (\d+-\d+-\d+)<br>', response)).strip(" ['']").replace('0000-00-00', '')
+    return str(re.findall(r'<b>配信開始日</b>: (\d+-\d+-\d+)<br>', response)).strip(" ['']").replace('0000-00-00', '')
 
 
 def getCover(detail_page):
@@ -76,7 +76,8 @@ def getCover(detail_page):
 
 
 def getExtraFanart(htmlcode):
-    extrafanart_list = htmlcode.xpath("/html/body/div[@class='row'][2]/div[@class='col-md-3']/div[@class='col-xs-12 col-md-12']/p/a/img[@class='img-responsive']/@src")
+    extrafanart_list = htmlcode.xpath(
+        "/html/body/div[@class='row'][2]/div[@class='col-md-3']/div[@class='col-xs-12 col-md-12']/p/a/img[@class='img-responsive']/@src")
     return extrafanart_list
 
 
@@ -85,7 +86,7 @@ def getCoverSmall(detail_page):
                                  "@class='img-responsive']/@src")).strip(" ['']")
 
 
-def getTag(response):  # 获取演员
+def getTag(response):  # 获取标签
     return re.findall(r'<a href="/genre/\S+">(\S+)</a>', response)
 
 
@@ -161,4 +162,5 @@ print(main('heyzo-1031'))
 print(main('ABP-905'))
 '''
 # print(main('heyzo-1031', ''))
+# print(main('ssni-645', ''))
 # print(main('ymdd-173', 'https://www.jav321.com/video/ymdd00173'))

@@ -5,7 +5,7 @@ import os
 import json
 from PIL import Image
 from configparser import ConfigParser
-from Getter import avsox, javbus, javdb, fc2fans_club, mgstage, dmm, jav321, xcity
+from Getter import avsox, javbus, javdb, mgstage, dmm, jav321, xcity
 
 
 # ========================================================================获取config
@@ -162,9 +162,7 @@ def getDataFromJSON(file_number, config, mode, appoint_url):  # 从JSON返回元
                 json_data = json.loads(javbus.main(file_number, appoint_url))
         # =======================================================================FC2-111111
         elif 'FC2' in file_number.upper():
-            json_data = json.loads(fc2fans_club.main(re.search('\d{4,}', file_number).group(), appoint_url))
-            if getDataState(json_data) == 0:
-                json_data = json.loads(javdb.main(file_number, appoint_url))
+            json_data = json.loads(javdb.main(file_number, appoint_url))
         # =======================================================================ssni00321
         elif re.match('\D{2,}00\d{3,}', file_number) and '-' not in file_number and '_' not in file_number:
             json_data = json.loads(dmm.main(file_number, appoint_url))
@@ -192,27 +190,25 @@ def getDataFromJSON(file_number, config, mode, appoint_url):  # 从JSON返回元
         }
     elif mode == 2:  # 仅从mgstage
         json_data = json.loads(mgstage.main(file_number, appoint_url))
-    elif mode == 3:  # 仅从fc2club
-        json_data = json.loads(fc2fans_club.main(file_number, appoint_url))
-    elif mode == 4:  # 仅从javbus
+    elif mode == 3:  # 仅从javbus
         if isuncensored:
             json_data = json.loads(javbus.main_uncensored(file_number, appoint_url))
         elif re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
             json_data = json.loads(javbus.main_us(file_number, appoint_url))
         else:
             json_data = json.loads(javbus.main(file_number, appoint_url))
-    elif mode == 5:  # 仅从jav321
+    elif mode == 4:  # 仅从jav321
         json_data = json.loads(jav321.main(file_number, isuncensored, appoint_url))
-    elif mode == 6:  # 仅从javdb
+    elif mode == 5:  # 仅从javdb
         if re.search('\D+\.\d{2}\.\d{2}\.\d{2}', file_number):
             json_data = json.loads(javdb.main_us(file_number, appoint_url))
         else:
-            json_data = json.loads(javdb.main(file_number, isuncensored, appoint_url))
-    elif mode == 7:  # 仅从avsox
+            json_data = json.loads(javdb.main(file_number, appoint_url, isuncensored))
+    elif mode == 6:  # 仅从avsox
         json_data = json.loads(avsox.main(file_number, appoint_url))
-    elif mode == 8:  # 仅从xcity
+    elif mode == 7:  # 仅从xcity
         json_data = json.loads(xcity.main(file_number, appoint_url))
-    elif mode == 9:  # 仅从dmm
+    elif mode == 8:  # 仅从dmm
         json_data = json.loads(dmm.main(file_number, appoint_url))
 
     # ================================================网站规则添加结束================================================

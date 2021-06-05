@@ -1,6 +1,7 @@
 import requests
 import os
 from configparser import ConfigParser
+import cloudscraper
 
 
 # ========================================================================获取config
@@ -32,6 +33,16 @@ def get_proxies(proxy_type, proxy):
 
 
 # ========================================================================网页请求
+# 破解cf5秒盾
+def get_html_javdb(url):
+    scraper = cloudscraper.create_scraper()
+    # 发送请求，获得响应
+    response = scraper.get(url)
+    # 获得网页源代码
+    html = response.text
+    return html
+
+
 def get_html(url, cookies=None):
     proxy_type = ''
     retry_count = 0

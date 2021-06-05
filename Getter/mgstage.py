@@ -23,7 +23,7 @@ def getActor(htmlcode):
 def getActorPhoto(actor):
     d = {}
     for i in actor:
-        if ',' not in i or ')' in i:
+        if i and ',' not in i or ')' in i:
             p = {i: ''}
             d.update(p)
     return d

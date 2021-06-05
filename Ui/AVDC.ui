@@ -658,11 +658,6 @@ p, li { white-space: pre-wrap; }
        </item>
        <item>
         <property name="text">
-         <string>fc2club</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
          <string>javbus</string>
         </property>
        </item>
